@@ -94,24 +94,48 @@ def create_sidebar_controls_lif():
     '''
 
     if 'current_list' not in st.session_state:
-        st.session_state.current_list = []  # Start with 0 current
-        st.session_state.frequency_list = []  # Start with 0 frequency
+        st.session_state.current_list = [0.0]  # Start with 0 current
+        st.session_state.frequency_list = [0.0]  # Start with 0 frequency
         st.session_state.last_current = 0.0
+    
+    if 'reset_counter' not in st.session_state:
+        st.session_state.reset_counter = 0
 
     st.sidebar.header('Model Parameters')
         
     st.sidebar.subheader('Current stimulus settings')
 
-    i_amp = st.sidebar.slider('Current amplitude (units?)', -3.0, 3.0, 0.0, 0.1)
-    i_start = st.sidebar.slider('Current start time (ms)', 10.0, 100.0, 10.0, 10.0)
-    i_end = st.sidebar.slider('Current end time (ms)', 90.0, 190.0, 90.0, 10.0)
+    reset_key = st.session_state.reset_counter
+
+    i_amp = st.sidebar.slider('Current amplitude (units?)', -3.0, 3.0, 0.0, 0.1, 
+                             key=f'i_amp_{reset_key}')
+    i_start = st.sidebar.slider('Current start time (ms)', 10.0, 100.0, 10.0, 10.0,
+                               key=f'i_start_{reset_key}')
+    i_end = st.sidebar.slider('Current end time (ms)', 90.0, 190.0, 90.0, 10.0,
+                             key=f'i_end_{reset_key}')
+    reset_pressed = st.sidebar.button("Reset F-I Data")
     
-    if st.sidebar.button("Reset F-I Data"):
-        st.session_state.current_list = []
-        st.session_state.frequency_list = []
+    if reset_pressed:
+        st.session_state.current_list = [0.0]
+        st.session_state.frequency_list = [0.0]
         st.session_state.last_current = 0.0
-    
+        st.session_state.reset_counter += 1 
+
         st.rerun()
+
+    
+    #i_amp = st.sidebar.slider('Current amplitude (units?)', -3.0, 3.0, 0.0, 0.1)
+    #i_start = st.sidebar.slider('Current start time (ms)', 10.0, 100.0, 10.0, 10.0)
+    #i_end = st.sidebar.slider('Current end time (ms)', 90.0, 190.0, 90.0, 10.0)
+    
+    
+    
+    #if st.sidebar.button("Reset F-I Data"):
+    #    st.session_state.current_list = []
+    #    st.session_state.frequency_list = []
+    #    st.session_state.last_current = 0.0
+    
+    #    st.rerun()
     
     # Return all parameters as a dictionary
     return {
