@@ -1,6 +1,53 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+def plot_somatic_membrane_potential_q10(time, Vs, Vs_, temperature, synaptic_input_list, response_time_q_list, last_synaptic_input):
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
+
+    ax1.plot(time, Vs, 'red', label='40.0$^o$ C')
+    ax1.plot(time, Vs_, 'blue', label=f'{temperature}$^o$ C')
+    ax1.set_xlabel('Time (ms)')
+    ax1.set_ylabel('Membrane Potential (mV)', color='black')
+    ax1.set_ylim(-150, 150)
+
+    ax1.tick_params(axis='y', labelcolor='black')
+    ax1.grid(True, alpha=0.3)
+    
+    # Set title and legends
+    ax1.set_title('Membrane Potential for the somatic compartment')
+
+    # Combine legends
+    lines1, labels1 = ax1.get_legend_handles_labels()
+    ax1.legend(lines1, labels1, loc='upper right')
+
+    if len(synaptic_input_list) > 0:
+        sorted_pairs = sorted(zip(synaptic_input_list, response_time_q_list))
+        sorted_synaptic_input, sorted_response_q = zip(*sorted_pairs)
+        sorted_synaptic_input = list(sorted_synaptic_input)
+        sorted_response_q = list(sorted_response_q)
+
+        ax2.plot(sorted_synaptic_input, sorted_response_q,
+                'bo-', linewidth=2, markersize=8, alpha=0.7, label='Measured points')
+        
+        if last_synaptic_input in [c for c in sorted_synaptic_input if c == last_synaptic_input]:
+            idx = next(i for i, c in enumerate(sorted_synaptic_input) if c == last_synaptic_input)
+            current_q = sorted_response_q[idx]
+            ax2.plot(last_synaptic_input, current_q, 'ro', markersize=12,
+                    label=f'Current: {last_synaptic_input:.1f} nA, {current_q:.1f} Hz')
+        
+        ax2.set_xlabel('Injected Current (nA)', fontsize=12)
+        ax2.set_ylabel('Firing Frequency (Hz)', fontsize=12)
+        ax2.set_title('Current-Frequency (F-I) Relationship', fontsize=14)
+        ax2.grid(True, alpha=0.3)
+        ax2.legend()
+        
+        if len(synaptic_input_list) > 1:
+            ax2.set_xlim(-0.1, max(synaptic_input_list) + 0.2)
+            ax2.set_ylim(-1, max(response_time_q_list) + 2)
+
+    plt.tight_layout()
+    return fig
+
 def plot_somatic_membrane_potential(time, Vs, Vs_, temperature, response_time_displayed=None, response_time_displayed_=None, response_time_q10=None):
 
     fig, ax1 = plt.subplots(figsize=(15, 6))
@@ -50,6 +97,38 @@ def plot_dendritic_membrane_potential(time, Vd, Vd_, temperature):
     plt.tight_layout()
     return fig
 
+def plot_soma_response_q10(synaptic_input_list, response_time_q_list, last_synaptic_input):
+    
+    fig_fi, ax = plt.subplots(figsize=(10, 6))
+        
+    if len(synaptic_input_list) > 0:
+        
+        sorted_pairs = sorted(zip(synaptic_input_list, response_time_q_list))
+        sorted_synaptic_input, sorted_response_q = zip(*sorted_pairs)
+        sorted_synaptic_input = list(sorted_synaptic_input)
+        sorted_response_q = list(sorted_response_q)
+
+        ax.plot(sorted_synaptic_input, sorted_response_q,
+                'bo-', linewidth=2, markersize=8, alpha=0.7, label='Measured points')
+        
+        # Highlight current point using sorted data
+        if last_synaptic_input in [c for c in sorted_synaptic_input if c == last_synaptic_input]:
+            idx = next(i for i, c in enumerate(sorted_synaptic_input) if c == last_synaptic_input)
+            current_q = sorted_response_q[idx]
+            ax.plot(last_synaptic_input, current_q, 'ro', markersize=12,
+                   label=f'Current: {last_synaptic_input:.1f} nA, {current_q:.1f} Hz')
+    
+    ax.set_xlabel('Injected Current (nA)', fontsize=12)
+    ax.set_ylabel('Firing Frequency (Hz)', fontsize=12)
+    ax.set_title('Current-Frequency (F-I) Relationship', fontsize=14)
+    ax.grid(True, alpha=0.3)
+    
+    if len(synaptic_input_list) > 1:
+        ax.set_xlim(-0.1, max(synaptic_input_list) + 0.2)
+        ax.set_ylim(0, max(response_time_q_list) + 2)
+    
+    return fig_fi
+
 def plot_membrane_potential(time, V, V_, stimulus, temperature):
     """
     Plot membrane potential and stimulus current over time
@@ -98,7 +177,59 @@ def plot_membrane_potential(time, V, V_, stimulus, temperature):
     plt.tight_layout()
     return fig
 
-def plot_current_frequency_relationship(current_list, frequency_list, last_current):
+def plot_lif(time, v, stimulus, current_list, frequency_list, last_current):
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
+
+    ax1.plot(time, v, 'r')
+    ax1.set_xlabel('Time (ms)')
+    ax1.set_ylabel('Membrane Potential (mV)', color='b')
+    ax1.set_ylim(-70, 0)
+    ax1.tick_params(axis='y', labelcolor='b')
+    ax1.grid(True, alpha=0.3)
+    
+    ax1.set_title('Membrane Potential and Stimulus Current')
+
+    if len(current_list) > 0:
+        sorted_pairs = sorted(zip(current_list, frequency_list))
+        sorted_current, sorted_frequency = zip(*sorted_pairs)
+        sorted_current = list(sorted_current)
+        sorted_frequency = list(sorted_frequency)
+        
+        ax2.plot(sorted_current, sorted_frequency,
+                'bo-', linewidth=2, markersize=8, alpha=0.7, label='Measured points')
+        
+        # Highlight current point using sorted data
+        if last_current in [c for c in sorted_current if c == last_current]:
+            idx = next(i for i, c in enumerate(sorted_current) if c == last_current)
+            current_freq = sorted_frequency[idx]
+            ax2.plot(last_current, current_freq, 'ro', markersize=12,
+                    label=f'Current: {last_current:.1f} nA, {current_freq:.1f} Hz')
+        
+        ax2.set_xlabel('Injected Current (nA)', fontsize=12)
+        ax2.set_ylabel('Firing Frequency (Hz)', fontsize=12)
+        ax2.set_title('Current-Frequency (F-I) Relationship', fontsize=14)
+        ax2.grid(True, alpha=0.3)
+        ax2.legend()
+        
+        if len(current_list) > 1:
+            ax2.set_xlim(-0.1, max(current_list) + 0.2)
+            ax2.set_ylim(-1, max(frequency_list) + 2)
+
+    else:
+        # Empty F-I plot when no data
+        ax2.set_xlabel('Injected Current (nA)', fontsize=12)
+        ax2.set_ylabel('Firing Frequency (Hz)', fontsize=12)
+        ax2.set_title('Current-Frequency (F-I) Relationship', fontsize=14)
+        ax2.grid(True, alpha=0.3)
+        ax2.text(0.5, 0.5, 'No data points yet\nAdjust current and observe', 
+                transform=ax2.transAxes, ha='center', va='center', fontsize=12)
+    
+    plt.tight_layout()
+    return fig
+
+'''
+def plot_current_frequency_relationship(time, v, stimulus, current_list, frequency_list, last_current):
     
     fig_fi, ax = plt.subplots(figsize=(10, 6))
         
@@ -164,7 +295,7 @@ def plot_lif_membrane_potential(time, v, stimulus):
     
     plt.tight_layout()
     return fig
-
+'''
 def plot_gate_dynamics(time, m, h, n, p=None, q=None, g_M=0, g_Ca=0):
     """
     Plot the dynamics of gate variables

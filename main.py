@@ -11,11 +11,11 @@ from utils import (display_lif_theory,
                    prepare_hvci_plots,
                    )
 
-from visualization import (plot_lif_membrane_potential,
-                           plot_current_frequency_relationship,
+from visualization import (plot_lif,
                            plot_membrane_potential,
                            plot_somatic_membrane_potential,
-                           plot_dendritic_membrane_potential)
+                           plot_dendritic_membrane_potential,
+                           plot_soma_response_q10)
 
 st.set_page_config(
     layout = 'wide',
@@ -32,7 +32,14 @@ st.markdown("""
 
 st.title('Models for simulating and analyzing the dynamics of a neuron')
 
-with st.expander("Introduction"):
+Neuron_class = st.selectbox('Contents',
+                             ['Introduction',
+                              'Integrate and Fire model',
+                              'Hodgkin Huxley',
+                              'HVC neurons'])
+
+if Neuron_class == 'Introduction':
+    #with st.expander("Introduction"):
     st.markdown('<p class="big-font"> A neuron is a special type of cell that can generate electrical signals. It does so by utilizing the influx and outflux of a variety of ions ' \
                 'through gates or channels that are specific to a given ion. Neuron cells can connect and communicate with each other to transmit this electrical signal to one another, ' \
                 ' and patterns of these electrical activity across  connected circuits between the neurons encodes for pretty much any information as well as gives rise to behavior. ' \
@@ -47,37 +54,20 @@ with st.expander("Introduction"):
                 'Finally one can explore generalized biophysical models for the two classes of neurons found in a brain region called HVC (known as proper name) in songbird species.' \
                 'This neurons exhibit a precise signature of activity associated with auditory features of the song. Both the Hodgkin</p>', unsafe_allow_html=True)
 
-#st.markdown('''<p class="big-font"> Click on the button to choose from which neuron model you'd like to learn about </p>''', unsafe_allow_html=True)
-
-Neuron_class = st.selectbox('Choose a Neuron model',
-                             ['',
-                              'Integrate and Fire model',
-                              'Hodgkin Huxley',
-                              'HVC neurons'])
-
 if Neuron_class == 'Integrate and Fire model':
 
     display_lif_theory()
 
     v, time, current_stimulus, current_list, frequency_list, last_current = prepare_lif_plots()
 
-    tab1, tab2 = st.tabs(['membrane potential', 'current-frequency relationship'])
-
-    with tab1:
-        fig_mp = plot_lif_membrane_potential(time,
-                                             v,
-                                             current_stimulus)
-        
-        st.pyplot(fig_mp)
+    fig_fi = plot_lif(time,
+                      v,
+                      current_stimulus,
+                      current_list,
+                      frequency_list,
+                      last_current)
     
-    with tab2:
-
-        fig_fi = plot_current_frequency_relationship(current_list,
-                                                     frequency_list,
-                                                     last_current,
-                                                     )
-     
-        st.pyplot(fig_fi)
+    st.pyplot(fig_fi)
 
 if Neuron_class == 'Hodgkin Huxley':
 
@@ -102,9 +92,9 @@ elif Neuron_class == 'HVC neurons':
     if HVC_neuron_type == 'HVC(RA)':
 
         display_hvcra_theory()
-        Vs, Vs_, Vd, Vd_, time, temperature, response_time_displayed, response_time_displayed_, response_time_q10 = prepare_hvcra_plots()
+        Vs, Vs_, Vd, Vd_, time, temperature, response_time_displayed, response_time_displayed_, response_time_q10, synaptic_input_list, response_time_q_list, last_synaptic_input = prepare_hvcra_plots()
 
-        tab1, tab2 = st.tabs(['Soma membrane potential', 'Dendrite membrane potential'])
+        tab1, tab2, tab3 = st.tabs(['Soma membrane potential', 'Dendrite membrane potential', 'Response time Q10'])
         
         with tab1:
                 
@@ -118,16 +108,21 @@ elif Neuron_class == 'HVC neurons':
 
             st.pyplot(fig_mp)
 
-            with tab2:
-                # Plot dendritic membrane potential
+        with tab2:
 
-                fig_mp = plot_dendritic_membrane_potential(time, 
-                                                Vd, 
-                                                Vd_, 
-                                                temperature, 
-                                                )
+            fig_mp = plot_dendritic_membrane_potential(time, 
+                                            Vd, 
+                                            Vd_, 
+                                            temperature, 
+                                            )
 
-                st.pyplot(fig_mp)
+            st.pyplot(fig_mp)
+        
+        with tab3:
+
+            fig_q = plot_soma_response_q10(synaptic_input_list, response_time_q_list, last_synaptic_input)
+
+            st.pyplot(fig_q)
 
     elif HVC_neuron_type == 'HVC(I)':
 
