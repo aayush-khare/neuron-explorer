@@ -270,8 +270,8 @@ def create_sidebar_controls_hvcra():
     with col1:
         input_type = st.selectbox('Input type', ['Current input', 'Synaptic input'], width=200)
     with col2:
-        temperature = st.selectbox('Temperature in Celsius', [30.0, 35.0], width=200) #  control temperature = 40.0 celsius
-
+        temperature = st.selectbox('Altered Temperature in $^o$C (control set to 40$^o$ C)', [30.0, 35.0], width=300) #  control temperature = 40.0 celsius
+    
     q_gate = st.sidebar.slider('Q10 for conformation dependent processes', 2.0, 4.0, 3.0, 0.1)
     q_cond = st.sidebar.slider('Q10 for diffusion dependent processes', 1.0, 2.0, 1.3, 0.1)
 
@@ -349,10 +349,8 @@ def create_sidebar_controls_hvcra():
 
         st.sidebar.subheader('Synaptic Input Settings')
 
-        ge_max = st.sidebar.slider('Excitatory Synapse Strength (mS/cm^2)', 0.05, 1.0, 0.05, 0.01, 
+        ge_max = st.sidebar.slider('Excitatory Synapse Strength (mS/cm^2)', 0.00, 1.0, 0.00, 0.01, 
                              key=f'ge_max_{reset_key}')
-        ge_start = st.sidebar.slider('Excitatory Synapse Start Time (ms)', 150.0, 200.0, 150.0, 0.5,
-                               key=f'ge_start_{reset_key}')
 
         gi_max = st.sidebar.slider('inhibitory synapse strength (mS/cm^2)', 0.0, 0.5, 0.0, 0.05)
         gi_start = st.sidebar.slider('inhibitory synapse start time (ms)', 100.0, 200.0, 150.0, 0.5)
@@ -369,7 +367,6 @@ def create_sidebar_controls_hvcra():
                 'Q_cond': q_cond,
                 'Input_type': input_type,
                 'ge_max': ge_max,
-                'ge_start': ge_start,
                 'gi_max': gi_max,
                 'gi_start': gi_start,
                 'External_input': external_input,
@@ -393,7 +390,6 @@ def create_sidebar_controls_hvcra():
                 'Q_cond': q_cond,
                 'Input_type': input_type,
                 'ge_max': ge_max,
-                'ge_start': ge_start,
                 'gi_max': gi_max,
                 'gi_start': gi_start,
                 'External_input': external_input,
@@ -415,7 +411,6 @@ def create_sidebar_controls_hvcra():
                 'Q_cond': q_cond,
                 'Input_type': input_type,
                 'ge_max': ge_max,
-                'ge_start': ge_start,
                 'gi_max': gi_max,
                 'gi_start': gi_start,
                 'External_input': external_input,
@@ -435,7 +430,6 @@ def create_sidebar_controls_hvcra():
                 'Q_cond': q_cond,
                 'Input_type': input_type,
                 'ge_max': ge_max,
-                'ge_start': ge_start,
                 'gi_max': gi_max,
                 'gi_start': gi_start,
                 'External_input': external_input,
@@ -587,6 +581,7 @@ def display_hvcra_theory():
 
 def prepare_hvcra_plots():
 
+    fluctuations = 'off'
     params = create_sidebar_controls_hvcra()
     temperature = params['temperature']
     q_gate = params['Q_gate']
@@ -664,16 +659,19 @@ def prepare_hvcra_plots():
     if input_type == 'Synaptic input':
 
         ge_max = params['ge_max']
-        ge_start = params['ge_start']
         gi_max = params['gi_max']
         gi_start = params['gi_start']
         external_input = params['External_input']
         noise_input = params['Noise_input']
         
+        ge_start = 150.0 
         noise_strength = None
         external_input_strength = None
         freq_noise = None
         freq = None
+
+        if external_input == 'Yes' or noise_input == 'Yes':
+            fluctuations = 'on'
 
         if external_input == 'Yes' and noise_input == 'Yes':
             freq = params['freq']
@@ -743,7 +741,7 @@ def prepare_hvcra_plots():
         response_time_q_list = params['Response_time_q_list']
         st.session_state.last_synaptic_input = params['Last_synaptic_input']
 
-        input_changed = abs(ge_max - st.session_state.last_synaptic_input) > 0.01
+        input_changed = abs(ge_max - st.session_state.last_synaptic_input) > 0.005
         input_exists = any(g == ge_max for g in synaptic_input_list)
 
         if input_changed and not input_exists:
@@ -873,10 +871,10 @@ def prepare_hvcra_plots():
         response_time_q10 = (response_time_displayed_ / response_time_displayed) ** (0.1 * (40.0 - temperature))
 
     if input_type == "Synaptic input":
-        return vs, vs_, vd, vd_, time, temperature, response_time_displayed, response_time_displayed_, response_time_q10, synaptic_input_list, response_time_q_list, st.session_state.last_synaptic_input
+        return input_type, fluctuations, vs, vs_, vd, vd_, time, temperature, response_time_displayed, response_time_displayed_, response_time_q10, synaptic_input_list, response_time_q_list, st.session_state.last_synaptic_input
 
     elif input_type == "Current input":
-        return vs, vs_, vd, vd_, time, temperature, response_time_displayed, response_time_displayed_, response_time_q10, current_input_list, frequency_control_list, st.session_state.last_current_input
+        return input_type, fluctuations, vs, vs_, vd, vd_, time, temperature, response_time_displayed, response_time_displayed_, response_time_q10, current_input_list, frequency_control_list, st.session_state.last_current_input
 
 def display_hvci_theory():
     pass

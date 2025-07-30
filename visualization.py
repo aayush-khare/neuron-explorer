@@ -1,22 +1,24 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+def plot_soma_spikes():
+    pass
+
 def plot_somatic_membrane_potential_q10(time, Vs, Vs_, temperature, synaptic_input_list, response_time_q_list, last_synaptic_input):
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
 
     ax1.plot(time, Vs, 'red', label='40.0$^o$ C')
     ax1.plot(time, Vs_, 'blue', label=f'{temperature}$^o$ C')
     ax1.set_xlabel('Time (ms)')
     ax1.set_ylabel('Membrane Potential (mV)', color='black')
-    ax1.set_ylim(-150, 150)
+    ax1.set_xlim(100, 200)
+    ax1.set_ylim(-100, 100)
 
     ax1.tick_params(axis='y', labelcolor='black')
     ax1.grid(True, alpha=0.3)
     
-    # Set title and legends
     ax1.set_title('Membrane Potential for the somatic compartment')
 
-    # Combine legends
     lines1, labels1 = ax1.get_legend_handles_labels()
     ax1.legend(lines1, labels1, loc='upper right')
 
@@ -27,23 +29,24 @@ def plot_somatic_membrane_potential_q10(time, Vs, Vs_, temperature, synaptic_inp
         sorted_response_q = list(sorted_response_q)
 
         ax2.plot(sorted_synaptic_input, sorted_response_q,
-                'bo-', linewidth=2, markersize=8, alpha=0.7, label='Measured points')
+                'go-', linewidth=1, markersize=4, alpha=0.7, label='Measured points')
         
         if last_synaptic_input in [c for c in sorted_synaptic_input if c == last_synaptic_input]:
             idx = next(i for i, c in enumerate(sorted_synaptic_input) if c == last_synaptic_input)
-            current_q = sorted_response_q[idx]
-            ax2.plot(last_synaptic_input, current_q, 'ro', markersize=12,
-                    label=f'Current: {last_synaptic_input:.1f} nA, {current_q:.1f} Hz')
+            current_q10 = sorted_response_q[idx]
+            ax2.plot(last_synaptic_input, current_q10, 'o', color='orange', markersize=4,
+                    label = fr'gE: {last_synaptic_input} mS/cm$^2$, ' + r'$Q_{10}$' + f' = {current_q10:.2f}')
         
-        ax2.set_xlabel('Injected Current (nA)', fontsize=12)
-        ax2.set_ylabel('Firing Frequency (Hz)', fontsize=12)
-        ax2.set_title('Current-Frequency (F-I) Relationship', fontsize=14)
+        ax2.set_xlabel('Excitatory synaptic input, gE (mS/cm$^2$)', fontsize=12)
+        ax2.set_ylabel('$Q_{10}$', fontsize=12)
+        ax2.set_title('Somatic response time $Q_{10}$', fontsize=14)
+        ax2.set_xticks([0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
         ax2.grid(True, alpha=0.3)
         ax2.legend()
         
         if len(synaptic_input_list) > 1:
-            ax2.set_xlim(-0.1, max(synaptic_input_list) + 0.2)
-            ax2.set_ylim(-1, max(response_time_q_list) + 2)
+            ax2.set_xlim(0.0, 1.01)
+            ax2.set_ylim(0, 4)
 
     plt.tight_layout()
     return fig

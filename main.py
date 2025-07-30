@@ -15,7 +15,9 @@ from visualization import (plot_lif,
                            plot_membrane_potential,
                            plot_somatic_membrane_potential,
                            plot_dendritic_membrane_potential,
-                           plot_soma_response_q10)
+                           plot_soma_response_q10,
+                           plot_soma_spikes,
+                           plot_somatic_membrane_potential_q10)
 
 st.set_page_config(
     layout = 'wide',
@@ -92,37 +94,81 @@ elif Neuron_class == 'HVC neurons':
     if HVC_neuron_type == 'HVC(RA)':
 
         display_hvcra_theory()
-        Vs, Vs_, Vd, Vd_, time, temperature, response_time_displayed, response_time_displayed_, response_time_q10, synaptic_input_list, response_time_q_list, last_synaptic_input = prepare_hvcra_plots()
+        input_type, fluctuations, Vs, Vs_, Vd, Vd_, time, temperature, response_time_displayed, response_time_displayed_, response_time_q10, input_list, data_list, last_input = prepare_hvcra_plots()
 
-        tab1, tab2, tab3 = st.tabs(['Soma membrane potential', 'Dendrite membrane potential', 'Response time Q10'])
-        
-        with tab1:
+        if input_type == "Current input":
+            tab1, tab2, tab3 = st.tabs(['Soma membrane potential', 'Dendrite membrane potential', 'Spike analysis'])
+
+            with tab1:
                 
-            fig_mp = plot_somatic_membrane_potential(time, 
-                                            Vs, 
-                                            Vs_, 
-                                            temperature, 
-                                            response_time_displayed, 
-                                            response_time_displayed_, 
-                                            response_time_q10)
+                fig_mp = plot_somatic_membrane_potential(time, 
+                                                Vs, 
+                                                Vs_, 
+                                                temperature, 
+                                                response_time_displayed, 
+                                                response_time_displayed_, 
+                                                response_time_q10)
 
-            st.pyplot(fig_mp)
+                st.pyplot(fig_mp)
 
-        with tab2:
+            with tab2:
 
-            fig_mp = plot_dendritic_membrane_potential(time, 
-                                            Vd, 
-                                            Vd_, 
-                                            temperature, 
-                                            )
+                fig_mp = plot_dendritic_membrane_potential(time, 
+                                                Vd, 
+                                                Vd_, 
+                                                temperature, 
+                                                )
 
-            st.pyplot(fig_mp)
+                st.pyplot(fig_mp)
+            
+            with tab3:
+                fig_a = plot_soma_spikes(input_list, data_list, last_input)
+
+                st.pyplot(fig_a)
+
         
-        with tab3:
+        elif input_type == "Synaptic input":
+            if fluctuations == 'off':
+                tab1, tab2 = st.tabs(['Soma membrane potential and response time Q10', 'Dendrite membrane potential'])
 
-            fig_q = plot_soma_response_q10(synaptic_input_list, response_time_q_list, last_synaptic_input)
+                with tab1:
 
-            st.pyplot(fig_q)
+                    fig_a = plot_somatic_membrane_potential_q10(time, Vs, Vs_, temperature, input_list, data_list, last_input)
+
+                    st.pyplot(fig_a)
+
+                with tab2:
+
+                    fig_mp = plot_dendritic_membrane_potential(time, 
+                                                    Vd, 
+                                                    Vd_, 
+                                                    temperature, 
+                                                    )
+
+                    st.pyplot(fig_mp)
+            
+            else:
+                tab1, tab2 = st.tabs(['Soma membrane potential', 'Dendrite membrane potential'])
+
+                with tab1:
+
+                    fig_mp = plot_somatic_membrane_potential(time, 
+                                                             Vs, 
+                                                             Vs_, 
+                                                             temperature
+                                                            )
+
+                    st.pyplot(fig_mp)
+
+                with tab2:
+
+                    fig_mp = plot_dendritic_membrane_potential(time, 
+                                                    Vd, 
+                                                    Vd_, 
+                                                    temperature, 
+                                                    )
+
+                    st.pyplot(fig_mp)
 
     elif HVC_neuron_type == 'HVC(I)':
 
