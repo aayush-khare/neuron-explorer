@@ -180,18 +180,24 @@ def plot_membrane_potential(time, V, V_, stimulus, temperature):
     plt.tight_layout()
     return fig
 
-def plot_lif(time, v, stimulus, current_list, frequency_list, last_current):
+def plot_lif(time, v, current, current_list, frequency_list, last_current):
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
 
-    ax1.plot(time, v, 'r')
+    ax1.plot(time, v, 'b')
     ax1.set_xlabel('Time (ms)')
     ax1.set_ylabel('Membrane Potential (mV)', color='b')
     ax1.set_ylim(-70, 0)
     ax1.tick_params(axis='y', labelcolor='b')
     ax1.grid(True, alpha=0.3)
-    
     ax1.set_title('Membrane Potential and Stimulus Current')
+
+    ax3 = ax1.twinx()
+
+    ax3.plot(time, current, 'magenta')
+    ax3.set_ylabel('current stimulus', color='magenta')
+    ax3.tick_params(axis='y', labelcolor='magenta')
+    ax3.set_ylim(-3.5, 3.5)
 
     if len(current_list) > 0:
         sorted_pairs = sorted(zip(current_list, frequency_list))
@@ -200,13 +206,13 @@ def plot_lif(time, v, stimulus, current_list, frequency_list, last_current):
         sorted_frequency = list(sorted_frequency)
         
         ax2.plot(sorted_current, sorted_frequency,
-                'bo-', linewidth=2, markersize=8, alpha=0.7, label='Measured points')
+                'bo-', linewidth=1, markersize=4, alpha=0.7, label='Measured points')
         
         # Highlight current point using sorted data
         if last_current in [c for c in sorted_current if c == last_current]:
             idx = next(i for i, c in enumerate(sorted_current) if c == last_current)
             current_freq = sorted_frequency[idx]
-            ax2.plot(last_current, current_freq, 'ro', markersize=12,
+            ax2.plot(last_current, current_freq, 'ro', markersize=6,
                     label=f'Current: {last_current:.1f} nA, {current_freq:.1f} Hz')
         
         ax2.set_xlabel('Injected Current (nA)', fontsize=12)
@@ -231,74 +237,7 @@ def plot_lif(time, v, stimulus, current_list, frequency_list, last_current):
     plt.tight_layout()
     return fig
 
-'''
-def plot_current_frequency_relationship(time, v, stimulus, current_list, frequency_list, last_current):
-    
-    fig_fi, ax = plt.subplots(figsize=(10, 6))
-        
-    if len(current_list) > 0:
-        
-        sorted_pairs = sorted(zip(current_list, frequency_list))
-        sorted_current, sorted_frequency = zip(*sorted_pairs)
-        sorted_current = list(sorted_current)
-        sorted_frequency = list(sorted_frequency)
 
-        ax.plot(sorted_current, sorted_frequency,
-                'bo-', linewidth=2, markersize=8, alpha=0.7, label='Measured points')
-        
-        # Highlight current point using sorted data
-        if last_current in [c for c in sorted_current if c == last_current]:
-            idx = next(i for i, c in enumerate(sorted_current) if c == last_current)
-            current_freq = sorted_frequency[idx]
-            ax.plot(last_current, current_freq, 'ro', markersize=12,
-                   label=f'Current: {last_current:.1f} nA, {current_freq:.1f} Hz')
-    
-    ax.set_xlabel('Injected Current (nA)', fontsize=12)
-    ax.set_ylabel('Firing Frequency (Hz)', fontsize=12)
-    ax.set_title('Current-Frequency (F-I) Relationship', fontsize=14)
-    ax.grid(True, alpha=0.3)
-    
-    if len(current_list) > 1:
-        ax.set_xlim(-0.1, max(current_list) + 0.2)
-        ax.set_ylim(-1, max(frequency_list) + 2)
-    
-    return fig_fi
-        
-
-def plot_lif_membrane_potential(time, v, stimulus):
-    """
-    Plot membrane potential and stimulus current over time
-    
-    Parameters:
-    -----------
-    time : array-like
-        Time array (ms)
-    V : array-like
-        Membrane potential array (mV)
-    stimulus : array-like
-        Stimulus current array (μA/cm²)
-        
-    Returns:
-    --------
-    fig : matplotlib.figure.Figure
-        The figure object
-    """
-
-    fig, ax1 = plt.subplots(figsize=(10, 6))
-    
-    # Plot membrane potential
-    ax1.plot(time, v, 'r')
-    ax1.set_xlabel('Time (ms)')
-    ax1.set_ylabel('Membrane Potential (mV)', color='b')
-    ax1.set_ylim(-70, 0)
-    ax1.tick_params(axis='y', labelcolor='b')
-    ax1.grid(True, alpha=0.3)
-    
-    ax1.set_title('Membrane Potential and Stimulus Current')
-    
-    plt.tight_layout()
-    return fig
-'''
 def plot_gate_dynamics(time, m, h, n, p=None, q=None, g_M=0, g_Ca=0):
     """
     Plot the dynamics of gate variables
