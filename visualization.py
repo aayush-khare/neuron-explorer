@@ -132,7 +132,7 @@ def plot_soma_response_q10(synaptic_input_list, response_time_q_list, last_synap
     
     return fig_fi
 
-def plot_membrane_potential(time, V, V_, stimulus, temperature):
+def plot_membrane_potential(time, V, V_, stimulus, temperature, current_list, frequency_list_control, frequency_list_alt, last_current):
     """
     Plot membrane potential and stimulus current over time
     
@@ -150,35 +150,53 @@ def plot_membrane_potential(time, V, V_, stimulus, temperature):
     fig : matplotlib.figure.Figure
         The figure object
     """
-    fig, ax1 = plt.subplots(figsize=(10, 6))
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
     
     # Plot membrane potential
     ax1.plot(time, V, 'r', label='6.3$^o$ C')
     ax1.plot(time, V_, 'b', label=f'{temperature}$^o$ C')
     ax1.set_xlabel('Time (ms)')
-    ax1.set_ylabel('Membrane Potential (mV)', color='b')
+    ax1.set_ylabel('Membrane Potential (mV)')
     ax1.set_ylim(-90, 50)
     #ax1.set_xlim(145,160)
-    ax1.tick_params(axis='y', labelcolor='b')
     ax1.grid(True, alpha=0.3)
     ax1.legend()
-    
-    # Plot stimulus current on secondary y-axis
-    #ax2 = ax1.twinx()
-    #ax2.plot(time, stimulus, 'r--', alpha=0.5, label='Stimulus Current')
-    #ax2.set_ylabel('Current (μA/cm²)', color='r')
-    #ax2.tick_params(axis='y', labelcolor='r')
-    
-    # Set title and legends
     ax1.set_title('Membrane Potential and Stimulus Current')
-    
-    # Combine legends
-    lines1, labels1 = ax1.get_legend_handles_labels()
-    #lines2, labels2 = ax2.get_legend_handles_labels()
-    #ax1.legend(lines1 + lines2, labels1 + labels2, loc='upper right')
-    
+
+
+    if len(current_list) > 0:
+        sorted_pairs = sorted(zip(current_list, frequency_list_control, frequency_list_alt))
+        sorted_current, sorted_frequency_control, sorted_frequency_alt = zip(*sorted_pairs)
+        sorted_current = list(sorted_current)
+        sorted_frequency_control = list(sorted_frequency_control)
+        sorted_frequency_alt = list(sorted_frequency_alt)
+        
+        ax2.plot(sorted_current, sorted_frequency_control,
+                'ro-', linewidth=1, markersize=4, alpha=0.7, label='Measured points control')
+        ax2.plot(sorted_current, sorted_frequency_alt,
+                 'bo-', linewidth=1, markersize=4, alpha=0.7, label='Measured points alt')
+        
+        if last_current in [c for c in sorted_current if c == last_current]:
+            idx = next(i for i, c in enumerate(sorted_current) if c == last_current)
+            current_freq_control = sorted_frequency_control[idx]
+            current_freq_alt = sorted_frequency_alt[idx]
+            ax2.plot(last_current, current_freq_control, 'ro', markersize=6,
+                    label=f'Current: {last_current:.1f} $\mu A/cm^{2}$, {current_freq_control:.1f} Hz')
+            ax2.plot(last_current, current_freq_alt, 'bo', markersize=6,
+                    label=f'Current: {last_current:.1f} $\mu A/cm^{2}$, {current_freq_alt:.1f} Hz')   
+      
+    else:
+        # Empty F-I plot when no data
+        ax2.set_xlabel('Injected Current ($\mu A/cm^{2}$)', fontsize=12)
+        ax2.set_ylabel('Firing Frequency (Hz)', fontsize=12)
+        ax2.set_title('Current-Frequency (F-I) Relationship', fontsize=14)
+        ax2.grid(True, alpha=0.3)
+        ax2.text(0.5, 0.5, 'No data points yet\nAdjust current and observe', 
+                transform=ax2.transAxes, ha='center', va='center', fontsize=12)
+
     plt.tight_layout()
     return fig
+
 
 def plot_lif(time, v, current, current_list, frequency_list, last_current):
 
@@ -194,10 +212,10 @@ def plot_lif(time, v, current, current_list, frequency_list, last_current):
 
     ax3 = ax1.twinx()
 
-    ax3.plot(time, current, 'magenta')
+    ax3.plot(time, current, 'magenta', alpha=0.4)
     ax3.set_ylabel('current stimulus', color='magenta')
     ax3.tick_params(axis='y', labelcolor='magenta')
-    ax3.set_ylim(-3.5, 3.5)
+    ax3.set_ylim(-1, 3.5)
 
     if len(current_list) > 0:
         sorted_pairs = sorted(zip(current_list, frequency_list))

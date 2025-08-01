@@ -74,16 +74,20 @@ if Neuron_class == 'Integrate and Fire model':
 if Neuron_class == 'Hodgkin Huxley':
 
     display_hh_theory()
-    v, v_, time, current_stimulus, temperature = prepare_hh_plots()
+    v, v_, time, current_stimulus, temperature, current_list, frequency_list_control, frequency_list_alt, last_current = prepare_hh_plots()
 
-    tab1, tab2 = st.tabs(['membrane potential', 'Gating variables'])
+    tab1, tab2 = st.tabs(['membrane potential and f-I relationship', 'Gating variables'])
 
     with tab1:
         fig_mp = plot_membrane_potential(time, 
                                         v, 
                                         v_, 
                                         current_stimulus,
-                                        temperature)
+                                        temperature,
+                                        current_list, 
+                                        frequency_list_control,
+                                        frequency_list_alt,
+                                        last_current)
 
         st.pyplot(fig_mp)
 
@@ -173,7 +177,7 @@ elif Neuron_class == 'HVC neurons':
     elif HVC_neuron_type == 'HVC(I)':
 
         display_hvci_theory()
-        v, v_, time, current_stimulus = prepare_hvci_plots()
+        v, v_, time, current_stimulus, temperature, current_list, frequency_list_control, frequency_list_alt, last_current = prepare_hvci_plots()
 
         tab1, tab2 = st.tabs(['membrane potential', 'gating variables'])
         
@@ -182,6 +186,11 @@ elif Neuron_class == 'HVC neurons':
             fig_mp = plot_membrane_potential(time,
                                              v,
                                              v_,
-                                             current_stimulus)
+                                             current_stimulus,
+                                             temperature,
+                                             current_list, 
+                                             frequency_list_control,
+                                             frequency_list_alt,
+                                             last_current)
             
             st.pyplot(fig_mp)

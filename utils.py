@@ -105,7 +105,7 @@ def create_sidebar_controls_lif():
 
     reset_key = st.session_state.reset_counter
 
-    i_amp = st.sidebar.slider('Current amplitude', -3.0, 3.0, 0.0, 0.1, 
+    i_amp = st.sidebar.slider('Current amplitude $\mu A/cm^2$', -3.0, 3.0, 0.0, 0.1, 
                              key=f'i_amp_{reset_key}')
     i_start = st.sidebar.slider('Current start time (ms)', 10.0, 100.0, 10.0, 10.0,
                                key=f'i_start_{reset_key}')
@@ -162,7 +162,7 @@ def prepare_lif_plots():
     
     if current_changed and not current_exists:
 
-        with st.spinner(f"Running F-I simulation for {i_amp:.1f} ..."):
+        with st.spinner(f"Running F-I simulation for {i_amp:.1f} $\mu A/cm^2$ ..."):
 
             spike_indices = []
             threshold = -50           
@@ -175,10 +175,14 @@ def prepare_lif_plots():
                 if v[i-1] < threshold and v[i] >= threshold:
                     spike_indices.append(i)
             
-            current_input_duration = i_end - i_start
+            if(len(spike_indices) > 1):
+                duration = (spike_indices[-1] - spike_indices[0]) * STEP_SIZE 
+                frequency = 1000 * len(spike_indices) / duration
 
-            frequency = 1000 * len(spike_indices) / current_input_duration if current_input_duration  > 0 else 0
-            
+            else:
+                duration = 0
+                frequency = 0
+                        
             current_list.append(i_amp)
             frequency_list.append(frequency)
             st.session_state.last_current = i_amp
@@ -192,7 +196,7 @@ def prepare_lif_plots():
             st.rerun()
             
     elif current_exists and current_changed:
-        st.info(f"Current {i_amp:.1f} already tested")
+        st.info(f"Current {i_amp:.1f} $\mu A/cm^2$ already tested")
         st.session_state.last_current = i_amp
     
     return v, time, current_stimulus, current_list, frequency_list, st.session_state.last_current
@@ -223,8 +227,12 @@ def create_sidebar_controls_hh():
 
     if 'current_list' not in st.session_state:
         st.session_state.current_list = []
+    
+    if 'frequency_list' not in st.session_state:
         st.session_state.frequency_list_control = []
         st.session_state.frequency_list_alt = []
+    
+    if 'last_current' not in st.session_state:
         st.session_state.last_current = 0.0
     
     if 'reset_counter' not in st.session_state:
@@ -232,11 +240,8 @@ def create_sidebar_controls_hh():
 
     st.sidebar.header('Model Parameters')
 
-    col1, col2 = st.columns(2)
-    with col1:
-        input_type = st.selectbox('Input type', ['Current input'], width=200)
-    with col2:
-        temperature = st.selectbox('Temperature in Celsius (control fixed at 6.3 Celsius)', [0.0, 10.0, -10.0], width=300) # control temperature = 6.3 celsius
+    
+    temperature = st.selectbox('Temperature in Celsius (control fixed at 6.3 Celsius)', [0.0, 10.0, -10.0], width=300) # control temperature = 6.3 celsius
 
     # Temperature
     st.sidebar.subheader('Temperature and Q10 values')
@@ -244,40 +249,38 @@ def create_sidebar_controls_hh():
     q_cond = st.sidebar.slider('Q10 for diffusion dependent processes', 1.0, 2.0, 1.3, 0.1)
 
     # Current stimulus parameters
-    if input_type == 'Current input':
-        st.sidebar.subheader('Current stimulus settings')
+    st.sidebar.subheader('Current stimulus settings')
 
-        reset_key = st.session_state.reset_counter
+    reset_key = st.session_state.reset_counter
 
-        i_amp = st.sidebar.slider('Current amplitude ($\mu A/cm^2$)', -30.0, 30.0, 0.0, 0.5, key=f'i_amp_{reset_key}')
-        i_start = st.sidebar.slider('Current start time (ms)', 100.0, 150.0, 100.0, 10.0, key=f'i_start_{reset_key}')
-        i_end = st.sidebar.slider('Current end time (ms)', 150.0, 200.0, 160.0, 10.0, key=f'i_end_{reset_key}')
+    i_amp = st.sidebar.slider('Current amplitude ($\mu A/cm^2$)', -30.0, 30.0, 0.0, 0.5, key=f'i_amp_{reset_key}')
+    i_start = st.sidebar.slider('Current start time (ms)', 100.0, 150.0, 100.0, 10.0, key=f'i_start_{reset_key}')
+    i_end = st.sidebar.slider('Current end time (ms)', 150.0, 200.0, 160.0, 10.0, key=f'i_end_{reset_key}')
 
-        reset_pressed = st.sidebar.button("Reset")
-        
-        if reset_pressed:
-            st.session_state.current_list = []
-            st.session_state.frequency_list_control = []
-            st.session_state.frequency_list_alt = []
-            st.session_state.last_current = 0.0
-            st.session_state.reset_counter += 1 
+    reset_pressed = st.sidebar.button("Reset")
+    
+    if reset_pressed:
+        st.session_state.current_list = []
+        st.session_state.frequency_list_control = []
+        st.session_state.frequency_list_alt = []
+        st.session_state.last_current = 0.0
+        st.session_state.reset_counter += 1 
 
-            st.rerun()
+        st.rerun()
 
-        # Return all parameters as a dictionary
-        return {
-            'temperature': temperature,
-            'Q_gate': q_gate,
-            'Q_cond': q_cond,
-            'I_amp': i_amp,
-            'I_start': i_start,
-            'I_end': i_end,
-            'Input_type': input_type,
-            'Current_list': st.session_state.current_list,
-            'Frequency_list_control': st.session_state.frequency_list_control,
-            'Frequency_list_alt': st.session_state.frequency_list_alt,
-            'Last_current': st.session_state.last_current
-        }
+    # Return all parameters as a dictionary
+    return {
+        'temperature': temperature,
+        'Q_gate': q_gate,
+        'Q_cond': q_cond,
+        'I_amp': i_amp,
+        'I_start': i_start,
+        'I_end': i_end,
+        'Current_list': st.session_state.current_list,
+        'Frequency_list_control': st.session_state.frequency_list_control,
+        'Frequency_list_alt': st.session_state.frequency_list_alt,
+        'Last_current': st.session_state.last_current
+    }
 
 def create_sidebar_controls_hvcra():
     '''
@@ -485,11 +488,34 @@ def create_sidebar_controls_hvci():
     q_cond = st.sidebar.slider('Q10 for diffusion dependent processes', 1.0, 2.0, 1.3, 0.1)
 
     if input_type == 'Current input':
+
+        if 'current_input_list' not in st.session_state:
+            st.session_state.current_input_list = []
+            st.session_state.frequency_control_list = []
+            st.session_state.frequency_alt_list = []
+            st.session_state.last_current_input = 0.0
+        
+        if 'reset_counter' not in st.session_state:
+            st.session_state.reset_counter = 0
+        
+        reset_key = st.session_state.reset_counter
+
+        reset_pressed = st.sidebar.button("Reset")
+
+        if reset_pressed:
+            st.session_state.current_input_list = []
+            st.session_state.frequency_control_list = []
+            st.session_state.frequency_alt_list = []
+            st.session_state.last_current_input = 0.0
+            st.session_state.reset_counter += 1 
+
+            st.rerun()
+
         st.sidebar.subheader('Current stimulus settings')
 
-        i_amp = st.sidebar.slider('Current amplitude (units?)', -30.0, 30.0, 0.0, 0.5)
-        i_start = st.sidebar.slider('Current start time (ms)', 0.0, 50.0, 50.0, 10.0)
-        i_end = st.sidebar.slider('Current end time (ms)', 50.0, 150.0, 60.0, 10.0)
+        i_amp = st.sidebar.slider('Current amplitude (units?)', -30.0, 30.0, 0.0, 0.5, key=f'i_amp_{reset_key}')
+        i_start = st.sidebar.slider('Current start time (ms)', 0.0, 50.0, 50.0, 10.0, key=f'i_start_{reset_key}')
+        i_end = st.sidebar.slider('Current end time (ms)', 50.0, 150.0, 60.0, 10.0, key=f'i_end_{reset_key}')
 
         return {
             'temperature': temperature,
@@ -499,6 +525,10 @@ def create_sidebar_controls_hvci():
             'I_start': i_start,
             'I_end': i_end,
             'Input_type': input_type,
+            'Current_input_list': st.session_state.current_input_list,
+            'Frequency_control_list': st.session_state.frequency_control_list,
+            'Frequency_alt_list': st.session_state.frequency_alt_list,
+            'Last_current': st.session_state.last_current_input
         }
     
     if input_type == 'Synaptic input':
@@ -572,38 +602,34 @@ def prepare_hh_plots():
     neuron_control = HodgkinHuxley(6.3, q_gate, q_cond)
     neuron_alt = HodgkinHuxley(temperature, q_gate, q_cond)
 
-    input_type = params['Input_type']
-
     STEP_SIZE = 0.01  # ms
     SIMULATION_TIME = 300.0 # ms
     time = np.arange(0, SIMULATION_TIME, STEP_SIZE)
 
     solution_alt = None
     solution_control = None
+ 
+    i_amp = params['I_amp']
+    i_start = params['I_start']
+    i_end = params['I_end']
 
-    if input_type == 'Current input':
+    current_list = params['Current_list']
+    frequency_list_control = params['Frequency_list_control']
+    frequency_list_alt = params['Frequency_list_alt']
+    st.session_state.last_current = params['Last_current']
+
+    current_changed = abs(i_amp - st.session_state.last_current) > 0.05
+    current_exists = any(c == i_amp for c in current_list)
     
-        i_amp = params['I_amp']
-        i_start = params['I_start']
-        i_end = params['I_end']
-
-        current_list = params['Current_list']
-        frequency_list_control = params['Frequency_list_control']
-        frequency_list_alt = params['Frequency_list_alt']
-        st.session_state.last_current = params['Last_current']
-
-        current_changed = abs(i_amp - st.session_state.last_current) > 0.05
-        current_exists = any(c == i_amp for c in current_list)
-        
-        current_stimulus = create_current_stimulus_array(time,
-                                                        i_amp,
-                                                        i_start,
-                                                        i_end                                               
-                                                        )
-        
-        solution_control = neuron_control.simulate(time, STEP_SIZE, current_stimulus_array=current_stimulus)
-        
-        solution_alt = neuron_alt.simulate(time, STEP_SIZE, current_stimulus_array=current_stimulus)
+    current_stimulus = create_current_stimulus_array(time,
+                                                    i_amp,
+                                                    i_start,
+                                                    i_end                                               
+                                                    )
+    
+    solution_control = neuron_control.simulate(time, STEP_SIZE, current_stimulus_array=current_stimulus)
+    
+    solution_alt = neuron_alt.simulate(time, STEP_SIZE, current_stimulus_array=current_stimulus)
 
     v = solution_control[:, 0]
     v_ = solution_alt[:, 0]
@@ -633,11 +659,18 @@ def prepare_hh_plots():
                 if v_[i-1] < threshold and v_[i] >= threshold:
                     spike_indices_.append(i)
             
-            current_input_duration = i_end - i_start
+            if len(spike_indices) > 1:
+                duration = (spike_indices[-1] - spike_indices[0]) * STEP_SIZE
+                frequency_control = 1000 * len(spike_indices) / duration
+            else:
+                frequency_control = 0
 
-            frequency_control = 1000 * len(spike_indices) / current_input_duration if current_input_duration  > 0 else 0
-            frequency_alt = 1000 * len(spike_indices_) / current_input_duration if current_input_duration > 0 else 0
-            
+            if len(spike_indices_) > 1:
+                duration_ = (spike_indices_[-1] - spike_indices_[0]) * STEP_SIZE
+                frequency_alt = 1000 * len(spike_indices_) / duration_
+            else:
+                frequency_alt = 0
+
             current_list.append(i_amp)
             frequency_list_control.append(frequency_control)
             frequency_list_alt.append(frequency_alt)
@@ -658,7 +691,7 @@ def prepare_hh_plots():
         st.info(f"Current {i_amp:.1f} $\mu A/cm^2$ already tested")
         st.session_state.last_current = i_amp        
 
-    return v, v_, time, current_stimulus, temperature
+    return v, v_, time, current_stimulus, temperature, current_list, frequency_list_control, frequency_list_alt, st.session_state.last_current
 
 def display_hvcra_theory():
     pass
@@ -1001,6 +1034,39 @@ def prepare_hvci_plots():
         solution_alt = neuron_alt.simulate(time,
                                                     STEP_SIZE,
                                                     current_stimulus_array=current_stimulus)
+        
+        current_input_list = params['Current_input_list']
+        frequency_control_list = params['Frequency_control_list']
+        frequency_alt_list = params['Frequency_alt_list']
+        st.session_state.last_current_input = params['Last_current']
+
+        input_changed = abs(i_amp - st.session_state.last_current_input) > 0.01
+        input_exists = any(c == i_amp for c in current_input_list)
+
+        if input_changed and not input_exists:
+
+            with st.spinner(f"Running simulation for {i_amp:.2f}..."):
+
+                current_stimulus = create_current_stimulus_array(time,
+                                                                i_amp,
+                                                                i_start,
+                                                                i_end                                               
+                                                                )
+                
+                solution_control = neuron_control.simulate(time,
+                                                        STEP_SIZE,
+                                                        current_stimulus_array=current_stimulus
+                                                        )
+                
+                solution_alt = neuron_alt.simulate(time,
+                                                STEP_SIZE,
+                                                current_stimulus_array=current_stimulus)
+
+                st.success(f"finished running!")
+            
+        elif input_exists and input_changed:
+            st.info(f"Current input {i_amp:.2f} already tested")
+            st.session_state.last_current_input = i_amp
 
     if input_type == 'Synaptic input':
         
@@ -1065,5 +1131,5 @@ def prepare_hvci_plots():
         
     v = solution_control[:, 0]
     v_ = solution_alt[:, 0]
-
-    return v, v_, time, current_stimulus
+    if input_type == "Current input":
+        return v, v_, time, current_stimulus, temperature, current_input_list, frequency_control_list, frequency_alt_list, st.session_state.last_current_input
