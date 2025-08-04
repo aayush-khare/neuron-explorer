@@ -91,43 +91,37 @@ def create_sidebar_controls_lif():
     Dictionary containing all parameter values for the LIF model
     '''
 
-    if 'current_list' not in st.session_state:
-        st.session_state.current_list = []
-        st.session_state.frequency_list = []
-        st.session_state.last_current = 0.0
+    if 'lif_current_list' not in st.session_state:
+        st.session_state.lif_current_list = []
+    if 'lif_last_current' not in st.session_state:
+        st.session_state.lif_last_current = 0.0
     
-    if 'reset_counter' not in st.session_state:
-        st.session_state.reset_counter = 0
+    if 'lif_frequency_list' not in st.session_state:
+        st.session_state.lif_frequency_list = []
+    if 'lif_reset_counter' not in st.session_state:
+        st.session_state.lif_reset_counter = 0
 
-    st.sidebar.header('Model Parameters')
-        
-    st.sidebar.subheader('Current stimulus settings')
+    lif_reset_key = st.session_state.lif_reset_counter
+    lif_reset_pressed = st.sidebar.button("Reset")
 
-    reset_key = st.session_state.reset_counter
-
-    i_amp = st.sidebar.slider('Current amplitude $\mu A/cm^2$', -3.0, 3.0, 0.0, 0.1, 
-                             key=f'i_amp_{reset_key}')
-    i_start = st.sidebar.slider('Current start time (ms)', 10.0, 100.0, 10.0, 10.0,
-                               key=f'i_start_{reset_key}')
-    i_end = st.sidebar.slider('Current end time (ms)', 90.0, 190.0, 190.0, 10.0,
-                             key=f'i_end_{reset_key}')
-    reset_pressed = st.sidebar.button("Reset")
-    
-    if reset_pressed:
-        st.session_state.current_list = []
-        st.session_state.frequency_list = []
-        st.session_state.last_current = 0.0
-        st.session_state.reset_counter += 1 
+    if lif_reset_pressed:
+        st.session_state.lif_current_list = []
+        st.session_state.lif_frequency_list = []
+        st.session_state.lif_last_current = 0.0
+        st.session_state.lif_reset_counter += 1 
 
         st.rerun()
     
+    st.sidebar.header('Model Parameters')        
+    st.sidebar.subheader('Current stimulus settings')
+
+    i_amp = st.sidebar.slider('Current amplitude $\mu A/cm^2$', -3.0, 3.0, 0.0, 0.1, key=f'i_amp_{lif_reset_key}')
+    
     return {
         'I_amp': i_amp,
-        'I_start': i_start,
-        'I_end': i_end,
-        'Current_list': st.session_state.current_list,
-        'Frequency_list': st.session_state.frequency_list,
-        'Last_current': st.session_state.last_current
+        'Current_list': st.session_state.lif_current_list,
+        'Frequency_list': st.session_state.lif_frequency_list,
+        'Last_current': st.session_state.lif_last_current
     }
 
 def prepare_lif_plots():
@@ -141,14 +135,15 @@ def prepare_lif_plots():
     time = np.arange(0, SIMULATION_TIME, STEP_SIZE)
 
     i_amp = params['I_amp']
-    i_start = params['I_start']
-    i_end = params['I_end']
-    current_list = params['Current_list']
-    frequency_list = params['Frequency_list']
-    st.session_state.last_current = params['Last_current']
+    i_start = 20.0
+    i_end = SIMULATION_TIME - 20.0
 
-    current_changed = abs(i_amp - st.session_state.last_current) > 0.05
-    current_exists = any(c == i_amp for c in current_list)
+    lif_current_list = st.session_state.lif_current_list
+    frequency_list = st.session_state.lif_frequency_list
+    lif_last_current = st.session_state.lif_last_current
+
+    current_changed = abs(i_amp - lif_last_current) > 0.05
+    current_exists = any(abs(c - i_amp) <= 0.05 for c in lif_current_list)
     
     current_stimulus = create_current_stimulus_array(time,
                                                     i_amp,
@@ -183,23 +178,23 @@ def prepare_lif_plots():
                 duration = 0
                 frequency = 0
                         
-            current_list.append(i_amp)
-            frequency_list.append(frequency)
-            st.session_state.last_current = i_amp
+            st.session_state.lif_current_list.append(i_amp)
+            st.session_state.lif_frequency_list.append(frequency)
 
-            sorted_pairs = sorted(zip(current_list, frequency_list))
-            current_list, frequency_list = zip(*sorted_pairs)
-            current_list = list(current_list)
-            frequency_list = list(frequency_list)
+            sorted_pairs = sorted(zip(st.session_state.lif_current_list, st.session_state.lif_frequency_list))
+            st.session_state.lif_current_list, st.session_state.lif_frequency_list = zip(*sorted_pairs) if sorted_pairs else ([], [])
+            st.session_state.lif_current_list = list(st.session_state.lif_current_list)
+            st.session_state.lif_frequency_list = list(st.session_state.lif_frequency_list)
             
             st.success(f"Added: {i_amp:.1f} → {frequency:.1f} Hz")
-            st.rerun()
+            #st.rerun()
             
     elif current_exists and current_changed:
         st.info(f"Current {i_amp:.1f} $\mu A/cm^2$ already tested")
-        st.session_state.last_current = i_amp
     
-    return v, time, current_stimulus, current_list, frequency_list, st.session_state.last_current
+    st.session_state.lif_last_current = i_amp
+    
+    return v, time, current_stimulus, st.session_state.lif_current_list, st.session_state.lif_frequency_list, st.session_state.lif_last_current
 
 def display_lif_theory():
     with st.expander('About Leaky Integrate and Fire model'):
@@ -225,25 +220,36 @@ def create_sidebar_controls_hh():
     Dictionary containing all parameter values for the HH model
     '''
 
-    if 'current_list' not in st.session_state:
-        st.session_state.current_list = []
+    if 'hh_current_list' not in st.session_state:
+        st.session_state.hh_current_list = []
+
+    if 'hh_last_current' not in st.session_state:
+        st.session_state.hh_last_current = 0.0
+
+    if 'hh_frequency_list_control' not in st.session_state:
+        st.session_state.hh_frequency_list_control = []
+
+    if 'hh_frequency_list_alt' not in st.session_state:
+        st.session_state.hh_frequency_list_alt = []
+
+    if 'hh_reset_counter' not in st.session_state:
+        st.session_state.hh_reset_counter = 0
+
+    hh_reset_key = st.session_state.hh_reset_counter
+
+    hh_reset_pressed = st.sidebar.button("Reset")
     
-    if 'frequency_list' not in st.session_state:
-        st.session_state.frequency_list_control = []
-        st.session_state.frequency_list_alt = []
-    
-    if 'last_current' not in st.session_state:
-        st.session_state.last_current = 0.0
-    
-    if 'reset_counter' not in st.session_state:
-        st.session_state.reset_counter = 0
+    if hh_reset_pressed:
+        st.session_state.hh_current_list = []
+        st.session_state.hh_frequency_list_control = []
+        st.session_state.hh_frequency_list_alt = []
+        st.session_state.hh_last_current = 0.0
+        st.session_state.hh_reset_counter += 1 
+
+        st.rerun()
 
     st.sidebar.header('Model Parameters')
-
     
-    temperature = st.selectbox('Temperature in Celsius (control fixed at 6.3 Celsius)', [0.0, 10.0, -10.0], width=300) # control temperature = 6.3 celsius
-
-    # Temperature
     st.sidebar.subheader('Temperature and Q10 values')
     q_gate = st.sidebar.slider('Q10 for conformation dependent processes', 2.0, 4.0, 3.0, 0.1)
     q_cond = st.sidebar.slider('Q10 for diffusion dependent processes', 1.0, 2.0, 1.3, 0.1)
@@ -251,22 +257,9 @@ def create_sidebar_controls_hh():
     # Current stimulus parameters
     st.sidebar.subheader('Current stimulus settings')
 
-    reset_key = st.session_state.reset_counter
-
-    i_amp = st.sidebar.slider('Current amplitude ($\mu A/cm^2$)', -30.0, 30.0, 0.0, 0.5, key=f'i_amp_{reset_key}')
-    i_start = st.sidebar.slider('Current start time (ms)', 100.0, 150.0, 100.0, 10.0, key=f'i_start_{reset_key}')
-    i_end = st.sidebar.slider('Current end time (ms)', 150.0, 200.0, 160.0, 10.0, key=f'i_end_{reset_key}')
-
-    reset_pressed = st.sidebar.button("Reset")
+    i_amp = st.sidebar.slider('Current amplitude ($\mu A/cm^2$)', -30.0, 30.0, 0.0, 0.1, key=f'i_amp_{hh_reset_key}')
     
-    if reset_pressed:
-        st.session_state.current_list = []
-        st.session_state.frequency_list_control = []
-        st.session_state.frequency_list_alt = []
-        st.session_state.last_current = 0.0
-        st.session_state.reset_counter += 1 
-
-        st.rerun()
+    temperature = st.selectbox('Temperature in Celsius (control fixed at 6.3 Celsius)', [0.0, 10.0, -10.0], width=300) # control temperature = 6.3 celsius
 
     # Return all parameters as a dictionary
     return {
@@ -274,13 +267,112 @@ def create_sidebar_controls_hh():
         'Q_gate': q_gate,
         'Q_cond': q_cond,
         'I_amp': i_amp,
-        'I_start': i_start,
-        'I_end': i_end,
-        'Current_list': st.session_state.current_list,
-        'Frequency_list_control': st.session_state.frequency_list_control,
-        'Frequency_list_alt': st.session_state.frequency_list_alt,
-        'Last_current': st.session_state.last_current
+        'HH_Current_list': st.session_state.hh_current_list,
+        'Frequency_list_control': st.session_state.hh_frequency_list_control,
+        'Frequency_list_alt': st.session_state.hh_frequency_list_alt,
+        'HH_Last_current': st.session_state.hh_last_current
     }
+
+def prepare_hh_plots():
+    
+    params = create_sidebar_controls_hh()
+    temperature = params['temperature']
+    q_gate = params['Q_gate']
+    q_cond = params['Q_cond']
+
+    neuron_control = HodgkinHuxley(6.3, q_gate, q_cond)
+    neuron_alt = HodgkinHuxley(temperature, q_gate, q_cond)
+
+    STEP_SIZE = 0.01  # ms
+    SIMULATION_TIME = 300.0 # ms
+    time = np.arange(0, SIMULATION_TIME, STEP_SIZE)
+
+    solution_alt = None
+    solution_control = None
+ 
+    i_amp = params['I_amp']
+    i_start = 50.0
+    i_end = SIMULATION_TIME - 50.0
+
+    current_list = st.session_state.hh_current_list
+    frequency_list_control = st.session_state.hh_frequency_list_control
+    frequency_list_alt = st.session_state.hh_frequency_list_alt
+    last_current = st.session_state.hh_last_current
+
+    current_changed = abs(i_amp - last_current) > 0.05
+    current_exists = any(abs(c - i_amp) <= 0.05 for c in current_list)
+    
+    current_stimulus = create_current_stimulus_array(time,
+                                                    i_amp,
+                                                    i_start,
+                                                    i_end                                               
+                                                    )
+    
+    solution_control = neuron_control.simulate(time, STEP_SIZE, current_stimulus_array=current_stimulus)
+    
+    solution_alt = neuron_alt.simulate(time, STEP_SIZE, current_stimulus_array=current_stimulus)
+
+    v = solution_control[:, 0]
+    v_ = solution_alt[:, 0]
+
+    if current_changed and not current_exists:
+
+        with st.spinner(f"Running F-I simulation for {i_amp:.1f} ..."):
+            spike_indices = []
+            spike_indices_ = []
+            threshold = -20         
+
+            current_stimulus = create_current_stimulus_array(time,
+                                                        i_amp,
+                                                        i_start,
+                                                        i_end                                               
+                                                        )  
+    
+            solution_control = neuron_control.simulate(time, STEP_SIZE, current_stimulus_array=current_stimulus)
+            solution_alt = neuron_alt.simulate(time, STEP_SIZE, current_stimulus_array=current_stimulus)
+        
+            v = solution_control[:, 0]
+            v_ = solution_alt[:, 0]
+
+            for i in range(1, len(v)):
+                if v[i-1] < threshold and v[i] >= threshold:
+                    spike_indices.append(i)
+                if v_[i-1] < threshold and v_[i] >= threshold:
+                    spike_indices_.append(i)
+            
+            if len(spike_indices) > 1:
+                duration = (spike_indices[-1] - spike_indices[0]) * STEP_SIZE
+                frequency_control = 1000 * len(spike_indices) / duration
+            else:
+                frequency_control = 0
+
+            if len(spike_indices_) > 1:
+                duration_ = (spike_indices_[-1] - spike_indices_[0]) * STEP_SIZE
+                frequency_alt = 1000 * len(spike_indices_) / duration_
+            else:
+                frequency_alt = 0
+
+            st.session_state.hh_current_list.append(i_amp)
+            st.session_state.hh_frequency_list_control.append(frequency_control)
+            st.session_state.hh_frequency_list_alt.append(frequency_alt)
+
+            sorted_pairs = sorted(zip(st.session_state.hh_current_list, st.session_state.hh_frequency_list_control, st.session_state.hh_frequency_list_alt))
+            st.session_state.hh_current_list, st.session_state.hh_frequency_list_control, st.session_state.hh_frequency_list_alt = zip(*sorted_pairs)
+            st.session_state.hh_current_list = list(st.session_state.hh_current_list)
+            st.session_state.hh_frequency_list_control = list(st.session_state.hh_frequency_list_control)
+            st.session_state.hh_frequency_list_alt = list(st.session_state.hh_frequency_list_alt)
+            
+            st.success(f"Added: {i_amp:.1f}")
+            #  st.rerun()
+
+    
+    else:
+        st.info(f"Current {i_amp:.1f} $\mu A/cm^2$ already tested")
+
+    st.session_state.hh_last_current = i_amp    
+
+    return v, v_, time, current_stimulus, temperature, st.session_state.hh_current_list, st.session_state.hh_frequency_list_control, st.session_state.hh_frequency_list_alt, st.session_state.hh_last_current
+
 
 def create_sidebar_controls_hvcra():
     '''
@@ -514,16 +606,12 @@ def create_sidebar_controls_hvci():
         st.sidebar.subheader('Current stimulus settings')
 
         i_amp = st.sidebar.slider('Current amplitude (units?)', -30.0, 30.0, 0.0, 0.5, key=f'i_amp_{reset_key}')
-        i_start = st.sidebar.slider('Current start time (ms)', 0.0, 50.0, 50.0, 10.0, key=f'i_start_{reset_key}')
-        i_end = st.sidebar.slider('Current end time (ms)', 50.0, 150.0, 60.0, 10.0, key=f'i_end_{reset_key}')
-
+        
         return {
             'temperature': temperature,
             'Q_gate': q_gate,
             'Q_cond': q_cond,
             'I_amp': i_amp,
-            'I_start': i_start,
-            'I_end': i_end,
             'Input_type': input_type,
             'Current_input_list': st.session_state.current_input_list,
             'Frequency_control_list': st.session_state.frequency_control_list,
@@ -591,107 +679,6 @@ def display_hh_theory():
             st.image(image, caption="HH model", use_container_width=True)
         except FileNotFoundError:
             st.info("Image not found")
-
-def prepare_hh_plots():
-    
-    params = create_sidebar_controls_hh()
-    temperature = params['temperature']
-    q_gate = params['Q_gate']
-    q_cond = params['Q_cond']
-
-    neuron_control = HodgkinHuxley(6.3, q_gate, q_cond)
-    neuron_alt = HodgkinHuxley(temperature, q_gate, q_cond)
-
-    STEP_SIZE = 0.01  # ms
-    SIMULATION_TIME = 300.0 # ms
-    time = np.arange(0, SIMULATION_TIME, STEP_SIZE)
-
-    solution_alt = None
-    solution_control = None
- 
-    i_amp = params['I_amp']
-    i_start = params['I_start']
-    i_end = params['I_end']
-
-    current_list = params['Current_list']
-    frequency_list_control = params['Frequency_list_control']
-    frequency_list_alt = params['Frequency_list_alt']
-    st.session_state.last_current = params['Last_current']
-
-    current_changed = abs(i_amp - st.session_state.last_current) > 0.05
-    current_exists = any(c == i_amp for c in current_list)
-    
-    current_stimulus = create_current_stimulus_array(time,
-                                                    i_amp,
-                                                    i_start,
-                                                    i_end                                               
-                                                    )
-    
-    solution_control = neuron_control.simulate(time, STEP_SIZE, current_stimulus_array=current_stimulus)
-    
-    solution_alt = neuron_alt.simulate(time, STEP_SIZE, current_stimulus_array=current_stimulus)
-
-    v = solution_control[:, 0]
-    v_ = solution_alt[:, 0]
-
-    if current_changed and not current_exists:
-
-        with st.spinner(f"Running F-I simulation for {i_amp:.1f} ..."):
-            spike_indices = []
-            spike_indices_ = []
-            threshold = -20         
-
-            current_stimulus = create_current_stimulus_array(time,
-                                                        i_amp,
-                                                        i_start,
-                                                        i_end                                               
-                                                        )  
-    
-            solution_control = neuron_control.simulate(time, STEP_SIZE, current_stimulus_array=current_stimulus)
-            solution_alt = neuron_alt.simulate(time, STEP_SIZE, current_stimulus_array=current_stimulus)
-        
-            v = solution_control[:, 0]
-            v_ = solution_alt[:, 0]
-
-            for i in range(1, len(v)):
-                if v[i-1] < threshold and v[i] >= threshold:
-                    spike_indices.append(i)
-                if v_[i-1] < threshold and v_[i] >= threshold:
-                    spike_indices_.append(i)
-            
-            if len(spike_indices) > 1:
-                duration = (spike_indices[-1] - spike_indices[0]) * STEP_SIZE
-                frequency_control = 1000 * len(spike_indices) / duration
-            else:
-                frequency_control = 0
-
-            if len(spike_indices_) > 1:
-                duration_ = (spike_indices_[-1] - spike_indices_[0]) * STEP_SIZE
-                frequency_alt = 1000 * len(spike_indices_) / duration_
-            else:
-                frequency_alt = 0
-
-            current_list.append(i_amp)
-            frequency_list_control.append(frequency_control)
-            frequency_list_alt.append(frequency_alt)
-
-            st.session_state.last_current = i_amp
-
-            sorted_pairs = sorted(zip(current_list, frequency_list_control, frequency_list_alt))
-            current_list, frequency_list_control, frequency_list_alt = zip(*sorted_pairs)
-            current_list = list(current_list)
-            frequency_list_control = list(frequency_list_control)
-            frequency_list_alt = list(frequency_list_alt)
-            
-            st.success(f"Added: {i_amp:.1f}")
-            #  st.rerun()
-
-    
-    else:
-        st.info(f"Current {i_amp:.1f} $\mu A/cm^2$ already tested")
-        st.session_state.last_current = i_amp        
-
-    return v, v_, time, current_stimulus, temperature, current_list, frequency_list_control, frequency_list_alt, st.session_state.last_current
 
 def display_hvcra_theory():
     pass
@@ -866,59 +853,59 @@ def prepare_hvcra_plots():
             with st.spinner(f"Running simulation for {ge_max:.2f} mS/cm^2..."):
 
                 excitatory_synapse_stimulus_control = create_synapse_stimulus_array(time,
-                                                        40.0,
-                                                        q_gate,
-                                                        ge_max,
-                                                        ge_start,
-                                                        STEP_SIZE
-                                                        )
+                                                                                    40.0,
+                                                                                    q_gate,
+                                                                                    ge_max,
+                                                                                    ge_start,
+                                                                                    STEP_SIZE
+                                                                                    )
                 
                 excitatory_synapse_stimulus_alt = create_synapse_stimulus_array(time,
-                                                        temperature,
-                                                        q_gate,
-                                                        ge_max,
-                                                        ge_start,
-                                                        STEP_SIZE
-                                                        )
+                                                                                temperature,
+                                                                                q_gate,
+                                                                                ge_max,
+                                                                                ge_start,
+                                                                                STEP_SIZE
+                                                                                )
                 
                 inhibitory_synapse_stimulus_control = create_synapse_stimulus_array(time,
-                                                    40.0,
-                                                q_gate,
-                                                gi_max,
-                                                gi_start,
-                                                STEP_SIZE
-                                                )
+                                                                                    40.0,
+                                                                                    q_gate,
+                                                                                    gi_max,
+                                                                                    gi_start,
+                                                                                    STEP_SIZE
+                                                                                    )
                 
                 inhibitory_synapse_stimulus_alt = create_synapse_stimulus_array(time,
-                                                        temperature,
-                                                        q_gate,
-                                                        gi_max,
-                                                        gi_start,
-                                                        STEP_SIZE
-                                                        )
+                                                                                temperature,
+                                                                                q_gate,
+                                                                                gi_max,
+                                                                                gi_start,
+                                                                                STEP_SIZE
+                                                                                )
 
                 solution_control = neuron_control.simulate(time,
-                                                    STEP_SIZE,                                        
-                                                    excitatory_synapse_stimulus_array=excitatory_synapse_stimulus_control,
-                                                    inhibitory_synapse_stimulus_array=inhibitory_synapse_stimulus_control,
-                                                    external_input_freq=freq,
-                                                    external_input_strength=external_input_strength,
-                                                    noise_freq=freq_noise,
-                                                    noise_strength=noise_strength)
+                                                           STEP_SIZE,                                        
+                                                           excitatory_synapse_stimulus_array=excitatory_synapse_stimulus_control,
+                                                           inhibitory_synapse_stimulus_array=inhibitory_synapse_stimulus_control,
+                                                           external_input_freq=freq,
+                                                           external_input_strength=external_input_strength,
+                                                           noise_freq=freq_noise,
+                                                           noise_strength=noise_strength)
                 
                 solution_alt = neuron_alt.simulate(time,
-                                                    STEP_SIZE,
-                                                    excitatory_synapse_stimulus_array=excitatory_synapse_stimulus_alt,
-                                                    inhibitory_synapse_stimulus_array=inhibitory_synapse_stimulus_alt,
-                                                    external_input_freq=freq,
-                                                    external_input_strength=external_input_strength,
-                                                    noise_freq=freq_noise,
-                                                    noise_strength=noise_strength)
+                                                   STEP_SIZE,
+                                                   excitatory_synapse_stimulus_array=excitatory_synapse_stimulus_alt,
+                                                   inhibitory_synapse_stimulus_array=inhibitory_synapse_stimulus_alt,
+                                                   external_input_freq=freq,
+                                                   external_input_strength=external_input_strength,
+                                                   noise_freq=freq_noise,
+                                                   noise_strength=noise_strength)
 
                 st.success(f"finished running!")
             
         elif input_exists and input_changed:
-            st.info(f"Synaptic input {ge_max:.2f} already tested")
+            st.info(f"Synaptic input {ge_max:.2f} \mS /cm^{2} already tested")
             st.session_state.last_synaptic_input = ge_max
 
     vs = solution_control[:, 1]
@@ -991,7 +978,9 @@ def prepare_hvcra_plots():
         return input_type, fluctuations, vs, vs_, vd, vd_, time, temperature, response_time_displayed, response_time_displayed_, response_time_q10, synaptic_input_list, response_time_q_list, st.session_state.last_synaptic_input
 
     elif input_type == "Current input":
-        return input_type, fluctuations, vs, vs_, vd, vd_, time, temperature, response_time_displayed, response_time_displayed_, response_time_q10, current_input_list, frequency_control_list, st.session_state.last_current_input
+
+        frequency_ratio = [f_alt / f_c if f_c != 0 else 0 for f_alt in frequency_alt_list for f_c in frequency_control_list]
+        return input_type, fluctuations, vs, vs_, vd, vd_, time, temperature, response_time_displayed, response_time_displayed_, response_time_q10, current_input_list, frequency_ratio, st.session_state.last_current_input
 
 def display_hvci_theory():
     pass
@@ -1017,8 +1006,8 @@ def prepare_hvci_plots():
     if input_type == 'Current input':
     
         i_amp = params['I_amp']
-        i_start = params['I_start']
-        i_end = params['I_end']
+        i_start = 100.0
+        i_end = SIMULATION_TIME - 100.0
         
         current_stimulus = create_current_stimulus_array(time,
                                                         i_amp,

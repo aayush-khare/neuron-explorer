@@ -16,7 +16,7 @@ from visualization import (plot_lif,
                            plot_somatic_membrane_potential,
                            plot_dendritic_membrane_potential,
                            plot_soma_response_q10,
-                           plot_soma_spikes,
+                           plot_somatic_membrane_potential_with_spike_frequency,
                            plot_somatic_membrane_potential_q10)
 
 st.set_page_config(
@@ -80,14 +80,14 @@ if Neuron_class == 'Hodgkin Huxley':
 
     with tab1:
         fig_mp = plot_membrane_potential(time, 
-                                        v, 
-                                        v_, 
-                                        current_stimulus,
-                                        temperature,
-                                        current_list, 
-                                        frequency_list_control,
-                                        frequency_list_alt,
-                                        last_current)
+                                         v, 
+                                         v_, 
+                                         current_stimulus,
+                                         temperature,
+                                         current_list, 
+                                         frequency_list_control,
+                                         frequency_list_alt,
+                                         last_current)
 
         st.pyplot(fig_mp)
 
@@ -101,17 +101,17 @@ elif Neuron_class == 'HVC neurons':
         input_type, fluctuations, Vs, Vs_, Vd, Vd_, time, temperature, response_time_displayed, response_time_displayed_, response_time_q10, input_list, data_list, last_input = prepare_hvcra_plots()
 
         if input_type == "Current input":
-            tab1, tab2, tab3 = st.tabs(['Soma membrane potential', 'Dendrite membrane potential', 'Spike analysis'])
+            tab1, tab2= st.tabs(['Soma membrane potential and spike frequency', 'Dendrite membrane potential'])
 
             with tab1:
                 
-                fig_mp = plot_somatic_membrane_potential(time, 
+                fig_mp = plot_somatic_membrane_potential_with_spike_frequency(time, 
                                                 Vs, 
                                                 Vs_, 
                                                 temperature, 
-                                                response_time_displayed, 
-                                                response_time_displayed_, 
-                                                response_time_q10)
+                                                input_list,
+                                                data_list,
+                                                last_input)
 
                 st.pyplot(fig_mp)
 
@@ -124,11 +124,6 @@ elif Neuron_class == 'HVC neurons':
                                                 )
 
                 st.pyplot(fig_mp)
-            
-            with tab3:
-                fig_a = plot_soma_spikes(input_list, data_list, last_input)
-
-                st.pyplot(fig_a)
 
         
         elif input_type == "Synaptic input":
@@ -137,7 +132,13 @@ elif Neuron_class == 'HVC neurons':
 
                 with tab1:
 
-                    fig_a = plot_somatic_membrane_potential_q10(time, Vs, Vs_, temperature, input_list, data_list, last_input)
+                    fig_a = plot_somatic_membrane_potential_q10(time, 
+                                                                Vs, 
+                                                                Vs_, 
+                                                                temperature, 
+                                                                input_list, 
+                                                                data_list, 
+                                                                last_input)
 
                     st.pyplot(fig_a)
 
