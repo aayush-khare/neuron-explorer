@@ -115,7 +115,7 @@ def create_sidebar_controls_lif():
     st.sidebar.header('Model Parameters')        
     st.sidebar.subheader('Current stimulus settings')
 
-    i_amp = st.sidebar.slider('Current amplitude $\mu A/cm^2$', -3.0, 3.0, 0.0, 0.1, key=f'i_amp_{lif_reset_key}')
+    i_amp = st.sidebar.slider('Current amplitude ($\mu A/cm^2$)', -1.0, 3.0, 0.0, 0.25, key=f'i_amp_{lif_reset_key}')
     
     return {
         'I_amp': i_amp,
@@ -171,7 +171,7 @@ def prepare_lif_plots():
                     spike_indices.append(i)
             
             if(len(spike_indices) > 1):
-                duration = (spike_indices[-1] - spike_indices[0]) * STEP_SIZE 
+                duration = i_end - i_start
                 frequency = 1000 * len(spike_indices) / duration
 
             else:
@@ -186,7 +186,7 @@ def prepare_lif_plots():
             st.session_state.lif_current_list = list(st.session_state.lif_current_list)
             st.session_state.lif_frequency_list = list(st.session_state.lif_frequency_list)
             
-            st.success(f"Added: {i_amp:.1f} → {frequency:.1f} Hz")
+            st.success(f"Added: {i_amp:.2f} $\mu A/cm^{2}$ → {frequency:.1f} Hz")
             #st.rerun()
             
     elif current_exists and current_changed:
@@ -249,15 +249,12 @@ def create_sidebar_controls_hh():
         st.rerun()
 
     st.sidebar.header('Model Parameters')
-    
     st.sidebar.subheader('Temperature and Q10 values')
     q_gate = st.sidebar.slider('Q10 for conformation dependent processes', 2.0, 4.0, 3.0, 0.1)
     q_cond = st.sidebar.slider('Q10 for diffusion dependent processes', 1.0, 2.0, 1.3, 0.1)
 
-    # Current stimulus parameters
     st.sidebar.subheader('Current stimulus settings')
-
-    i_amp = st.sidebar.slider('Current amplitude ($\mu A/cm^2$)', -30.0, 30.0, 0.0, 0.1, key=f'i_amp_{hh_reset_key}')
+    i_amp = st.sidebar.slider('Current amplitude ($\mu A/cm^2$)', -3.0, 15.0, 0.0, 0.5, format="%0.1f", key=f'i_amp_{hh_reset_key}')
     
     temperature = st.selectbox('Temperature in Celsius (control fixed at 6.3 Celsius)', [0.0, 10.0, -10.0], width=300) # control temperature = 6.3 celsius
 
@@ -294,13 +291,13 @@ def prepare_hh_plots():
     i_start = 50.0
     i_end = SIMULATION_TIME - 50.0
 
-    current_list = st.session_state.hh_current_list
+    hh_current_list = st.session_state.hh_current_list
     frequency_list_control = st.session_state.hh_frequency_list_control
     frequency_list_alt = st.session_state.hh_frequency_list_alt
-    last_current = st.session_state.hh_last_current
+    hh_last_current = st.session_state.hh_last_current
 
-    current_changed = abs(i_amp - last_current) > 0.05
-    current_exists = any(abs(c - i_amp) <= 0.05 for c in current_list)
+    current_changed = abs(i_amp - hh_last_current) >= 0.5
+    current_exists = any(abs(c - i_amp) == 0.00 for c in hh_current_list)
     
     current_stimulus = create_current_stimulus_array(time,
                                                     i_amp,
@@ -317,16 +314,10 @@ def prepare_hh_plots():
 
     if current_changed and not current_exists:
 
-        with st.spinner(f"Running F-I simulation for {i_amp:.1f} ..."):
+        with st.spinner(f"Running F-I simulation for {i_amp:.1f} $\mu A/cm^{2}$..."):
             spike_indices = []
             spike_indices_ = []
-            threshold = -20         
-
-            current_stimulus = create_current_stimulus_array(time,
-                                                        i_amp,
-                                                        i_start,
-                                                        i_end                                               
-                                                        )  
+            threshold = -20          
     
             solution_control = neuron_control.simulate(time, STEP_SIZE, current_stimulus_array=current_stimulus)
             solution_alt = neuron_alt.simulate(time, STEP_SIZE, current_stimulus_array=current_stimulus)
@@ -340,14 +331,14 @@ def prepare_hh_plots():
                 if v_[i-1] < threshold and v_[i] >= threshold:
                     spike_indices_.append(i)
             
-            if len(spike_indices) > 1:
-                duration = (spike_indices[-1] - spike_indices[0]) * STEP_SIZE
+            if len(spike_indices) > 0:
+                duration = i_end - i_start
                 frequency_control = 1000 * len(spike_indices) / duration
             else:
                 frequency_control = 0
 
-            if len(spike_indices_) > 1:
-                duration_ = (spike_indices_[-1] - spike_indices_[0]) * STEP_SIZE
+            if len(spike_indices_) > 0:
+                duration_ = i_end - i_start
                 frequency_alt = 1000 * len(spike_indices_) / duration_
             else:
                 frequency_alt = 0
@@ -362,7 +353,7 @@ def prepare_hh_plots():
             st.session_state.hh_frequency_list_control = list(st.session_state.hh_frequency_list_control)
             st.session_state.hh_frequency_list_alt = list(st.session_state.hh_frequency_list_alt)
             
-            st.success(f"Added: {i_amp:.1f}")
+            st.success(f"Added: {i_amp:.1f} $\mu A/cm^{2}$")
             #  st.rerun()
 
     

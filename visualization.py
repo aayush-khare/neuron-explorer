@@ -170,36 +170,23 @@ def plot_soma_response_q10(synaptic_input_list, response_time_q_list, last_synap
     return fig_fi
 
 def plot_membrane_potential(time, V, V_, stimulus, temperature, current_list, frequency_list_control, frequency_list_alt, last_current):
-    """
-    Plot membrane potential and stimulus current over time
-    
-    Parameters:
-    -----------
-    time : array-like
-        Time array (ms)
-    V : array-like
-        Membrane potential array (mV)
-    stimulus : array-like
-        Stimulus current array (μA/cm²)
-        
-    Returns:
-    --------
-    fig : matplotlib.figure.Figure
-        The figure object
-    """
+
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
-    
-    # Plot membrane potential
+    ax3 = ax1.twinx()
+    ax3.plot(time, stimulus, 'tab:pink')
+    ax3.set_ylabel(f'current stimulus ($\mu A/cm^{2})$', color='tab:pink', fontsize=12)
+    ax3.tick_params(axis='y', labelcolor='tab:pink')
+    ax3.set_ylim(-3.5, 15.5)    
+
+
     ax1.plot(time, V, 'r', label='6.3$^o$ C')
     ax1.plot(time, V_, 'b', label=f'{temperature}$^o$ C')
-    ax1.set_xlabel('Time (ms)')
-    ax1.set_ylabel('Membrane Potential (mV)')
+    ax1.set_xlabel('Time (ms)', fontsize=12)
+    ax1.set_ylabel('Membrane Potential (mV)', fontsize=12)
     ax1.set_ylim(-90, 50)
-    #ax1.set_xlim(145,160)
     ax1.grid(True, alpha=0.3)
     ax1.legend()
     ax1.set_title('Membrane Potential and Stimulus Current')
-
 
     if len(current_list) > 0:
         sorted_pairs = sorted(zip(current_list, frequency_list_control, frequency_list_alt))
@@ -209,25 +196,26 @@ def plot_membrane_potential(time, V, V_, stimulus, temperature, current_list, fr
         sorted_frequency_alt = list(sorted_frequency_alt)
         
         ax2.plot(sorted_current, sorted_frequency_control,
-                'ro-', linewidth=1, markersize=4, alpha=0.7, label='Measured points control')
+                'ro-', linewidth=1, markersize=4, alpha=0.7)
         ax2.plot(sorted_current, sorted_frequency_alt,
-                 'bo-', linewidth=1, markersize=4, alpha=0.7, label='Measured points alt')
-        ax2.set_xlabel('Injected Current ($\mu A/cm^{2}$)', fontsize=12)
-        ax2.set_ylabel('Firing Frequency (Hz)', fontsize=12)
-        ax2.set_title('Current-Frequency (F-I) Relationship', fontsize=14)
-        ax2.grid(True, alpha=0.3)
+                 'bo-', linewidth=1, markersize=4, alpha=0.7)
         
         if last_current in [c for c in sorted_current if c == last_current]:
             idx = next(i for i, c in enumerate(sorted_current) if c == last_current)
             current_freq_control = sorted_frequency_control[idx]
             current_freq_alt = sorted_frequency_alt[idx]
-            ax2.plot(last_current, current_freq_control, 'ro', markersize=6,
-                    label=f'Current: {last_current:.1f} $\mu A/cm^{2}$, {current_freq_control:.1f} Hz')
-            ax2.plot(last_current, current_freq_alt, 'bo', markersize=6,
-                    label=f'Current: {last_current:.1f} $\mu A/cm^{2}$, {current_freq_alt:.1f} Hz')   
+            ax2.plot(last_current, current_freq_control, 'o', color='red', markersize=10,
+                    label=f'{last_current:.1f} $\mu A/cm^{2}$, {current_freq_control:.1f} Hz')
+            ax2.plot(last_current, current_freq_alt, 'o', color='blue', markersize=10,
+                    label=f'{last_current:.1f} $\mu A/cm^{2}$, {current_freq_alt:.1f} Hz')   
+        
+        ax2.set_xlabel('Injected Current ($\mu A/cm^{2}$)', fontsize=12)
+        ax2.set_ylabel('Firing Frequency (Hz)', fontsize=12)
+        ax2.set_title('Current-Frequency (F-I) Relationship', fontsize=14)
+        ax2.grid(True, alpha=0.3)
+        ax2.legend()
       
     else:
-        # Empty F-I plot when no data
         ax2.set_xlabel('Injected Current ($\mu A/cm^{2}$)', fontsize=12)
         ax2.set_ylabel('Firing Frequency (Hz)', fontsize=12)
         ax2.set_title('Current-Frequency (F-I) Relationship', fontsize=14)
@@ -235,27 +223,28 @@ def plot_membrane_potential(time, V, V_, stimulus, temperature, current_list, fr
         ax2.text(0.5, 0.5, 'No data points yet\nAdjust current and observe', 
                 transform=ax2.transAxes, ha='center', va='center', fontsize=12)
 
+
     plt.tight_layout()
     return fig
 
 def plot_lif(time, v, current, current_list, frequency_list, last_current):
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
 
     ax1.plot(time, v, 'b')
     ax1.set_xlabel('Time (ms)')
     ax1.set_ylabel('Membrane Potential (mV)', color='b')
-    ax1.set_ylim(-70, 0)
+    ax1.set_ylim(-90, 20)
     ax1.tick_params(axis='y', labelcolor='b')
     ax1.grid(True, alpha=0.3)
     ax1.set_title('Membrane Potential and Stimulus Current')
 
     ax3 = ax1.twinx()
 
-    ax3.plot(time, current, 'magenta', alpha=0.4)
-    ax3.set_ylabel('current stimulus', color='magenta')
-    ax3.tick_params(axis='y', labelcolor='magenta')
-    ax3.set_ylim(-1, 3.5)
+    ax3.plot(time, current, 'tab:pink')
+    ax3.set_ylabel(f'current stimulus ($\mu A/cm^{2})$', color='tab:pink')
+    ax3.tick_params(axis='y', labelcolor='tab:pink')
+    ax3.set_ylim(-1.5, 3.5)
 
     if len(current_list) > 0:
         sorted_pairs = sorted(zip(current_list, frequency_list))
@@ -263,30 +252,30 @@ def plot_lif(time, v, current, current_list, frequency_list, last_current):
         sorted_current = list(sorted_current)
         sorted_frequency = list(sorted_frequency)
         
-        ax2.plot(sorted_current, sorted_frequency,
-                'bo-', linewidth=1, markersize=4, alpha=0.7, label='Measured points')
+        ax2.plot(sorted_current, sorted_frequency, 
+                'o-', color='black', linewidth=1, markersize=4, alpha=1, label='Measured points')
         
         # Highlight current point using sorted data
         if last_current in [c for c in sorted_current if c == last_current]:
             idx = next(i for i, c in enumerate(sorted_current) if c == last_current)
             current_freq = sorted_frequency[idx]
             ax2.plot(last_current, current_freq, 'ro', markersize=6,
-                    label=f'Current: {last_current:.1f} nA, {current_freq:.1f} Hz')
+                    label=f'{last_current:.2f} $\mu A/cm^{2}$, {current_freq:.1f} Hz')
         
-        ax2.set_xlabel('Injected Current (nA)', fontsize=12)
-        ax2.set_ylabel('Firing Frequency (Hz)', fontsize=12)
+        ax2.set_xlabel(f'Injected Current ($\mu A/cm^{2}$)', fontsize=10)
+        ax2.set_ylabel('Firing Frequency (Hz)', fontsize=10)
         ax2.set_title('Current-Frequency (F-I) Relationship', fontsize=14)
         ax2.grid(True, alpha=0.3)
         ax2.legend()
         
         if len(current_list) > 1:
-            ax2.set_xlim(-0.1, max(current_list) + 0.2)
-            ax2.set_ylim(-1, max(frequency_list) + 2)
+            ax2.set_xlim(min(current_list) - 0.5, max(current_list) + 0.5)
+            ax2.set_ylim(-10, max(frequency_list) + 10)
 
     else:
         # Empty F-I plot when no data
-        ax2.set_xlabel('Injected Current (nA)', fontsize=12)
-        ax2.set_ylabel('Firing Frequency (Hz)', fontsize=12)
+        ax2.set_xlabel('Injected Current (nA)', fontsize=10)
+        ax2.set_ylabel('Firing Frequency (Hz)', fontsize=10)
         ax2.set_title('Current-Frequency (F-I) Relationship', fontsize=14)
         ax2.grid(True, alpha=0.3)
         ax2.text(0.5, 0.5, 'No data points yet\nAdjust current and observe', 
