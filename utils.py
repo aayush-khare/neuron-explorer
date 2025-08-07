@@ -364,7 +364,6 @@ def prepare_hh_plots():
 
     return v, v_, time, current_stimulus, temperature, st.session_state.hh_current_list, st.session_state.hh_frequency_list_control, st.session_state.hh_frequency_list_alt, st.session_state.hh_last_current
 
-
 def create_sidebar_controls_hvcra():
     '''
     Sidebar controls for the HVC(RA) projection neuron model
@@ -389,67 +388,73 @@ def create_sidebar_controls_hvcra():
 
     if input_type == 'Current input':
         
-        if 'current_input_list' not in st.session_state:
-            st.session_state.current_input_list = []
-            st.session_state.frequency_control_list = []
-            st.session_state.frequency_alt_list = []
-            st.session_state.last_current_input = 0.0
+        if 'hvcra_current_input_list' not in st.session_state:
+            st.session_state.hvcra_current_input_list = []
+        if 'hvcra_frequency_control_list' not in st.session_state:
+            st.session_state.hvcra_frequency_control_list = []
+        if 'hvcra_frequency_alt_list' not in st.session_state:
+            st.session_state.hvcra_frequency_alt_list = []
+        if 'hvcra_last_current_input' not in st.session_state:
+            st.session_state.hvcra_last_current_input = 0.0
         
-        if 'reset_counter' not in st.session_state:
-            st.session_state.reset_counter = 0
+        if 'hvcra_reset_counter' not in st.session_state:
+            st.session_state.hvcra_reset_counter = 0
         
-        reset_key = st.session_state.reset_counter
+        hvcra_reset_key = st.session_state.hvcra_reset_counter
+        hvcra_reset_pressed = st.sidebar.button("Reset")
 
-        reset_pressed = st.sidebar.button("Reset")
-
-        if reset_pressed:
-            st.session_state.current_input_list = []
-            st.session_state.frequency_control_list = []
-            st.session_state.frequency_alt_list = []
-            st.session_state.last_current_input = 0.0
-            st.session_state.reset_counter += 1 
+        if hvcra_reset_pressed:
+            st.session_state.hvcra_current_input_list = []
+            st.session_state.hvcra_frequency_control_list = []
+            st.session_state.hvcra_frequency_alt_list = []
+            st.session_state.hvcra_last_current_input = 0.0
+            st.session_state.hvcra_reset_counter += 1 
 
             st.rerun()
 
         st.sidebar.subheader('Current stimulus settings')
 
-        i_amp = st.sidebar.slider('Current amplitude (units?)', -5.0, 5.0, 0.1, 0.1, key=f'i_amp_{reset_key}')
-        i_start = st.sidebar.slider('Current start time (ms)', 150.0, 200.0, 150.0, 10.0, key=f'i_start_{reset_key}')
-        i_end = st.sidebar.slider('Current end time (ms)', 190.0, 200.0, 190.0, 10.0,  key=f'i_end_{reset_key}')
+        i_amp = st.sidebar.slider('Current amplitude (units?)', -0.5, 1.0, 0.00, 0.05, key=f'i_amp_{hvcra_reset_key}')
+        #i_start = st.sidebar.slider('Current start time (ms)', 150.0, 200.0, 150.0, 10.0, key=f'i_start_{hvcra_reset_key}')
+        #i_end = st.sidebar.slider('Current end time (ms)', 190.0, 200.0, 190.0, 10.0,  key=f'i_end_{hvcra_reset_key}')
 
         return {
             'temperature': temperature,
             'Q_gate': q_gate,
             'Q_cond': q_cond,
             'I_amp': i_amp,
-            'I_start': i_start,
-            'I_end': i_end,
+            #'I_start': i_start,
+            #'I_end': i_end,
             'Input_type': input_type,
-            'Current_input_list': st.session_state.current_input_list,
-            'Frequency_control_list': st.session_state.frequency_control_list,
-            'Frequency_alt_list': st.session_state.frequency_alt_list,
-            'Last_current': st.session_state.last_current_input
+            'Current_input_list': st.session_state.hvcra_current_input_list,
+            'Frequency_control_list': st.session_state.hvcra_frequency_control_list,
+            'Frequency_alt_list': st.session_state.hvcra_frequency_alt_list,
+            'Last_current': st.session_state.hvcra_last_current_input
             }
     
     if input_type == 'Synaptic input':
 
-        if 'synaptic_input_list' not in st.session_state:
-            st.session_state.synaptic_input_list = []
-            st.session_state.response_time_q_list = []
-            st.session_state.last_synaptic_input = 0.0
-        
-        if 'reset_counter' not in st.session_state:
-            st.session_state.reset_counter = 0
+        if 'hvcra_synaptic_input_list' not in st.session_state:
+            st.session_state.hvcra_synaptic_input_list = []
+        if 'response_time_control_list' not in st.session_state:
+            st.session_state.response_time_control_list = []
+        if 'response_time_alt_list' not in st.session_state:
+            st.session_state.response_time_alt_list = []
+        if 'hvcra_last_synaptic_input' not in st.session_state:
+            st.session_state.hvcra_last_synaptic_input = 0.0
+        if 'hvcra_reset_counter' not in st.session_state:
+            st.session_state.hvcra_reset_counter = 0
 
-        reset_key = st.session_state.reset_counter
+        hvcra_reset_key = st.session_state.hvcra_reset_counter
 
-        reset_pressed = st.sidebar.button("Reset")
+        hvcra_reset_pressed = st.sidebar.button("Reset")
 
-        if reset_pressed:
-            st.session_state.synaptic_input_list = []
-            st.session_state.response_time_q_list = []
-            st.session_state.last_synaptic_input = 0.0
-            st.session_state.reset_counter += 1 
+        if hvcra_reset_pressed:
+            st.session_state.hvcra_synaptic_input_list = []
+            st.session_state.response_time_control_list = []
+            st.session_state.response_time_alt_list = []
+            st.session_state.hvcra_last_synaptic_input = 0.0
+            st.session_state.hvcra_reset_counter += 1 
 
             st.rerun()
 
@@ -461,11 +466,10 @@ def create_sidebar_controls_hvcra():
 
         st.sidebar.subheader('Synaptic Input Settings')
 
-        ge_max = st.sidebar.slider('Excitatory Synapse Strength (mS/cm^2)', 0.00, 1.0, 0.00, 0.01, 
-                             key=f'ge_max_{reset_key}')
+        ge_max = st.sidebar.slider('Excitatory Synapse Strength (mS/cm^2)', 0.00, 1.0, 0.00, 0.01, key=f'ge_max_{hvcra_reset_key}')
 
-        gi_max = st.sidebar.slider('inhibitory synapse strength (mS/cm^2)', 0.0, 0.5, 0.0, 0.05)
-        gi_start = st.sidebar.slider('inhibitory synapse start time (ms)', 100.0, 200.0, 150.0, 0.5)
+        gi_max = st.sidebar.slider('inhibitory synapse strength (mS/cm^2)', 0.0, 0.5, 0.0, 0.05, key=f'gi_max_{hvcra_reset_key}')
+        gi_start = st.sidebar.slider('inhibitory synapse start time (ms)', 100.0, 200.0, 150.0, 0.5, key=f'gi_start_{hvcra_reset_key}')
 
         if external_input == 'Yes' and noise_input == 'Yes':
             freq = st.sidebar.slider('external input frequency (Hz)', 500.0, 1500.0, 500.0, 250.0)
@@ -546,9 +550,10 @@ def create_sidebar_controls_hvcra():
                 'gi_start': gi_start,
                 'External_input': external_input,
                 'Noise_input': noise_input,
-                'Synaptic_input_list': st.session_state.synaptic_input_list,
-                'Response_time_q_list': st.session_state.response_time_q_list,
-                'Last_synaptic_input': st.session_state.last_synaptic_input
+                'Synaptic_input_list': st.session_state.hvcra_synaptic_input_list,
+                'Response_time_control_list': st.session_state.response_time_control_list,
+                'Response_time_alt_list': st.session_state.response_time_alt_list,                
+                'Last_synaptic_input': st.session_state.hvcra_last_synaptic_input
             }
 
 def create_sidebar_controls_hvci():
@@ -572,31 +577,33 @@ def create_sidebar_controls_hvci():
 
     if input_type == 'Current input':
 
-        if 'current_input_list' not in st.session_state:
-            st.session_state.current_input_list = []
-            st.session_state.frequency_control_list = []
-            st.session_state.frequency_alt_list = []
-            st.session_state.last_current_input = 0.0
+        if 'hvci_current_input_list' not in st.session_state:
+            st.session_state.hvci_current_input_list = []
+        if 'hvci_frequency_control_list' not in st.session_state:
+            st.session_state.hvci_frequency_control_list = []
+        if 'hvci_frequency_alt_list' not in st.session_state:
+            st.session_state.hvci_frequency_alt_list = []
+        if 'hvci_last_current_input' not in st.session_state:
+            st.session_state.hvci_last_current_input = 0.0
         
-        if 'reset_counter' not in st.session_state:
-            st.session_state.reset_counter = 0
+        if 'hvci_reset_counter' not in st.session_state:
+            st.session_state.hvci_reset_counter = 0
         
-        reset_key = st.session_state.reset_counter
+        hvci_reset_key = st.session_state.hvci_reset_counter
+        hvci_reset_pressed = st.sidebar.button("Reset")
 
-        reset_pressed = st.sidebar.button("Reset")
-
-        if reset_pressed:
-            st.session_state.current_input_list = []
-            st.session_state.frequency_control_list = []
-            st.session_state.frequency_alt_list = []
-            st.session_state.last_current_input = 0.0
-            st.session_state.reset_counter += 1 
+        if hvci_reset_pressed:
+            st.session_state.hvci_current_input_list = []
+            st.session_state.hvci_frequency_control_list = []
+            st.session_state.hvci_frequency_alt_list = []
+            st.session_state.hvci_last_current_input = 0.0
+            st.session_state.hvci_reset_counter += 1 
 
             st.rerun()
 
         st.sidebar.subheader('Current stimulus settings')
 
-        i_amp = st.sidebar.slider('Current amplitude (units?)', -30.0, 30.0, 0.0, 0.5, key=f'i_amp_{reset_key}')
+        i_amp = st.sidebar.slider(f'Current amplitude ($\mu A/cm^{2}$)', -2.0, 20.0, 0.0, 1.0, key=f'i_amp_{hvci_reset_key}')
         
         return {
             'temperature': temperature,
@@ -604,10 +611,10 @@ def create_sidebar_controls_hvci():
             'Q_cond': q_cond,
             'I_amp': i_amp,
             'Input_type': input_type,
-            'Current_input_list': st.session_state.current_input_list,
-            'Frequency_control_list': st.session_state.frequency_control_list,
-            'Frequency_alt_list': st.session_state.frequency_alt_list,
-            'Last_current': st.session_state.last_current_input
+            'Current_input_list': st.session_state.hvci_current_input_list,
+            'Frequency_control_list': st.session_state.hvci_frequency_control_list,
+            'Frequency_alt_list': st.session_state.hvci_frequency_alt_list,
+            'Last_current': st.session_state.hvci_last_current_input
         }
     
     if input_type == 'Synaptic input':
@@ -677,6 +684,8 @@ def display_hvcra_theory():
 def prepare_hvcra_plots():
 
     fluctuations = 'off'
+    input_changed = 0
+    input_exists = 0
     params = create_sidebar_controls_hvcra()
     temperature = params['temperature']
     q_gate = params['Q_gate']
@@ -691,17 +700,23 @@ def prepare_hvcra_plots():
     SIMULATION_TIME = 300.0 # ms
     time = np.arange(0, SIMULATION_TIME, STEP_SIZE)
 
+    vs = np.full((30000, 1), 0)
+    vs_ = np.full((30000, 1), 0)
+    vd = np.full((30000, 1), 0)
+    vd_ = np.full((30000, 1), 0)
+
     solution_alt = None
     solution_control = None
 
     response_time_displayed = None
     response_time_displayed_ = None
+    response_time_q10 = None
 
     if input_type == 'Current input':
-    
+
         i_amp = params['I_amp']
-        i_start = params['I_start']
-        i_end = params['I_end']
+        i_start = 150.0
+        i_end = 170.0
         
         current_stimulus = create_current_stimulus_array(time,
                                                         i_amp,
@@ -718,23 +733,23 @@ def prepare_hvcra_plots():
                                            STEP_SIZE,
                                            current_stimulus_array=current_stimulus)
         
-        current_input_list = params['Current_input_list']
-        frequency_control_list = params['Frequency_control_list']
-        frequency_alt_list = params['Frequency_alt_list']
-        st.session_state.last_current_input = params['Last_current']
+        vs = solution_control[:, 1]
+        vd = solution_control[:, 0]
 
-        input_changed = abs(i_amp - st.session_state.last_current_input) > 0.01
-        input_exists = any(c == i_amp for c in current_input_list)
+        vs_ = solution_alt[:, 1]
+        vd_ = solution_alt[:, 0]
+        
+        hvcra_current_input_list = st.session_state.hvcra_current_input_list
+        hvcra_frequency_control_list = st.session_state.hvcra_frequency_control_list
+        hvcra_frequency_alt_list = st.session_state.hvcra_frequency_alt_list
+        hvcra_last_current = st.session_state.hvcra_last_current_input
 
-        if input_changed and not input_exists:
+        current_changed = abs(i_amp - hvcra_last_current) > 0.01
+        current_exists = any(c == i_amp for c in hvcra_current_input_list)
+
+        if current_changed and not current_exists:
 
             with st.spinner(f"Running simulation for {i_amp:.2f}..."):
-
-                current_stimulus = create_current_stimulus_array(time,
-                                                                i_amp,
-                                                                i_start,
-                                                                i_end                                               
-                                                                )
                 
                 solution_control = neuron_control.simulate(time,
                                                         STEP_SIZE,
@@ -745,12 +760,45 @@ def prepare_hvcra_plots():
                                                 STEP_SIZE,
                                                 current_stimulus_array=current_stimulus)
 
-                st.success(f"finished running!")
-            
-        elif input_exists and input_changed:
-            st.info(f"Current input {i_amp:.2f} already tested")
-            st.session_state.last_current_input = i_amp
+                vs = solution_control[:, 1]
+                vd = solution_control[:, 0]
 
+                vs_ = solution_alt[:, 1]
+                vd_ = solution_alt[:, 0]
+
+                st.success(f"finished running!")
+
+                spike_count_control = 0
+                spike_count_alt = 0
+                threshold = -20           
+        
+                for i in range(1, len(vs)):
+                    if vs[i-1] < threshold and vs[i] >= threshold:
+                        spike_count_control += 1
+                    if vs_[i-1] < threshold and vs_[i] >= threshold:
+                        spike_count_alt += 1
+                    
+                frequency_control = spike_count_control
+                frequency_alt = spike_count_alt
+
+                st.session_state.hvcra_current_input_list.append(i_amp)
+                st.session_state.hvcra_frequency_control_list.append(frequency_control)
+                st.session_state.hvcra_frequency_alt_list.append(frequency_alt)
+                st.session_state.hvcra_last_current_input = i_amp
+
+                sorted_pairs = sorted(zip(st.session_state.hvcra_current_input_list, st.session_state.hvcra_frequency_control_list, st.session_state.hvcra_frequency_alt_list))
+                st.session_state.hvcra_current_input_list, st.session_state.hvcra_frequency_control_list, st.session_state.hvcra_frequency_alt_list = zip(*sorted_pairs)
+                st.session_state.hvcra_current_input_list = list(st.session_state.hvcra_current_input_list)
+                st.session_state.hvcra_frequency_control_list = list(st.session_state.hvcra_frequency_control_list)
+                st.session_state.hvcra_frequency_alt_list = list(st.session_state.hvcra_frequency_alt_list)
+        
+        elif current_exists and current_changed:
+            st.info(f"Current input {i_amp:.2f} already tested")
+        
+        st.session_state.hvcra_last_current_input = i_amp
+
+        return input_type, fluctuations, vs, vs_, vd, vd_, time, temperature, st.session_state.hvcra_current_input_list, st.session_state.hvcra_frequency_control_list, st.session_state.hvcra_frequency_alt_list, st.session_state.hvcra_last_current_input
+ 
     if input_type == 'Synaptic input':
 
         ge_max = params['ge_max']
@@ -832,12 +880,19 @@ def prepare_hvcra_plots():
                                             noise_freq=freq_noise,
                                             noise_strength=noise_strength)
 
-        synaptic_input_list = params['Synaptic_input_list']
-        response_time_q_list = params['Response_time_q_list']
-        st.session_state.last_synaptic_input = params['Last_synaptic_input']
+        vs = solution_control[:, 1]
+        vd = solution_control[:, 0]
 
-        input_changed = abs(ge_max - st.session_state.last_synaptic_input) > 0.005
-        input_exists = any(g == ge_max for g in synaptic_input_list)
+        vs_ = solution_alt[:, 1]
+        vd_ = solution_alt[:, 0]
+
+        hvcra_synaptic_input_list = st.session_state.hvcra_synaptic_input_list
+        response_time_control_list = st.session_state.response_time_control_list
+        response_time_alt_list = st.session_state.response_time_alt_list
+        hvcra_last_synaptic_input = st.session_state.hvcra_last_synaptic_input 
+
+        input_changed = abs(ge_max - hvcra_last_synaptic_input) > 0.005
+        input_exists = any(g == ge_max for g in hvcra_synaptic_input_list)
 
         if input_changed and not input_exists:
 
@@ -892,91 +947,50 @@ def prepare_hvcra_plots():
                                                    external_input_strength=external_input_strength,
                                                    noise_freq=freq_noise,
                                                    noise_strength=noise_strength)
+                
+                vs = solution_control[:, 1]
+                vd = solution_control[:, 0]
+
+                vs_ = solution_alt[:, 1]
+                vd_ = solution_alt[:, 0]
+
+                response_time_displayed = response_time(time, 
+                                                        vd, 
+                                                        vs, 
+                                                        excitatory_input_start_time=ge_start, 
+                                                        excitatory_input_strength=ge_max)
+                
+                response_time_displayed_ = response_time(time, 
+                                                        vd_, 
+                                                        vs_, 
+                                                        excitatory_input_start_time=ge_start, 
+                                                        excitatory_input_strength=ge_max)
+                
+                st.session_state.hvcra_synaptic_input_list.append(ge_max)
+                st.session_state.response_time_control_list.append(response_time_displayed)
+                st.session_state.response_time_alt_list.append(response_time_displayed_)
+                st.session_state.hvcra_last_synaptic_input = ge_max
+
+                sorted_pairs = sorted(zip(st.session_state.hvcra_synaptic_input_list, st.session_state.response_time_control_list, st.session_state.response_time_alt_list))
+                st.session_state.hvcra_synaptic_input_list, st.session_state.response_time_control_list, st.session_state.response_time_alt_list = zip(*sorted_pairs)
+                st.session_state.hvcra_synaptic_input_list = list(st.session_state.hvcra_synaptic_input_list)
+                st.session_state.response_time_control_list = list(st.session_state.response_time_control_list)
+                st.session_state.response_time_alt_list = list(st.session_state.response_time_alt_list)
+
 
                 st.success(f"finished running!")
             
         elif input_exists and input_changed:
             st.info(f"Synaptic input {ge_max:.2f} \mS /cm^{2} already tested")
-            st.session_state.last_synaptic_input = ge_max
-
-    vs = solution_control[:, 1]
-    vd = solution_control[:, 0]
-
-    vs_ = solution_alt[:, 1]
-    vd_ = solution_alt[:, 0]
-
-    if input_type == 'Current input':
-
-        if input_changed and not input_exists:
-            spike_indices_control = []
-            spike_indices_alt = []
-            threshold = -20           
-    
-            for i in range(1, len(vs)):
-                if vs[i-1] < threshold and vs[i] >= threshold:
-                    spike_indices_control.append(i)
-                if vs_[i-1] < threshold and vs_[i] >= threshold:
-                    spike_indices_alt.append(i)
-                
+            st.session_state.hvcra_last_synaptic_input = ge_max
             
-            current_input_duration = i_end - i_start
-
-            frequency_control = 1000 * len(spike_indices_control) / current_input_duration if current_input_duration  > 0 else 0
-            frequency_alt = 1000 * len(spike_indices_alt) / current_input_duration if current_input_duration  > 0 else 0
-
-            current_input_list.append(i_amp)
-            frequency_control_list.append(frequency_control)
-            frequency_alt_list.append(frequency_alt)
-            st.session_state.last_current_input = i_amp
-
-            sorted_pairs = sorted(zip(current_input_list, frequency_control_list, frequency_alt_list))
-            current_input_list, frequency_control_list, frequency_alt_list = zip(*sorted_pairs)
-            current_input_list = list(current_input_list)
-            frequency_control_list = list(frequency_control_list)
-            frequency_alt_list = list(frequency_alt_list)
-
-    if input_type == 'Synaptic input':
-        
-        response_time_displayed = response_time(time, 
-                                                vd, 
-                                                vs, 
-                                                excitatory_input_start_time=ge_start, 
-                                                excitatory_input_strength=ge_max)
-        
-        response_time_displayed_ = response_time(time, 
-                                                 vd_, 
-                                                 vs_, 
-                                                 excitatory_input_start_time=ge_start, 
-                                                 excitatory_input_strength=ge_max)
-        
-        if input_changed and not input_exists:
-
-            synaptic_input_list.append(ge_max)
-            response_time_q_list.append(response_time_displayed_ / response_time_displayed)
-            st.session_state.last_synaptic_input = ge_max
-
-            sorted_pairs = sorted(zip(synaptic_input_list, response_time_q_list))
-            synaptic_input_list, response_time_q_list = zip(*sorted_pairs)
-            synaptic_input_list = list(synaptic_input_list)
-            response_time_q_list = list(response_time_q_list)
-    
-    response_time_q10 = None
-
-    if response_time_displayed_ is not None and response_time_displayed is not None:
-        response_time_q10 = (response_time_displayed_ / response_time_displayed) ** (0.1 * (40.0 - temperature))
-
-    if input_type == "Synaptic input":
-        return input_type, fluctuations, vs, vs_, vd, vd_, time, temperature, response_time_displayed, response_time_displayed_, response_time_q10, synaptic_input_list, response_time_q_list, st.session_state.last_synaptic_input
-
-    elif input_type == "Current input":
-
-        frequency_ratio = [f_alt / f_c if f_c != 0 else 0 for f_alt in frequency_alt_list for f_c in frequency_control_list]
-        return input_type, fluctuations, vs, vs_, vd, vd_, time, temperature, response_time_displayed, response_time_displayed_, response_time_q10, current_input_list, frequency_ratio, st.session_state.last_current_input
+        return input_type, fluctuations, vs, vs_, vd, vd_, time, temperature, st.session_state.hvcra_synaptic_input_list, st.session_state.response_time_control_list, st.session_state.response_time_alt_list, st.session_state.hvcra_last_synaptic_input
 
 def display_hvci_theory():
     pass
 
 def prepare_hvci_plots():
+    
     params = create_sidebar_controls_hvci()
     temperature = params['temperature']
     q_gate = params['Q_gate']
@@ -988,8 +1002,14 @@ def prepare_hvci_plots():
     input_type = params['Input_type']
 
     STEP_SIZE = 0.01  # ms
-    SIMULATION_TIME = 1000.0 # ms
-    time = np.arange(0, SIMULATION_TIME, STEP_SIZE)
+    if input_type == 'Current input':
+        simulation_time = 500.0 # ms
+    else:
+        simulation_time = 1000.0
+    time = np.arange(0, simulation_time, STEP_SIZE)
+
+    v = np.full((30000, 1), 0)
+    v_ = np.full((30000, 1), 0)
 
     solution_alt = None
     solution_control = None
@@ -997,8 +1017,8 @@ def prepare_hvci_plots():
     if input_type == 'Current input':
     
         i_amp = params['I_amp']
-        i_start = 100.0
-        i_end = SIMULATION_TIME - 100.0
+        i_start = 50.0
+        i_end = simulation_time - 50.0
         
         current_stimulus = create_current_stimulus_array(time,
                                                         i_amp,
@@ -1015,15 +1035,18 @@ def prepare_hvci_plots():
                                                     STEP_SIZE,
                                                     current_stimulus_array=current_stimulus)
         
-        current_input_list = params['Current_input_list']
-        frequency_control_list = params['Frequency_control_list']
-        frequency_alt_list = params['Frequency_alt_list']
-        st.session_state.last_current_input = params['Last_current']
+        v = solution_control[:, 0]
+        v_ = solution_alt[:, 0]
+        
+        hvci_current_input_list = st.session_state.hvci_current_input_list
+        hvci_frequency_control_list = st.session_state.hvci_frequency_control_list
+        hvci_frequency_alt_list = st.session_state.hvci_frequency_alt_list
+        hvci_last_current = st.session_state.hvci_last_current_input
 
-        input_changed = abs(i_amp - st.session_state.last_current_input) > 0.01
-        input_exists = any(c == i_amp for c in current_input_list)
+        current_changed = abs(i_amp - hvci_last_current) > 0.01
+        current_exists = any(c == i_amp for c in hvci_current_input_list)
 
-        if input_changed and not input_exists:
+        if current_changed and not current_exists:
 
             with st.spinner(f"Running simulation for {i_amp:.2f}..."):
 
@@ -1043,10 +1066,40 @@ def prepare_hvci_plots():
                                                 current_stimulus_array=current_stimulus)
 
                 st.success(f"finished running!")
+
+                v = solution_control[:, 0]
+                v_ = solution_alt[:, 0]
+
+                spike_count_control = 0
+                spike_count_alt = 0
+                threshold = -20           
+        
+                for i in range(1, len(v)):
+                    if v[i-1] < threshold and v[i] >= threshold:
+                        spike_count_control += 1
+                    if v_[i-1] < threshold and v_[i] >= threshold:
+                        spike_count_alt += 1
+                    
+                frequency_control = spike_count_control
+                frequency_alt = spike_count_alt
+
+                st.session_state.hvci_current_input_list.append(i_amp)
+                st.session_state.hvci_frequency_control_list.append(frequency_control)
+                st.session_state.hvci_frequency_alt_list.append(frequency_alt)
+                st.session_state.hvci_last_current_input = i_amp
+
+                sorted_pairs = sorted(zip(st.session_state.hvci_current_input_list, st.session_state.hvci_frequency_control_list, st.session_state.hvci_frequency_alt_list))
+                st.session_state.hvci_current_input_list, st.session_state.hvci_frequency_control_list, st.session_state.hvci_frequency_alt_list = zip(*sorted_pairs)
+                st.session_state.hvci_current_input_list = list(st.session_state.hvci_current_input_list)
+                st.session_state.hvci_frequency_control_list = list(st.session_state.hvci_frequency_control_list)
+                st.session_state.hvci_frequency_alt_list = list(st.session_state.hvci_frequency_alt_list)
             
-        elif input_exists and input_changed:
+        elif current_exists and current_changed:
             st.info(f"Current input {i_amp:.2f} already tested")
-            st.session_state.last_current_input = i_amp
+        
+        st.session_state.hvci_last_current_input = i_amp
+        
+        return v, v_, time, current_stimulus, temperature, st.session_state.hvci_current_input_list, st.session_state.hvci_frequency_control_list, st.session_state.hvci_frequency_alt_list, st.session_state.hvci_last_current_input
 
     if input_type == 'Synaptic input':
         
@@ -1109,7 +1162,4 @@ def prepare_hvci_plots():
                                             noise_freq=freq_noise,
                                             noise_strength=noise_strength)
         
-    v = solution_control[:, 0]
-    v_ = solution_alt[:, 0]
-    if input_type == "Current input":
-        return v, v_, time, current_stimulus, temperature, current_input_list, frequency_control_list, frequency_alt_list, st.session_state.last_current_input
+

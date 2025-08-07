@@ -1,5 +1,4 @@
 import streamlit as st
-import matplotlib.pyplot as plt
 
 from utils import (display_lif_theory,
                    prepare_lif_plots,
@@ -11,18 +10,19 @@ from utils import (display_lif_theory,
                    prepare_hvci_plots,
                    )
 
-from visualization import (plot_lif,
-                           plot_membrane_potential,
+from visualization import (plot_lif_membrane_potential,
+                           plot_hh_membrane_potential,
                            plot_somatic_membrane_potential,
                            plot_dendritic_membrane_potential,
-                           plot_soma_response_q10,
-                           plot_somatic_membrane_potential_with_spike_frequency,
-                           plot_somatic_membrane_potential_q10)
+                           plot_somatic_membrane_potential_with_spike_counts,
+                           plot_somatic_membrane_potential_q10,
+                           plot_hvci_membrane_potential)
 
 st.set_page_config(
     layout = 'wide',
     page_title = 'Neuron model simulator'
 )
+
 st.markdown("""
             <style>
             .big-font {
@@ -41,7 +41,7 @@ Neuron_class = st.selectbox('Contents',
                               'HVC neurons'])
 
 if Neuron_class == 'Introduction':
-    #with st.expander("Introduction"):
+
     st.markdown('<p class="big-font"> A neuron is a special type of cell that can generate electrical signals. It does so by utilizing the influx and outflux of a variety of ions ' \
                 'through gates or channels that are specific to a given ion. Neuron cells can connect and communicate with each other to transmit this electrical signal to one another, ' \
                 ' and patterns of these electrical activity across  connected circuits between the neurons encodes for pretty much any information as well as gives rise to behavior. ' \
@@ -62,7 +62,7 @@ if Neuron_class == 'Integrate and Fire model':
 
     v, time, current_stimulus, current_list, frequency_list, last_current = prepare_lif_plots()
 
-    fig_fi = plot_lif(time,
+    fig_fi = plot_lif_membrane_potential(time,
                       v,
                       current_stimulus,
                       current_list,
@@ -79,7 +79,7 @@ if Neuron_class == 'Hodgkin Huxley':
     tab1, tab2 = st.tabs(['membrane potential and f-I relationship', 'Gating variables'])
 
     with tab1:
-        fig_mp = plot_membrane_potential(time, 
+        fig_mp = plot_hh_membrane_potential(time, 
                                          v, 
                                          v_, 
                                          current_stimulus,
@@ -91,26 +91,27 @@ if Neuron_class == 'Hodgkin Huxley':
 
         st.pyplot(fig_mp)
 
-elif Neuron_class == 'HVC neurons':
+if Neuron_class == 'HVC neurons':
     
     HVC_neuron_type = st.selectbox('HVC neuron', ['Choose HVC neuron type', 'HVC(RA)', 'HVC(I)'])
     
     if HVC_neuron_type == 'HVC(RA)':
 
         display_hvcra_theory()
-        input_type, fluctuations, Vs, Vs_, Vd, Vd_, time, temperature, response_time_displayed, response_time_displayed_, response_time_q10, input_list, data_list, last_input = prepare_hvcra_plots()
+        input_type, fluctuations, Vs, Vs_, Vd, Vd_, time, temperature, input_list, control_data_list, alt_data_list, last_input = prepare_hvcra_plots()
 
         if input_type == "Current input":
             tab1, tab2= st.tabs(['Soma membrane potential and spike frequency', 'Dendrite membrane potential'])
 
             with tab1:
                 
-                fig_mp = plot_somatic_membrane_potential_with_spike_frequency(time, 
-                                                Vs, 
+                fig_mp = plot_somatic_membrane_potential_with_spike_counts(time, 
+                                                                           Vs, 
                                                 Vs_, 
                                                 temperature, 
                                                 input_list,
-                                                data_list,
+                                                control_data_list,
+                                                alt_data_list,
                                                 last_input)
 
                 st.pyplot(fig_mp)
@@ -137,7 +138,8 @@ elif Neuron_class == 'HVC neurons':
                                                                 Vs_, 
                                                                 temperature, 
                                                                 input_list, 
-                                                                data_list, 
+                                                                control_data_list, 
+                                                                alt_data_list,
                                                                 last_input)
 
                     st.pyplot(fig_a)
@@ -184,7 +186,7 @@ elif Neuron_class == 'HVC neurons':
         
         with tab1:
 
-            fig_mp = plot_membrane_potential(time,
+            fig_mp = plot_hvci_membrane_potential(time,
                                              v,
                                              v_,
                                              current_stimulus,
