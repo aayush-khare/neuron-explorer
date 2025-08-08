@@ -10,11 +10,13 @@ from models.hvc_interneuron import HvcInterNeuron
 def create_current_stimulus_array(time_array, i_amp, i_start, i_end):
     '''
     Function for creating a pulse current input
-
+    Args:
+        time_array (numpy.ndarray): The time points at which to evaluate the current stimulus.
+        i_amp (float): The amplitude of the current pulse.
+        i_start (float): The start time of the current pulse.
+        i_end (float): The end time of the current pulse.
     Returns:
-
-    current stimulus : array
-    numpy array containing current input values at different time points
+        numpy.ndarray: A numpy array containing current input values at different time points.
     '''
     current_stimulus = np.zeros_like(time_array)
     start_id = np.argmin(np.abs(time_array - i_start))
@@ -25,11 +27,16 @@ def create_current_stimulus_array(time_array, i_amp, i_start, i_end):
 def create_synapse_stimulus_array(time_array, temp, q_gate, g_max, g_start, step_size):
     '''
     Function for creating a single kick and decay type synaptic input
-
+    Args:
+        time_array (numpy.ndarray): The time points at which to evaluate the synaptic stimulus.
+        temp (float): The temperature in Celsius.
+        q_gate (float): The Q10 value for conformation dependent processes.
+        g_max (float): The maximum synaptic conductance strength.
+        g_start (float): The start time of the synaptic input.
+        step_size (float): The time step size for the simulation.
     Returns:
 
-    synapse_stimulus : array
-    numpy array containing values of the synaptic conductance strength at different time points
+        numpy.ndarray: A numpy array containing values of the synaptic conductance strength at different time points.
     '''
     synapse_stimulus = np.zeros_like(time_array)
     start_id = np.argmin(np.abs(time_array - g_start))
@@ -41,15 +48,22 @@ def create_synapse_stimulus_array(time_array, temp, q_gate, g_max, g_start, step
 
 def response_time(time, vd, vs, current_amplitude=None, current_input_start_time=None, excitatory_input_start_time=None, excitatory_input_strength=None, threshold=-20):
     """
-    Assess whether the neuron spiked or not and return a rise time
-    The rise time is defined as the time from input to reaching a peak somatic membrane 
-    potential in case the peak is below threshold or the time from input to threshold membrane potential (-20 mV)
+    Assess whether neuron spiked and return a response time for the soma
+    The response time is defined as the time for somatic membrane potential to reach a peak value from input time for subthreshold response 
+    or the time to reach -20 mV for superthreshold response
 
-    Parameters:
-    -----------
+    Args:
+        time (numpy.ndarray): The time points at which to evaluate the response.
+        vd (numpy.ndarray): The dendritic membrane potential over time.
+        vs (numpy.ndarray): The somatic membrane potential over time.
+        current_amplitude (float, optional): The amplitude of the current stimulus.
+        current_input_start_time (float, optional): The start time of the current stimulus.
+        excitatory_input_start_time (float, optional): The start time of the excitatory input.
+        excitatory_input_strength (float, optional): The strength of the excitatory input.
+        threshold (float, optional): The voltage threshold for spike detection.
 
     Returns:
-    --------
+        float: The response time for the soma.
 
     """
     time = time.tolist()
@@ -60,33 +74,33 @@ def response_time(time, vd, vs, current_amplitude=None, current_input_start_time
         if current_amplitude > 0:
 
             if max(vd) > threshold and max(vs) > threshold:
-                rise_time = np.round(time[next(x[0] for x in enumerate(vs) if x[1] > threshold)] - current_input_start_time, 3)
-                return rise_time
+                response_time = np.round(time[next(x[0] for x in enumerate(vs) if x[1] > threshold)] - current_input_start_time, 3)
+                return response_time
             elif max(vd) < threshold and max(vs) > threshold:
-                rise_time = np.round(time[next(x[0] for x in enumerate(vs) if x[1] > threshold)] - current_input_start_time, 3)
-                return rise_time
+                response_time = np.round(time[next(x[0] for x in enumerate(vs) if x[1] > threshold)] - current_input_start_time, 3)
+                return response_time
             elif max(vd) < threshold and max(vs) < threshold:
-                rise_time = np.round(time[vs.index(max(vs))] - current_input_start_time, 3)
-                return rise_time
+                response_time = np.round(time[vs.index(max(vs))] - current_input_start_time, 3)
+                return response_time
     
     elif excitatory_input_strength is not None:
         if excitatory_input_strength > 0:
             if max(vd) > threshold and max(vs) > threshold:
-                rise_time = np.round(time[next(x[0] for x in enumerate(vs) if x[1] > threshold)] - excitatory_input_start_time, 3)
-                return rise_time
+                response_time = np.round(time[next(x[0] for x in enumerate(vs) if x[1] > threshold)] - excitatory_input_start_time, 3)
+                return response_time
             elif max(vd) < threshold and max(vs) > threshold:
-                rise_time = np.round(time[next(x[0] for x in enumerate(vs) if x[1] > threshold)] - excitatory_input_start_time, 3)
-                return rise_time
+                response_time = np.round(time[next(x[0] for x in enumerate(vs) if x[1] > threshold)] - excitatory_input_start_time, 3)
+                return response_time
             elif max(vd) < threshold and max(vs) < threshold:
-                rise_time = np.round(time[vs.index(max(vs))] - excitatory_input_start_time, 3)
-                return rise_time
+                response_time = np.round(time[vs.index(max(vs))] - excitatory_input_start_time, 3)
+                return response_time
             
 def create_sidebar_controls_lif():
     '''
     Sidebar controls for the Leaky Integrate and Fire neuron model
 
     Returns:
-
+    -------
     params : dict
     Dictionary containing all parameter values for the LIF model
     '''
@@ -125,7 +139,9 @@ def create_sidebar_controls_lif():
     }
 
 def prepare_lif_plots():
-    
+    """
+    Prepare the plots for the Leaky Integrate and Fire neuron model
+    """
     params = create_sidebar_controls_lif()
 
     neuron = LIF()
@@ -139,7 +155,6 @@ def prepare_lif_plots():
     i_end = SIMULATION_TIME - 20.0
 
     lif_current_list = st.session_state.lif_current_list
-    frequency_list = st.session_state.lif_frequency_list
     lif_last_current = st.session_state.lif_last_current
 
     current_changed = abs(i_amp - lif_last_current) > 0.05
@@ -150,18 +165,17 @@ def prepare_lif_plots():
                                                     i_start,
                                                     i_end                                               
                                                     )
-    
+
     solution = neuron.simulate(time, STEP_SIZE, current_stimulus_array=current_stimulus)
-        
     v = solution[:, 0]
-    
+
     if current_changed and not current_exists:
 
         with st.spinner(f"Running F-I simulation for {i_amp:.1f} $\mu A/cm^2$ ..."):
 
             spike_indices = []
-            threshold = -50           
-    
+            threshold = -50
+            
             solution = neuron.simulate(time, STEP_SIZE, current_stimulus_array=current_stimulus)
         
             v = solution[:, 0]
@@ -187,7 +201,6 @@ def prepare_lif_plots():
             st.session_state.lif_frequency_list = list(st.session_state.lif_frequency_list)
             
             st.success(f"Added: {i_amp:.2f} $\mu A/cm^{2}$ → {frequency:.1f} Hz")
-            #st.rerun()
             
     elif current_exists and current_changed:
         st.info(f"Current {i_amp:.1f} $\mu A/cm^2$ already tested")
@@ -197,6 +210,10 @@ def prepare_lif_plots():
     return v, time, current_stimulus, st.session_state.lif_current_list, st.session_state.lif_frequency_list, st.session_state.lif_last_current
 
 def display_lif_theory():
+    """
+    Display the theoretical background of the Leaky Integrate and Fire model
+    """
+
     with st.expander('About Leaky Integrate and Fire model'):
         st.markdown("""
     
@@ -215,7 +232,7 @@ def create_sidebar_controls_hh():
     Sidebar controls for the Hodgkin Huxley (HH) neuron model
 
     Returns:
-
+    -------
     params : dict
     Dictionary containing all parameter values for the HH model
     '''
@@ -234,31 +251,26 @@ def create_sidebar_controls_hh():
 
     if 'hh_reset_counter' not in st.session_state:
         st.session_state.hh_reset_counter = 0
-
-    hh_reset_key = st.session_state.hh_reset_counter
-
-    hh_reset_pressed = st.sidebar.button("Reset")
     
-    if hh_reset_pressed:
+    def handle_reset():
         st.session_state.hh_current_list = []
         st.session_state.hh_frequency_list_control = []
         st.session_state.hh_frequency_list_alt = []
         st.session_state.hh_last_current = 0.0
-        st.session_state.hh_reset_counter += 1 
+        st.session_state.hh_reset_counter += 1
 
-        st.rerun()
+    hh_reset_key = st.session_state.hh_reset_counter
 
     st.sidebar.header('Model Parameters')
     st.sidebar.subheader('Temperature and Q10 values')
-    q_gate = st.sidebar.slider('Q10 for conformation dependent processes', 2.0, 4.0, 3.0, 0.1)
-    q_cond = st.sidebar.slider('Q10 for diffusion dependent processes', 1.0, 2.0, 1.3, 0.1)
+    q_gate = st.sidebar.slider('Q10 for conformation dependent processes', 2.0, 4.0, 3.0, 0.1, on_change=handle_reset)
+    q_cond = st.sidebar.slider('Q10 for diffusion dependent processes', 1.0, 2.0, 1.3, 0.1, on_change=handle_reset)
 
     st.sidebar.subheader('Current stimulus settings')
-    i_amp = st.sidebar.slider('Current amplitude ($\mu A/cm^2$)', -3.0, 15.0, 0.0, 0.5, format="%0.1f", key=f'i_amp_{hh_reset_key}')
+    i_amp = st.sidebar.slider('Current amplitude ($\mu A/cm^2$)', -1.0, 15.0, 1.0, 1.0, format="%0.1f", key=f'i_amp_{hh_reset_key}')
     
-    temperature = st.selectbox('Temperature in Celsius (control fixed at 6.3 Celsius)', [0.0, 10.0, -10.0], width=300) # control temperature = 6.3 celsius
+    temperature = st.selectbox('Temperature in Celsius (control fixed at 6.3 Celsius)', [0.0, 10.0, -10.0], width=300, on_change=handle_reset) # control temperature = 6.3 celsius
 
-    # Return all parameters as a dictionary
     return {
         'temperature': temperature,
         'Q_gate': q_gate,
@@ -271,6 +283,9 @@ def create_sidebar_controls_hh():
     }
 
 def prepare_hh_plots():
+    """
+    Prepare the plots for the Hodgkin Huxley neuron model
+    """
     
     params = create_sidebar_controls_hh()
     temperature = params['temperature']
@@ -292,8 +307,6 @@ def prepare_hh_plots():
     i_end = SIMULATION_TIME - 50.0
 
     hh_current_list = st.session_state.hh_current_list
-    frequency_list_control = st.session_state.hh_frequency_list_control
-    frequency_list_alt = st.session_state.hh_frequency_list_alt
     hh_last_current = st.session_state.hh_last_current
 
     current_changed = abs(i_amp - hh_last_current) >= 0.5
@@ -302,7 +315,7 @@ def prepare_hh_plots():
     current_stimulus = create_current_stimulus_array(time,
                                                     i_amp,
                                                     i_start,
-                                                    i_end                                               
+                                                    i_end
                                                     )
     
     solution_control = neuron_control.simulate(time, STEP_SIZE, current_stimulus_array=current_stimulus)
@@ -317,13 +330,15 @@ def prepare_hh_plots():
         with st.spinner(f"Running F-I simulation for {i_amp:.1f} $\mu A/cm^{2}$..."):
             spike_indices = []
             spike_indices_ = []
-            threshold = -20          
-    
+            threshold = -20
+            
             solution_control = neuron_control.simulate(time, STEP_SIZE, current_stimulus_array=current_stimulus)
             solution_alt = neuron_alt.simulate(time, STEP_SIZE, current_stimulus_array=current_stimulus)
         
             v = solution_control[:, 0]
             v_ = solution_alt[:, 0]
+
+            st.session_state.hh_current_list.append(i_amp)
 
             for i in range(1, len(v)):
                 if v[i-1] < threshold and v[i] >= threshold:
@@ -337,13 +352,13 @@ def prepare_hh_plots():
             else:
                 frequency_control = 0
 
-            if len(spike_indices_) > 0:
+            if len(spike_indices_) > 0 and not any(c < 0 for c in st.session_state.hh_current_list):
                 duration_ = i_end - i_start
                 frequency_alt = 1000 * len(spike_indices_) / duration_
             else:
                 frequency_alt = 0
 
-            st.session_state.hh_current_list.append(i_amp)
+            
             st.session_state.hh_frequency_list_control.append(frequency_control)
             st.session_state.hh_frequency_list_alt.append(frequency_alt)
 
@@ -354,8 +369,6 @@ def prepare_hh_plots():
             st.session_state.hh_frequency_list_alt = list(st.session_state.hh_frequency_list_alt)
             
             st.success(f"Added: {i_amp:.1f} $\mu A/cm^{2}$")
-            #  st.rerun()
-
     
     else:
         st.info(f"Current {i_amp:.1f} $\mu A/cm^2$ already tested")
@@ -369,7 +382,7 @@ def create_sidebar_controls_hvcra():
     Sidebar controls for the HVC(RA) projection neuron model
 
     Returns:
-
+    -------
     params : dict
     Dictionary containing all parameter values for the HVC(RA)
     '''
@@ -377,16 +390,10 @@ def create_sidebar_controls_hvcra():
     st.sidebar.header('Model Parameters')
     st.sidebar.subheader('Temperature and Q10 values')
 
-    col1, col2 = st.columns(2)
-    with col1:
-        input_type = st.selectbox('Input type', ['Current input', 'Synaptic input'], width=200)
-    with col2:
-        temperature = st.selectbox('Altered Temperature in $^o$C (control set to 40$^o$ C)', [30.0, 35.0], width=300) #  control temperature = 40.0 celsius
     
-    q_gate = st.sidebar.slider('Q10 for conformation dependent processes', 2.0, 4.0, 3.0, 0.1)
-    q_cond = st.sidebar.slider('Q10 for diffusion dependent processes', 1.0, 2.0, 1.3, 0.1)
+    input_type = st.selectbox('Input type', ['Current input', 'Synaptic input'], width=200)
 
-    if input_type == 'Current input':
+    if input_type == 'Current input':   
         
         if 'hvcra_current_input_list' not in st.session_state:
             st.session_state.hvcra_current_input_list = []
@@ -395,36 +402,33 @@ def create_sidebar_controls_hvcra():
         if 'hvcra_frequency_alt_list' not in st.session_state:
             st.session_state.hvcra_frequency_alt_list = []
         if 'hvcra_last_current_input' not in st.session_state:
-            st.session_state.hvcra_last_current_input = 0.0
-        
+            st.session_state.hvcra_last_current_input = 0.0      
         if 'hvcra_reset_counter' not in st.session_state:
             st.session_state.hvcra_reset_counter = 0
         
-        hvcra_reset_key = st.session_state.hvcra_reset_counter
-        hvcra_reset_pressed = st.sidebar.button("Reset")
-
-        if hvcra_reset_pressed:
+        def handle_reset():
             st.session_state.hvcra_current_input_list = []
             st.session_state.hvcra_frequency_control_list = []
             st.session_state.hvcra_frequency_alt_list = []
             st.session_state.hvcra_last_current_input = 0.0
-            st.session_state.hvcra_reset_counter += 1 
+            st.session_state.hvcra_reset_counter += 1
 
-            st.rerun()
+        hvcra_reset_key = st.session_state.hvcra_reset_counter
+
+        temperature = st.selectbox('Altered Temperature in $^o$C (control set to 40$^o$ C)', [30.0, 35.0], width=300, on_change=handle_reset) #  control temperature = 40.0 celsius
+        
+        q_gate = st.sidebar.slider('Q10 for conformation dependent processes', 2.0, 4.0, 3.0, 0.1, on_change=handle_reset)
+        q_cond = st.sidebar.slider('Q10 for diffusion dependent processes', 1.0, 2.0, 1.3, 0.1, on_change=handle_reset)
 
         st.sidebar.subheader('Current stimulus settings')
 
-        i_amp = st.sidebar.slider('Current amplitude (units?)', -0.5, 1.0, 0.00, 0.05, key=f'i_amp_{hvcra_reset_key}')
-        #i_start = st.sidebar.slider('Current start time (ms)', 150.0, 200.0, 150.0, 10.0, key=f'i_start_{hvcra_reset_key}')
-        #i_end = st.sidebar.slider('Current end time (ms)', 190.0, 200.0, 190.0, 10.0,  key=f'i_end_{hvcra_reset_key}')
+        i_amp = st.sidebar.slider(f'Current amplitude ($\mu A/cm^{2}$)', -0.2, 1.0, 0.00, 0.1, key=f'i_amp_{hvcra_reset_key}')
 
         return {
             'temperature': temperature,
             'Q_gate': q_gate,
             'Q_cond': q_cond,
             'I_amp': i_amp,
-            #'I_start': i_start,
-            #'I_end': i_end,
             'Input_type': input_type,
             'Current_input_list': st.session_state.hvcra_current_input_list,
             'Frequency_control_list': st.session_state.hvcra_frequency_control_list,
@@ -445,31 +449,35 @@ def create_sidebar_controls_hvcra():
         if 'hvcra_reset_counter' not in st.session_state:
             st.session_state.hvcra_reset_counter = 0
 
-        hvcra_reset_key = st.session_state.hvcra_reset_counter
-
-        hvcra_reset_pressed = st.sidebar.button("Reset")
-
-        if hvcra_reset_pressed:
+        def handle_reset():
             st.session_state.hvcra_synaptic_input_list = []
             st.session_state.response_time_control_list = []
             st.session_state.response_time_alt_list = []
             st.session_state.hvcra_last_synaptic_input = 0.0
-            st.session_state.hvcra_reset_counter += 1 
+            st.session_state.hvcra_reset_counter += 1
 
-            st.rerun()
+        hvcra_reset_key = st.session_state.hvcra_reset_counter
 
+        temperature = st.selectbox('Altered Temperature in $^o$C (control set to 40$^o$ C)', [30.0, 35.0], width=300, on_change=handle_reset) #  control temperature = 40.0 celsius
+        
+        q_gate = st.sidebar.slider('Q10 for conformation dependent processes', 2.0, 4.0, 3.0, 0.1, on_change=handle_reset)
+        q_cond = st.sidebar.slider('Q10 for diffusion dependent processes', 1.0, 2.0, 1.3, 0.1, on_change=handle_reset)
+
+        external_input = 'No'
+        noise_input = 'No'
+        '''
         col1, col2 = st.columns(2)
         with col1:
             external_input = st.selectbox('Add External Input', ['No', 'Yes'], width=200)
         with col2:
             noise_input = st.selectbox('Add Noise Input', ['No', 'Yes'], width=200)
-
+        '''
         st.sidebar.subheader('Synaptic Input Settings')
 
-        ge_max = st.sidebar.slider('Excitatory Synapse Strength (mS/cm^2)', 0.00, 1.0, 0.00, 0.01, key=f'ge_max_{hvcra_reset_key}')
+        ge_max = st.sidebar.slider('Excitatory Synapse Strength (mS/cm^2)', 0.01, 1.0, 0.01, 0.01, key=f'ge_max_{hvcra_reset_key}')
 
-        gi_max = st.sidebar.slider('inhibitory synapse strength (mS/cm^2)', 0.0, 0.5, 0.0, 0.05, key=f'gi_max_{hvcra_reset_key}')
-        gi_start = st.sidebar.slider('inhibitory synapse start time (ms)', 100.0, 200.0, 150.0, 0.5, key=f'gi_start_{hvcra_reset_key}')
+        gi_max = 0.0 #st.sidebar.slider('inhibitory synapse strength (mS/cm^2)', 0.0, 0.5, 0.0, 0.05, key=f'gi_max_{hvcra_reset_key}')
+        gi_start = 0.0 #st.sidebar.slider('inhibitory synapse start time (ms)', 100.0, 200.0, 150.0, 0.5, key=f'gi_start_{hvcra_reset_key}')
 
         if external_input == 'Yes' and noise_input == 'Yes':
             freq = st.sidebar.slider('external input frequency (Hz)', 500.0, 1500.0, 500.0, 250.0)
@@ -537,7 +545,7 @@ def create_sidebar_controls_hvcra():
                 'Response_time_q_list': st.session_state.response_time_q_list,
                 'Last_synaptic_input': st.session_state.last_synaptic_input
             }
-            
+        
         else:
             
             return {
@@ -568,7 +576,7 @@ def create_sidebar_controls_hvci():
 
     st.sidebar.header('Model Parameters')
 
-    input_type = st.selectbox('Input type', ['Current input', 'Synaptic input'])
+    input_type = st.selectbox('Input type', ['Current input', 'Noise input'])
 
     st.sidebar.subheader('Temperature and Q10 values')
     temperature = st.selectbox('Temperature in Celsius', [30.0, 35.0]) #  control temperature = 40.0 celsius
@@ -603,7 +611,7 @@ def create_sidebar_controls_hvci():
 
         st.sidebar.subheader('Current stimulus settings')
 
-        i_amp = st.sidebar.slider(f'Current amplitude ($\mu A/cm^{2}$)', -2.0, 20.0, 0.0, 1.0, key=f'i_amp_{hvci_reset_key}')
+        i_amp = st.sidebar.slider(f'Current amplitude ($\mu A/cm^{2}$)', 0.0, 15.0, 0.0, 1.0, key=f'i_amp_{hvci_reset_key}')
         
         return {
             'temperature': temperature,
@@ -632,7 +640,6 @@ def create_sidebar_controls_hvci():
         if noise_input == 'Yes':
             freq_noise = st.sidebar.slider('noise input frequency (Hz)', 50.0, 300.0, 200.0, 50.0)
         
-            # Return all parameters as a dictionary
             return {
                 'temperature': temperature,
                 'Q_gate': q_gate,
@@ -660,6 +667,10 @@ def create_sidebar_controls_hvci():
             }
 
 def display_hh_theory():
+    """
+    Display the theoretical background of the Hodgkin-Huxley model.
+    """
+
     with st.expander('About Hodgkin-Huxley model'):
         st.markdown("""
         ## About Hodgkin Huxley model
@@ -679,9 +690,37 @@ def display_hh_theory():
             st.info("Image not found")
 
 def display_hvcra_theory():
-    pass
+    """
+    Display the theoretical background of the HVC(RA) model.
+    """
+    with st.expander('About HVC(RA) model'):
+        st.markdown("""
+        ## About HVC(RA) model
+
+        A complex dynamical model that mimics the biophysical mechanisms involved in action potential generation
+        for an excitatory class of neurons in the premotor brain region HVC in songbirds. This model involves the
+        complex morphology of the HVC(RA) neurons broken down into two compartments, a dendrite and a soma which
+        are coupled via ohmic coupling. The dendritic compartment contains a Calcium ion channel, which imparts 
+        the model with eliciting a wide calcium spike. This in turn drives 4-5 tightly chunked sodium ion spikes
+        in the somatic compartment. This behavior of the model is representative of the bursting behavior observed 
+        in HVC(RA) neurons.
+
+        ### Ion channels incorporated
+            Dendrite:
+                - Calcium channel
+                - Calcium concentration dependent Potassium channel
+                - Leak channel
+                    
+            Soma:
+                - Sodium channel
+                - Potassium channel
+                - Leak channel
+        """)
 
 def prepare_hvcra_plots():
+    """
+    Prepare plots for the HVC(RA) model simulations.
+    """
 
     fluctuations = 'off'
     input_changed = 0
@@ -708,9 +747,8 @@ def prepare_hvcra_plots():
     solution_alt = None
     solution_control = None
 
-    response_time_displayed = None
-    response_time_displayed_ = None
-    response_time_q10 = None
+    response_time_control = None
+    response_time_alt = None
 
     if input_type == 'Current input':
 
@@ -740,8 +778,6 @@ def prepare_hvcra_plots():
         vd_ = solution_alt[:, 0]
         
         hvcra_current_input_list = st.session_state.hvcra_current_input_list
-        hvcra_frequency_control_list = st.session_state.hvcra_frequency_control_list
-        hvcra_frequency_alt_list = st.session_state.hvcra_frequency_alt_list
         hvcra_last_current = st.session_state.hvcra_last_current_input
 
         current_changed = abs(i_amp - hvcra_last_current) > 0.01
@@ -749,7 +785,7 @@ def prepare_hvcra_plots():
 
         if current_changed and not current_exists:
 
-            with st.spinner(f"Running simulation for {i_amp:.2f}..."):
+            with st.spinner(f"Running simulation for {i_amp:.2f} $\mu A/cm^{2}$..."):
                 
                 solution_control = neuron_control.simulate(time,
                                                         STEP_SIZE,
@@ -766,7 +802,7 @@ def prepare_hvcra_plots():
                 vs_ = solution_alt[:, 1]
                 vd_ = solution_alt[:, 0]
 
-                st.success(f"finished running!")
+                st.success(f"finished running for current input {i_amp:.2f} $\mu A/cm^{2}$!")
 
                 spike_count_control = 0
                 spike_count_alt = 0
@@ -793,7 +829,7 @@ def prepare_hvcra_plots():
                 st.session_state.hvcra_frequency_alt_list = list(st.session_state.hvcra_frequency_alt_list)
         
         elif current_exists and current_changed:
-            st.info(f"Current input {i_amp:.2f} already tested")
+            st.info(f"Current input {i_amp:.2f} $\mu A/cm^{2}$already tested")
         
         st.session_state.hvcra_last_current_input = i_amp
 
@@ -887,8 +923,6 @@ def prepare_hvcra_plots():
         vd_ = solution_alt[:, 0]
 
         hvcra_synaptic_input_list = st.session_state.hvcra_synaptic_input_list
-        response_time_control_list = st.session_state.response_time_control_list
-        response_time_alt_list = st.session_state.response_time_alt_list
         hvcra_last_synaptic_input = st.session_state.hvcra_last_synaptic_input 
 
         input_changed = abs(ge_max - hvcra_last_synaptic_input) > 0.005
@@ -896,7 +930,7 @@ def prepare_hvcra_plots():
 
         if input_changed and not input_exists:
 
-            with st.spinner(f"Running simulation for {ge_max:.2f} mS/cm^2..."):
+            with st.spinner(f"Running simulation for {ge_max:.2f} $mS/cm^{2}$..."):
 
                 excitatory_synapse_stimulus_control = create_synapse_stimulus_array(time,
                                                                                     40.0,
@@ -954,21 +988,21 @@ def prepare_hvcra_plots():
                 vs_ = solution_alt[:, 1]
                 vd_ = solution_alt[:, 0]
 
-                response_time_displayed = response_time(time, 
+                response_time_control = response_time(time, 
                                                         vd, 
                                                         vs, 
                                                         excitatory_input_start_time=ge_start, 
                                                         excitatory_input_strength=ge_max)
                 
-                response_time_displayed_ = response_time(time, 
+                response_time_alt = response_time(time, 
                                                         vd_, 
                                                         vs_, 
                                                         excitatory_input_start_time=ge_start, 
                                                         excitatory_input_strength=ge_max)
                 
                 st.session_state.hvcra_synaptic_input_list.append(ge_max)
-                st.session_state.response_time_control_list.append(response_time_displayed)
-                st.session_state.response_time_alt_list.append(response_time_displayed_)
+                st.session_state.response_time_control_list.append(response_time_control)
+                st.session_state.response_time_alt_list.append(response_time_alt)
                 st.session_state.hvcra_last_synaptic_input = ge_max
 
                 sorted_pairs = sorted(zip(st.session_state.hvcra_synaptic_input_list, st.session_state.response_time_control_list, st.session_state.response_time_alt_list))
@@ -978,19 +1012,39 @@ def prepare_hvcra_plots():
                 st.session_state.response_time_alt_list = list(st.session_state.response_time_alt_list)
 
 
-                st.success(f"finished running!")
+                st.success(f"finished running for synaptic input {ge_max:.2f} $mS/cm^{2}$!")
             
         elif input_exists and input_changed:
-            st.info(f"Synaptic input {ge_max:.2f} \mS /cm^{2} already tested")
+            st.info(f"Synaptic input {ge_max:.2f} $mS/cm^{2}$ already tested")
             st.session_state.hvcra_last_synaptic_input = ge_max
             
         return input_type, fluctuations, vs, vs_, vd, vd_, time, temperature, st.session_state.hvcra_synaptic_input_list, st.session_state.response_time_control_list, st.session_state.response_time_alt_list, st.session_state.hvcra_last_synaptic_input
 
 def display_hvci_theory():
-    pass
+    """
+    Display the theoretical background for HVCI.
+    """
+    with st.expander('About HVC(I)) model'):
+        st.markdown("""
+        ## About HVC(I) model
+
+        A complex dynamical model that mimics the biophysical mechanisms involved in action potential generation
+        for an inhibitory class of neurons in the premotor brain region HVC in songbirds. This model involves the
+        complex morphology of the HVC(I) neuron broken down to a single somatic compartment, which exhibits fast-spiking
+        behavior, representative of the behavior observed in HVC(I) neurons.
+
+        ### Ion channels incorporated
+                - Sodium channel
+                - Delay rectified Potassium channel
+                - Fast Potassium channel
+                - Leak channel
+        """)
 
 def prepare_hvci_plots():
-    
+    """
+    Prepare plots for the HVC(I) model.
+    """
+
     params = create_sidebar_controls_hvci()
     temperature = params['temperature']
     q_gate = params['Q_gate']
@@ -1039,8 +1093,6 @@ def prepare_hvci_plots():
         v_ = solution_alt[:, 0]
         
         hvci_current_input_list = st.session_state.hvci_current_input_list
-        hvci_frequency_control_list = st.session_state.hvci_frequency_control_list
-        hvci_frequency_alt_list = st.session_state.hvci_frequency_alt_list
         hvci_last_current = st.session_state.hvci_last_current_input
 
         current_changed = abs(i_amp - hvci_last_current) > 0.01
@@ -1048,7 +1100,7 @@ def prepare_hvci_plots():
 
         if current_changed and not current_exists:
 
-            with st.spinner(f"Running simulation for {i_amp:.2f}..."):
+            with st.spinner(f"Running simulation for {i_amp:.2f} $\mu A/cm^{2}$..."):
 
                 current_stimulus = create_current_stimulus_array(time,
                                                                 i_amp,
@@ -1065,7 +1117,7 @@ def prepare_hvci_plots():
                                                 STEP_SIZE,
                                                 current_stimulus_array=current_stimulus)
 
-                st.success(f"finished running!")
+                st.success(f"finished running for {i_amp:.2f} $\mu A/cm^{2}$!")
 
                 v = solution_control[:, 0]
                 v_ = solution_alt[:, 0]
@@ -1095,7 +1147,7 @@ def prepare_hvci_plots():
                 st.session_state.hvci_frequency_alt_list = list(st.session_state.hvci_frequency_alt_list)
             
         elif current_exists and current_changed:
-            st.info(f"Current input {i_amp:.2f} already tested")
+            st.info(f"Current input {i_amp:.2f} $\mu A/cm^{2}$ already tested")
         
         st.session_state.hvci_last_current_input = i_amp
         
