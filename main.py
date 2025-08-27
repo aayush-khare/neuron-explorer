@@ -1,6 +1,7 @@
 import streamlit as st
 
-from utils import (display_lif_theory,
+from utils import (display_introduction,
+                   display_lif_theory,
                    prepare_lif_plots,
                    display_hh_theory,
                    prepare_hh_plots,
@@ -42,20 +43,8 @@ Neuron_class = st.selectbox('Contents',
 
 if Neuron_class == 'Introduction':
 
-    st.markdown('<p class="big-font"> A neuron is a special type of cell that can generate electrical signals. It does so by utilizing the influx and outflux of a variety of ions ' \
-                'through gates or channels that are specific to a given ion. Neuron cells can connect and communicate with each other to transmit this electrical signal to one another, ' \
-                ' and patterns of these electrical activity across  connected circuits between the neurons encodes for pretty much any information as well as gives rise to behavior. ' \
-                'Neuroscience is an area of study that focuses on understanding the nervous system, which is made up of the brain and the spinal cord, and a neuron is a fundamental' \
-                ' unit of this system.</p>', unsafe_allow_html=True) \
-
-    st.image("../streamlit_images/neuron.jpg", width=1000)
-        
-    st.markdown('<p class="big-font"> In this interactive tool, one can explore different neuron models, that serve as a representation for the dynamics of a neuron. \
-                We will look at the simplest model: the leaky-integrate-and-fire neuron model, that does not incorporate any biophysical details, but still gives a good enough insight into the ' \
-                'basic dynamics involved. Followed by this, one can explore the Hodgkin-Huxley model, which incorporates some biophysical details that govern action potential generation. ' \
-                'Finally one can explore generalized biophysical models for the two classes of neurons found in a brain region called HVC (known as proper name) in songbird species.' \
-                'This neurons exhibit a precise signature of activity associated with auditory features of the song. Both the Hodgkin</p>', unsafe_allow_html=True)
-
+    display_introduction()
+    
 if Neuron_class == 'Integrate and Fire model':
 
     display_lif_theory()

@@ -7,6 +7,21 @@ from models.hodgkin_huxley import HodgkinHuxley
 from models.hvc_projection_neuron import HvcProjectionNeuron
 from models.hvc_interneuron import HvcInterNeuron
 
+def display_introduction():
+    
+    st.markdown('<p class="big-font"> Neurons are special type of cells that generate electrical signals and communicate with each other through electrochemical processes triggered by these electrical changes. '\
+                'The generation of the electrical signal is governed by the flow of different types of ions across the cell membrane. Our nervous system is made up of the brain and the spinal cord, and a neuron ' \
+                'cell is the fundamental unit of this system. Neuroscience is an area of research that seeks to develop an understanding of this system, and in doing so, requires understanding how these fundamental units function.</p>', unsafe_allow_html=True) \
+
+    st.image("../streamlit_images/neuron.jpg", width=1000)
+        
+    st.markdown('<p class="big-font"> In this interactive tool, you get to explore some models for simulating the dynamics of a neuron cell. \
+                We will start with the Leaky-Integrate-and-Fire (LIF) neuron model. This is a simple model, yet captures effectively the most basic function of neuron cells, that is, accumulating input signals, \
+                and if the inputs cross a threshold, emitting an action potential. This model does not incorporate any complex biophysical details, but still gives a good insight into neuron function ' \
+                'We will build upon this insight by next looking at the Hodgkin-Huxley model. This model incorporates mathematical formalisms to represent the complex biophysical mechanisms involved in the ' \
+                'movement of different ions across the cell membrane, and how these govern action potential generation. These mechanisms are temperature dependent, and so we will also look into how a change in the surrounding temperatures affect the resulting dynamics of a neuron. ' \
+                'Finally you get to explore generalized biophysical models for the excitatory and inhibitory classes of neurons found in a brain region called HVC (known as proper name) in songbird species.</p>', unsafe_allow_html=True)
+
 def create_current_stimulus_array(time_array, i_amp, i_start, i_end):
     '''
     Function for creating a pulse current input
@@ -214,17 +229,52 @@ def display_lif_theory():
     Display the theoretical background of the Leaky Integrate and Fire model
     """
 
-    with st.expander('About Leaky Integrate and Fire model'):
-        st.markdown("""
+    st.markdown("""
+    <style>
+    .streamlit-expanderHeader {
+        font-size: 150px !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    with st.expander('**About the Leaky Integrate and Fire Model**'):
+        st.markdown(f"""
     
-    A simple model to explain the current vs frequency relationship as seen in many biological neurons. \
-    This model only incorporates a leak channel that ensures the membrane potential of the neuron model \
-    returns to it's resting state value in the absence of inputs.                    
-    
-    Using this setup, you can vary the input current's strength, as well as the time interval over which the current is applied. 
-    The current in put in this case is pulse input, that can raise the membrane potential. As the membrane potential rises and crosses a threshold, 
-    the model artificially is set to a value of 0 before being reset to it's resting value. In this way, this setup demonstrates neuron
-    behavior without taking into account any biophysical mechanisms into account.
+    The Leaky Integrate and Fire (LIF) model is a simple mathematical model that effectively \
+    explains the most basic neuron function, i.e., integrating inputs to produce an output \
+    spike. 
+
+                    
+    The Leaky in the LIF model corresponds to the incorporation of a leaky ion channel \
+    in the model, that ensures that the membrane potential exponentially decays back to the \
+    resting-state value in the absence of any inputs. This is the only ion channel incorporated \
+    in the model. The membrane potential dynamics of the model can be given by the equation """)
+        
+        st.latex(r''' C\frac{dV}{dt} = I_L + I_{inj} ''')
+
+        st.markdown(f"""Here the first term on RHS is the leak current given by""")
+
+        st.latex(r''' I_L = g_L(E_L - V)''')
+
+        st.markdown(f""" In the presence of a constant current input, the differential equation has an analytical solution for the time evolution of the membrane potential given by""")
+
+        st.latex(r''' V(t) = E_L + I_{inj}R + (V(0) - E_L - I_{inj}R)e^{-\frac{t}{\tau}}''')
+
+        st.markdown(f""" Here $R = \\frac{{{1}}}{{g_L}}$  and the time constant $\\tau = RC$. 
+                    This equation, holding for any value of the membrane potential below the threshold
+                    value, can be used to obtain a response time for the LIF model. This response time, say
+                    $t'$ corresponds to the time it takes for the neuron to fire an action potential from the
+                    time at which the current pulse starts. Setting $V(0) = E_L$ and $V(t') = V_{{th}}$, the threshold
+                    membrane potential, we get""")
+        
+        st.latex(r''' t' = \tau ln(\frac{I_{inj}R}{I_{inj}R + V(0) - V_{th}})''')
+
+        st.markdown(f"""In the following setup, we have defined the threshold to be -50 mV. Each time the membrane potential crosses the threshold, we artificially set the membrane potential back to a reset value
+                    which in this case is the same as the leak reversal potential. If the current pulse is still active, it would again depolarize the membrane potential towards the threshold. 
+                    This means we can get an expression for the response time, and in turn the firing rate the LIF model will exhibit and its dependence on model parameters.""")
+
+        st.markdown(f"""As can be seen, increasing the current can increase the firing rate. Additionally, it should be noted that the closer the initial value is to threshold membrane potential
+                    the higher would be the firing rate, or faster the response.
     """)
 
 def create_sidebar_controls_hh():
