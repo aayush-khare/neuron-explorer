@@ -169,21 +169,40 @@ if Neuron_class == 'HVC neurons':
     elif HVC_neuron_type == 'HVC(I)':
 
         display_hvci_theory()
-        v_control, v_alt, time, current_stimulus, temperature, current_list, frequency_list_control, frequency_list_alt, last_current = prepare_hvci_plots()
+        input_type, v_control, v_alt, time, current_stimulus, temperature, current_list, frequency_list_control, frequency_list_alt, last_current = prepare_hvci_plots()
 
-        tab1, tab2 = st.tabs(['membrane potential', 'gating variables'])
-        
-        with tab1:
-
-            fig_mp = plot_hvci_membrane_potential(time,
-                                                  v_control,
-                                                  v_alt,
-                                                  current_stimulus,
-                                                  temperature,
-                                                  current_list, 
-                                                  frequency_list_control,
-                                                  frequency_list_alt,
-                                                  last_current
-                                                  )
+        if input_type == "Single current pulse":
+            tab1, tab2 = st.tabs(['membrane potential', 'gating variables'])
             
-            st.pyplot(fig_mp)
+            with tab1:
+
+                fig_mp = plot_hvci_membrane_potential(time,
+                                                    v_control,
+                                                    v_alt,
+                                                    current_stimulus,
+                                                    temperature,
+                                                    current_list, 
+                                                    frequency_list_control,
+                                                    frequency_list_alt,
+                                                    last_current
+                                                    )
+                
+                st.pyplot(fig_mp)
+        
+        else:
+            tab1, tab2 = st.tabs(['membrane potential', 'gating variables'])
+            
+            with tab1:
+
+                fig_mp = plot_hvci_membrane_potential(time,
+                                                    v_control,
+                                                    v_alt,
+                                                    current_stimulus,
+                                                    temperature,
+                                                    current_list, 
+                                                    frequency_list_control,
+                                                    frequency_list_alt,
+                                                    last_current
+                                                    )
+                
+                st.pyplot(fig_mp)

@@ -626,14 +626,12 @@ def create_sidebar_controls_hvci():
 
     st.sidebar.header('Model Parameters')
 
-    input_type = st.selectbox('Input type', ['Current input', 'Noise input'])
+    #input_type = st.selectbox('Input type', ['Current input', 'Noise input'])
+    input_type = st.selectbox('Input type', ['Single current pulse', 'Multiple current pulses with noise'])
 
     st.sidebar.subheader('Temperature and Q10 values')
-    temperature = st.selectbox('Temperature in Celsius', [30.0, 35.0]) #  control temperature = 40.0 celsius
-    q_gate = st.sidebar.slider('Q10 for conformation dependent processes', 2.0, 4.0, 3.0, 0.1)
-    q_cond = st.sidebar.slider('Q10 for diffusion dependent processes', 1.0, 2.0, 1.3, 0.1)
-
-    if input_type == 'Current input':
+    
+    if input_type == 'Single current pulse':
 
         if 'hvci_current_input_list' not in st.session_state:
             st.session_state.hvci_current_input_list = []
@@ -648,16 +646,17 @@ def create_sidebar_controls_hvci():
             st.session_state.hvci_reset_counter = 0
         
         hvci_reset_key = st.session_state.hvci_reset_counter
-        hvci_reset_pressed = st.sidebar.button("Reset")
 
-        if hvci_reset_pressed:
+        def handle_reset():
             st.session_state.hvci_current_input_list = []
             st.session_state.hvci_frequency_control_list = []
             st.session_state.hvci_frequency_alt_list = []
             st.session_state.hvci_last_current_input = 0.0
             st.session_state.hvci_reset_counter += 1 
 
-            st.rerun()
+        temperature = st.selectbox('Temperature in Celsius', [30.0, 35.0], on_change=handle_reset) #  control temperature = 40.0 celsius
+        q_gate = st.sidebar.slider('Q10 for conformation dependent processes', 2.0, 4.0, 3.0, 0.1, on_change=handle_reset)
+        q_cond = st.sidebar.slider('Q10 for diffusion dependent processes', 1.0, 2.0, 1.3, 0.1, on_change=handle_reset)
 
         st.sidebar.subheader('Current stimulus settings')
 
@@ -675,46 +674,51 @@ def create_sidebar_controls_hvci():
             'Last_current': st.session_state.hvci_last_current_input
         }
     
-    if input_type == 'Synaptic input':
+    if input_type == 'Noise input':
 
-        noise_input = st.selectbox('Add noise input', ['No', 'Yes'])
-
-        st.sidebar.subheader('synaptic input settings')
-
-        ge_max = st.sidebar.slider('excitatory synapse strength (mS/cm^2)', 0.0, 1.0, 0.0, 0.05)
-        ge_start = st.sidebar.slider('excitatory synapse start time (ms)', 50.0, 200.0, 150.0, 0.5)
-
-        gi_max = st.sidebar.slider('inhibitory synapse strength (mS/cm^2)', 0.0, 0.5, 0.0, 0.05)
-        gi_start = st.sidebar.slider('inhibitory synapse start time (ms)', 50.0, 200.0, 150.0, 0.5)
-
-        if noise_input == 'Yes':
-            freq_noise = st.sidebar.slider('noise input frequency (Hz)', 50.0, 300.0, 200.0, 50.0)
+        if 'hvci_noise_input_list' not in st.session_state:
+            st.session_state.hvci_noise_input_list = []
+        if 'hvci_frequency_control_list' not in st.session_state:
+            st.session_state.hvci_frequency_control_list = []
+        if 'hvci_frequency_alt_list' not in st.session_state:
+            st.session_state.hvci_frequency_alt_list = []
+        if 'hvci_last_noise_input' not in st.session_state:
+            st.session_state.hvci_last_noise_input = 0.0
         
-            return {
-                'temperature': temperature,
-                'Q_gate': q_gate,
-                'Q_cond': q_cond,
-                'Input_type': input_type,
-                'ge_max': ge_max,
-                'ge_start': ge_start,
-                'gi_max': gi_max,
-                'gi_start': gi_start,
-                'Noise_input': noise_input,
-                'freq_noise': freq_noise
-            }
+        if 'hvci_reset_counter' not in st.session_state:
+            st.session_state.hvci_reset_counter = 0
         
-        else:
-            return {
-                'temperature': temperature,
-                'Q_gate': q_gate,
-                'Q_cond': q_cond,
-                'Input_type': input_type,
-                'ge_max': ge_max,
-                'ge_start': ge_start,
-                'gi_max': gi_max,
-                'gi_start': gi_start,
-                'Noise_input': noise_input
-            }
+        hvci_reset_key = st.session_state.hvci_reset_counter
+
+        def handle_reset():
+            st.session_state.hvci_noise_input_list = []
+            st.session_state.hvci_frequency_control_list = []
+            st.session_state.hvci_frequency_alt_list = []
+            st.session_state.hvci_last_noise_input = 0.0
+            st.session_state.hvci_reset_counter += 1 
+
+        temperature = st.selectbox('Temperature in Celsius', [30.0, 35.0], on_change=handle_reset) #  control temperature = 40.0 celsius
+        q_gate = st.sidebar.slider('Q10 for conformation dependent processes', 2.0, 4.0, 3.0, 0.1, on_change=handle_reset)
+        q_cond = st.sidebar.slider('Q10 for diffusion dependent processes', 1.0, 2.0, 1.3, 0.1, on_change=handle_reset)
+
+        st.sidebar.subheader('Noise input settings')
+
+        freq_noise = st.sidebar.slider('noise input frequency (Hz)', 50.0, 300.0, 200.0, 50.0, on_change=handle_reset)
+        g_noise_max = st.sidebar.slider(f'noise input max kick ($mS/cm^{2}$)', 0.0, 0.45, 0.0, 0.05, key=f'i_amp_{hvci_reset_key}')
+        
+        return {
+            'temperature': temperature,
+            'Q_gate': q_gate,
+            'Q_cond': q_cond,
+            'Input_type': input_type,
+            'Noise_input_list': st.session_state.hvci_noise_input_list,
+            'Frequency_control_list': st.session_state.hvci_frequency_control_list,
+            'Frequency_alt_list': st.session_state.hvci_frequency_alt_list,
+            'Last_noise': st.session_state.hvci_last_noise_input,
+            'freq_noise': freq_noise,
+            'Noise_kick': g_noise_max
+        }
+
 
 def display_hh_theory():
     """
@@ -1106,19 +1110,19 @@ def prepare_hvci_plots():
     input_type = params['Input_type']
 
     STEP_SIZE = 0.01  # ms
-    if input_type == 'Current input':
-        simulation_time = 500.0 # ms
+    if input_type == 'Single current pulse':
+        simulation_time = 300.0 # ms
     else:
         simulation_time = 1000.0
     time = np.arange(0, simulation_time, STEP_SIZE)
 
-    v = np.full((30000, 1), 0)
-    v_ = np.full((30000, 1), 0)
+    v = np.full((10000, 1), 0)
+    v_ = np.full((10000, 1), 0)
 
     solution_alt = None
     solution_control = None
     current_stimulus = None
-    if input_type == 'Current input':
+    if input_type == 'Single current pulse':
     
         i_amp = params['I_amp']
         i_start = 50.0
@@ -1182,8 +1186,8 @@ def prepare_hvci_plots():
                     if v_[i-1] < threshold and v_[i] >= threshold:
                         spike_count_alt += 1
                     
-                frequency_control = spike_count_control
-                frequency_alt = spike_count_alt
+                frequency_control = spike_count_control * 1000 / (i_end - i_start)
+                frequency_alt = spike_count_alt * 1000 / (i_end - i_start)
 
                 st.session_state.hvci_current_input_list.append(i_amp)
                 st.session_state.hvci_frequency_control_list.append(frequency_control)
@@ -1201,52 +1205,42 @@ def prepare_hvci_plots():
         
         st.session_state.hvci_last_current_input = i_amp
         
-        return v, v_, time, current_stimulus, temperature, st.session_state.hvci_current_input_list, st.session_state.hvci_frequency_control_list, st.session_state.hvci_frequency_alt_list, st.session_state.hvci_last_current_input
+        return input_type, v, v_, time, current_stimulus, temperature, st.session_state.hvci_current_input_list, st.session_state.hvci_frequency_control_list, st.session_state.hvci_frequency_alt_list, st.session_state.hvci_last_current_input
 
-    if input_type == 'Synaptic input':
+    if input_type == 'Multiple current pulses with noise':
         
-        ge_max = params['ge_max']
-        ge_start = params['ge_start']
-        gi_max = params['gi_max']
-        gi_start = params['gi_start']
-        noise_input = params['Noise_input']
-
-        noise_strength = None
-        freq_noise = None
-
-        if noise_input == 'Yes':
-            freq_noise = params['freq_noise']  
-            noise_strength = 0.45    
+        noise_strength = params['Noise_kick']
+        freq_noise = params['freq_noise'] 
         
         excitatory_synapse_stimulus_control = create_synapse_stimulus_array(time,
                                                 40.0,
                                                 q_gate,
-                                                ge_max,
-                                                ge_start,
+                                                0,
+                                                0,
                                                 STEP_SIZE
                                                 )
         
         excitatory_synapse_stimulus_alt = create_synapse_stimulus_array(time,
                                                 temperature,
                                                 q_gate,
-                                                ge_max,
-                                                ge_start,
+                                                0,
+                                                0,
                                                 STEP_SIZE
                                                 )
         
         inhibitory_synapse_stimulus_control = create_synapse_stimulus_array(time,
                                                 40.0,
                                                 q_gate,
-                                                gi_max,
-                                                gi_start,
+                                                0,
+                                                0,
                                                 STEP_SIZE
                                                 )
         
         inhibitory_synapse_stimulus_alt = create_synapse_stimulus_array(time,
                                                 temperature,
                                                 q_gate,
-                                                gi_max,
-                                                gi_start,
+                                                0,
+                                                0,
                                                 STEP_SIZE
                                                 )
         
@@ -1264,4 +1258,97 @@ def prepare_hvci_plots():
                                             noise_freq=freq_noise,
                                             noise_strength=noise_strength)
         
+        v = solution_control[:, 0]
+        v_ = solution_alt[:, 0]
+        
+        hvci_noise_input_list = st.session_state.hvci_noise_input_list
+        hvci_last_noise = st.session_state.hvci_last_noise_input
+
+        noise_changed = abs(noise_strength - hvci_last_noise) > 0.01
+        noise_exists = any(n == noise_strength for n in hvci_noise_input_list)
+
+        if noise_changed and not noise_exists:
+
+            with st.spinner(f"Running simulation for {noise_strength:.2f} $mS/cm^{2}$..."):
+
+                excitatory_synapse_stimulus_control = create_synapse_stimulus_array(time,
+                                                        40.0,
+                                                        q_gate,
+                                                        0,
+                                                        0,
+                                                        STEP_SIZE
+                                                        )
+                
+                excitatory_synapse_stimulus_alt = create_synapse_stimulus_array(time,
+                                                        temperature,
+                                                        q_gate,
+                                                        0,
+                                                        0,
+                                                        STEP_SIZE
+                                                        )
+                
+                inhibitory_synapse_stimulus_control = create_synapse_stimulus_array(time,
+                                                        40.0,
+                                                        q_gate,
+                                                        0,
+                                                        0,
+                                                        STEP_SIZE
+                                                        )
+                
+                inhibitory_synapse_stimulus_alt = create_synapse_stimulus_array(time,
+                                                        temperature,
+                                                        q_gate,
+                                                        0,
+                                                        0,
+                                                        STEP_SIZE
+                                                        )
+                
+                solution_control = neuron_control.simulate(time,
+                                                    STEP_SIZE,                                        
+                                                    excitatory_synapse_stimulus_array=excitatory_synapse_stimulus_control,
+                                                    inhibitory_synapse_stimulus_array=inhibitory_synapse_stimulus_control,
+                                                    noise_freq=freq_noise,
+                                                    noise_strength=noise_strength)
+                
+                solution_alt = neuron_alt.simulate(time,
+                                                    STEP_SIZE,
+                                                    excitatory_synapse_stimulus_array=excitatory_synapse_stimulus_alt,
+                                                    inhibitory_synapse_stimulus_array=inhibitory_synapse_stimulus_alt,
+                                                    noise_freq=freq_noise,
+                                                    noise_strength=noise_strength)
+                
+                v = solution_control[:, 0]
+                v_ = solution_alt[:, 0]
+
+                spike_count_control = 0
+                spike_count_alt = 0
+                threshold = -20           
+        
+                for i in range(1, len(v)):
+                    if v[i-1] < threshold and v[i] >= threshold:
+                        spike_count_control += 1
+                    if v_[i-1] < threshold and v_[i] >= threshold:
+                        spike_count_alt += 1
+                    
+                frequency_control = spike_count_control
+                frequency_alt = spike_count_alt
+
+                st.session_state.hvci_noise_input_list.append(noise_strength)
+                st.session_state.hvci_frequency_control_list.append(frequency_control)
+                st.session_state.hvci_frequency_alt_list.append(frequency_alt)
+                st.session_state.hvci_last_noise_input = noise_strength
+
+                sorted_pairs = sorted(zip(st.session_state.hvci_noise_input_list, st.session_state.hvci_frequency_control_list, st.session_state.hvci_frequency_alt_list))
+                st.session_state.hvci_noise_input_list, st.session_state.hvci_frequency_control_list, st.session_state.hvci_frequency_alt_list = zip(*sorted_pairs)
+                st.session_state.hvci_noise_input_list = list(st.session_state.hvci_noise_input_list)
+                st.session_state.hvci_frequency_control_list = list(st.session_state.hvci_frequency_control_list)
+                st.session_state.hvci_frequency_alt_list = list(st.session_state.hvci_frequency_alt_list)
+            
+        elif noise_exists and noise_changed:
+            st.info(f"Noise input {noise_strength:.2f} $mS/cm^{2}$ already tested")
+        
+        st.session_state.hvci_last_noise_input = noise_strength
+        
+        return input_type, v, v_, time, current_stimulus, temperature, st.session_state.hvci_noise_input_list, st.session_state.hvci_frequency_control_list, st.session_state.hvci_frequency_alt_list, st.session_state.hvci_last_noise_input
+
 
