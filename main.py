@@ -1,6 +1,7 @@
 import streamlit as st
 
 from utils import (display_introduction,
+                   display_electrical_properties,
                    display_lif_theory,
                    prepare_lif_plots,
                    display_hh_theory,
@@ -37,13 +38,19 @@ st.title('Models for simulating and analyzing the dynamics of a neuron')
 
 Neuron_class = st.selectbox('Contents',
                              ['Introduction',
+                              'Electrical Properties of a Neuron',
                               'Integrate and Fire model',
                               'Hodgkin Huxley',
+                              'Temperature dependence of neural dynamics',
                               'HVC neurons'])
 
 if Neuron_class == 'Introduction':
 
     display_introduction()
+
+if Neuron_class == 'Electrical Properties of a Neuron':
+
+    display_electrical_properties()
     
 if Neuron_class == 'Integrate and Fire model':
 

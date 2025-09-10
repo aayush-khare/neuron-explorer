@@ -231,10 +231,11 @@ def plot_hvci_membrane_potential(time, v_control, v_alt, stimulus, temperature, 
     """
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
     ax3 = ax1.twinx()
-    ax3.plot(time, stimulus, 'tab:green')
+    ax3.plot(time, stimulus, 'tab:green', linestyle='--')
     ax3.set_ylabel(f'current stimulus ($\mu A/cm^{2})$', color='tab:green', fontsize=12)
     ax3.tick_params(axis='y', labelcolor='tab:green')
-    ax3.set_ylim(-3.5, 15.5)    
+    ax3.set_ylim(-3.5, 15.5) 
+    ax3.set_xlim(400, 600)   
 
 
     ax1.plot(time, v_control, 'r', label='40.0$^o$ C')
@@ -242,6 +243,7 @@ def plot_hvci_membrane_potential(time, v_control, v_alt, stimulus, temperature, 
     ax1.set_xlabel('Time (ms)', fontsize=12)
     ax1.set_ylabel('Membrane Potential (mV)', fontsize=12)
     ax1.set_ylim(-90, 50)
+    ax1.set_xlim(400, 600)
     ax1.grid(True, alpha=0.3)
     ax1.legend()
     ax1.set_title('Membrane Potential and Stimulus Current')
@@ -305,7 +307,7 @@ def plot_hh_membrane_potential(time, v_control, v_alt, stimulus, temperature, cu
     """
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
     ax3 = ax1.twinx()
-    ax3.plot(time, stimulus, 'tab:green')
+    ax3.plot(time, stimulus, 'tab:green', linestyle='--')
     ax3.set_ylabel(f'current stimulus ($\mu A/cm^{2})$', color='tab:green', fontsize=12)
     ax3.tick_params(axis='y', labelcolor='tab:green')
     ax3.set_ylim(-3.5, 15.5)    
@@ -387,7 +389,7 @@ def plot_lif_membrane_potential(time, v, current, current_list, frequency_list, 
 
     ax3 = ax1.twinx()
 
-    ax3.plot(time, current, 'tab:pink')
+    ax3.plot(time, current, 'tab:pink', linestyle='--')
     ax3.set_ylabel(f'current stimulus ($\mu A/cm^{2})$', color='tab:pink')
     ax3.tick_params(axis='y', labelcolor='tab:pink')
     ax3.set_ylim(-1.5, 3.5)

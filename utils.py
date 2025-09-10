@@ -1,6 +1,8 @@
 import numpy as np
+from math import exp, log
 import streamlit as st
 from PIL import Image
+import os
 
 from models.leaky_integrate_and_fire import LIF
 from models.hodgkin_huxley import HodgkinHuxley
@@ -11,16 +13,83 @@ def display_introduction():
     
     st.markdown('<p class="big-font"> Neurons are special type of cells that generate electrical signals and communicate with each other through electrochemical processes triggered by these electrical changes. '\
                 'The generation of the electrical signal is governed by the flow of different types of ions across the cell membrane. Our nervous system is made up of the brain and the spinal cord, and a neuron ' \
-                'cell is the fundamental unit of this system. Neuroscience is an area of research that seeks to develop an understanding of this system, and in doing so, requires understanding how these fundamental units function.</p>', unsafe_allow_html=True) \
+                'cell is the fundamental unit of this system. Neuroscience is an area of research that seeks to develop an understanding of this system, and in doing so, also requires understanding how these fundamental units function.</p>', unsafe_allow_html=True) \
 
     st.image("../streamlit_images/neuron.jpg", width=1000)
         
     st.markdown('<p class="big-font"> In this interactive tool, you get to explore some models for simulating the dynamics of a neuron cell. \
-                We will start with the Leaky-Integrate-and-Fire (LIF) neuron model. This is a simple model, yet captures effectively the most basic function of neuron cells, that is, accumulating input signals, \
+                We will start by first developing a basic understanding of the electrical properties of neuron cells. With that, we will then discuss how these electrical properties can be simulated' \
+                ' on a computer. We wil start with the Leaky-Integrate-and-Fire (LIF) neuron model. This is a simple model, yet captures effectively the most basic function of neuron cells, that is, accumulating input signals, \
                 and if the inputs cross a threshold, emitting an action potential. This model does not incorporate any complex biophysical details, but still gives a good insight into neuron function ' \
                 'We will build upon this insight by next looking at the Hodgkin-Huxley model. This model incorporates mathematical formalisms to represent the complex biophysical mechanisms involved in the ' \
                 'movement of different ions across the cell membrane, and how these govern action potential generation. These mechanisms are temperature dependent, and so we will also look into how a change in the surrounding temperatures affect the resulting dynamics of a neuron. ' \
                 'Finally you get to explore generalized biophysical models for the excitatory and inhibitory classes of neurons found in a brain region called HVC (known as proper name) in songbird species.</p>', unsafe_allow_html=True)
+
+def display_electrical_properties():
+
+    image_folder = '../neuron_parts'
+    image_files = sorted([f for f in os.listdir(image_folder) if f.endswith(('.png'))])
+
+    descriptions = [
+    "Neuron cells have a complex morphology with different parts playing different roles in the electrical properties",
+    "A neuron receives information from other neurons through a tree like strucuture called dendrite",
+    "This information is processed and translated to an electrical signal at the soma",
+    "This electrical signal is transmitted along a long cable like structure called the axon, through the ends of which this neuron can then communicate with other neurons."
+    ]
+
+    assert len(descriptions) >= len(image_files), "Not enough descriptions for the images!"
+
+    if 'img_index' not in st.session_state:
+        st.session_state.img_index = 0
+
+    current_index = st.session_state.img_index
+    current_image = Image.open(os.path.join(image_folder, image_files[current_index]))
+    st.image(current_image, caption=f"{descriptions[current_index]}", width=400)
+
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        if st.button("⬅️ Prev") and current_index > 0:
+            st.session_state.img_index -= 1
+
+    with col2:
+        if st.button("Next ➡️") and current_index < len(image_files) - 1:
+            st.session_state.img_index += 1
+
+
+    image_folder_ = '../neuron_dynamics'
+    image_files_ = sorted([f for f in os.listdir(image_folder_) if f.endswith(('.png'))])
+
+    descriptions_ = [
+    "Neuron cells have a complex morphology with different parts playing different roles in the electrical properties",
+    "A neuron receives information from other neurons through a tree like strucuture called dendrite",
+    "This information is processed and translated to an electrical signal at the soma",
+    "This electrical signal is transmitted along a long cable like structure called the axon, through the ends of which this neuron can then communicate with other neurons.",
+    "a",
+    "b"
+    ]
+
+    assert len(descriptions_) >= len(image_files_), "Not enough descriptions for the images!"
+
+    if 'img_index_' not in st.session_state:
+        st.session_state.img_index_ = 0
+
+    current_index_ = st.session_state.img_index_
+    current_image_ = Image.open(os.path.join(image_folder_, image_files_[current_index_]))
+    st.image(current_image_, width=700)
+
+    st.markdown(f"{descriptions_[current_index_]}")
+
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("Prev") and current_index_ > 0:
+            st.session_state.img_index_ -= 1
+
+    with col2:
+        if st.button("Next") and current_index_ < len(image_files_) - 1:
+            st.session_state.img_index_ += 1
+    st.markdown('Under resting state conditions, there exists a difference in potential across the membrane of neuron cells. The intracellular medium is at a much negative potential \
+                 compared to the extracellular medium. This difference in the potential is termed as the membrane potential and is used to denote the state of a neuron. If the membrane \
+                 potential rises to values towards 0 mV, the neuron is said to be depolarized. ')
 
 def create_current_stimulus_array(time_array, i_amp, i_start, i_end):
     '''
@@ -58,6 +127,72 @@ def create_synapse_stimulus_array(time_array, temp, q_gate, g_max, g_start, step
     q = pow(q_gate, 0.1 * (40.0 - temp))
     for i in range(len(time_array) - start_id):
         synapse_stimulus[start_id + i] = g_max * np.exp(-i * step_size / ( 2 * q ))
+
+    return synapse_stimulus
+
+def generate_poisson_events(event_time, freq):
+
+    rand_num = np.random.uniform(0.0, 1.0)
+    event_time = event_time - (log(rand_num) * 1000 / freq)
+   
+    return event_time
+
+def create_synapse_stimulus_over_intervals_array(time_array, temp, q_gate, g_max, freq, interval_size, step_size, simulation_time):
+    '''
+    Function for creating synaptic inputs, that exist over a number of intervals in time
+    Args:
+        time_array (numpy.ndarray): The time points at which to evaluate the synaptic stimulus.
+        temp (float): The temperature in Celsius.
+        q_gate (float): The Q10 value for conformation dependent processes.
+        g_max (float): The maximum synaptic conductance strength.
+        freq (float): Frequency with which the inputs are made.
+        interval_size (float): size of the time intervals over which the input is made
+        step_size (float): The time step size for the simulation
+        simulation_time (float): Time for which simulation is run
+    Returns:
+
+        numpy.ndarray: A numpy array containing values of the synaptic conductance strength at different time points.
+    '''
+
+    synapse_stimulus = np.zeros_like(time_array)
+    q = pow(q_gate, 0.1 * (40.0 - temp))
+
+    num_inputs = 5
+    start_id = [np.argmin(np.abs(time_array - 150.0 * (i+1))) for i in range(num_inputs)]
+    interval_steps = int(interval_size / step_size)
+    end_id = [start_id[i] + interval_steps for i in range(num_inputs)]
+
+    event_time = 0.0
+    np.random.seed(1995)
+    num_steps = int(simulation_time / step_size)
+    print(num_steps)
+
+    for i in range(num_steps):
+        
+        event_count = 0
+
+        make_input = any(start <= i < end for start, end in zip(start_id, end_id))
+        if make_input:
+            while True:
+                if (i + 0.5) * step_size <= event_time < (i + 1.5) * step_size:
+                    print('false')
+                    event_count += 1
+                    event_time = generate_poisson_events(event_time, freq)
+                elif event_time < (i + 0.5) * step_size:
+                    event_time = generate_poisson_events(event_time, freq)
+                else:
+                    break
+        
+        kick_strength = 0
+        if event_count == 0:
+            if synapse_stimulus[i-1] != 0:
+                synapse_stimulus[i] = synapse_stimulus[i-1] * exp(-step_size / (2 * q_gate))
+        else:
+            for _ in range(event_count):
+                kick_strength += np.random.uniform(0.0, 1.0) * g_max
+
+            synapse_stimulus[i] = synapse_stimulus[i-1] + kick_strength
+            event_count = 0
 
     return synapse_stimulus
 
@@ -627,7 +762,7 @@ def create_sidebar_controls_hvci():
     st.sidebar.header('Model Parameters')
 
     #input_type = st.selectbox('Input type', ['Current input', 'Noise input'])
-    input_type = st.selectbox('Input type', ['Single current pulse', 'Multiple current pulses with noise'])
+    input_type = st.selectbox('Input type', ['Single current pulse', 'Synaptic input in multiple intervals'])
 
     st.sidebar.subheader('Temperature and Q10 values')
     
@@ -674,16 +809,16 @@ def create_sidebar_controls_hvci():
             'Last_current': st.session_state.hvci_last_current_input
         }
     
-    if input_type == 'Noise input':
+    if input_type == 'Synaptic input in multiple intervals':
 
-        if 'hvci_noise_input_list' not in st.session_state:
-            st.session_state.hvci_noise_input_list = []
+        if 'hvci_synaptic_input_list' not in st.session_state:
+            st.session_state.hvci_synaptic_input_list = []
         if 'hvci_frequency_control_list' not in st.session_state:
             st.session_state.hvci_frequency_control_list = []
         if 'hvci_frequency_alt_list' not in st.session_state:
             st.session_state.hvci_frequency_alt_list = []
-        if 'hvci_last_noise_input' not in st.session_state:
-            st.session_state.hvci_last_noise_input = 0.0
+        if 'hvci_last_synaptic_input' not in st.session_state:
+            st.session_state.hvci_last_synaptic_input = 0.0
         
         if 'hvci_reset_counter' not in st.session_state:
             st.session_state.hvci_reset_counter = 0
@@ -691,34 +826,35 @@ def create_sidebar_controls_hvci():
         hvci_reset_key = st.session_state.hvci_reset_counter
 
         def handle_reset():
-            st.session_state.hvci_noise_input_list = []
+            st.session_state.hvci_synaptic_input_list = []
             st.session_state.hvci_frequency_control_list = []
             st.session_state.hvci_frequency_alt_list = []
-            st.session_state.hvci_last_noise_input = 0.0
+            st.session_state.hvci_last_synaptic_input = 0.0
             st.session_state.hvci_reset_counter += 1 
 
         temperature = st.selectbox('Temperature in Celsius', [30.0, 35.0], on_change=handle_reset) #  control temperature = 40.0 celsius
         q_gate = st.sidebar.slider('Q10 for conformation dependent processes', 2.0, 4.0, 3.0, 0.1, on_change=handle_reset)
         q_cond = st.sidebar.slider('Q10 for diffusion dependent processes', 1.0, 2.0, 1.3, 0.1, on_change=handle_reset)
 
-        st.sidebar.subheader('Noise input settings')
+        st.sidebar.subheader('Synaptic input settings')
 
-        freq_noise = st.sidebar.slider('noise input frequency (Hz)', 50.0, 300.0, 200.0, 50.0, on_change=handle_reset)
-        g_noise_max = st.sidebar.slider(f'noise input max kick ($mS/cm^{2}$)', 0.0, 0.45, 0.0, 0.05, key=f'i_amp_{hvci_reset_key}')
+        freq_input = st.sidebar.slider('input frequency (Hz)', 50.0, 300.0, 200.0, 50.0, on_change=handle_reset)
+        g_max = st.sidebar.slider(f'input max kick ($mS/cm^{2}$)', 0.0, 5.0, 0.0, 0.5, key=f'i_amp_{hvci_reset_key}')
+        interval_size = st.sidebar.slider(f'size of input intervals (ms)', 20.0, 60.0, 20.0, 10.0, on_change=handle_reset)
         
         return {
             'temperature': temperature,
             'Q_gate': q_gate,
             'Q_cond': q_cond,
             'Input_type': input_type,
-            'Noise_input_list': st.session_state.hvci_noise_input_list,
+            'synaptic_input_list': st.session_state.hvci_synaptic_input_list,
             'Frequency_control_list': st.session_state.hvci_frequency_control_list,
             'Frequency_alt_list': st.session_state.hvci_frequency_alt_list,
-            'Last_noise': st.session_state.hvci_last_noise_input,
-            'freq_noise': freq_noise,
-            'Noise_kick': g_noise_max
+            'last_input': st.session_state.hvci_last_synaptic_input,
+            'freq_input': freq_input,
+            'input_kick': g_max,
+            'interval_size': interval_size
         }
-
 
 def display_hh_theory():
     """
@@ -727,9 +863,12 @@ def display_hh_theory():
 
     with st.expander('About Hodgkin-Huxley model'):
         st.markdown("""
-        ## About Hodgkin Huxley model
+        ## About Hodgkin Huxley (HH) model
         
-        A complex dynamical model that mimics the biophysical mechanisms involved in action potential generation.
+        A complex dynamical model that mimics the biophysical mechanisms involved in action potential generation. \
+        Unlike the LIF model, the HH model incorporates voltage-gated ion channels, that impart non-linear features \
+        to the model dynamics. The exact mathematical form for these voltage-gated ion channels was determined \
+        through electrophysiological experiments 
         
         ### Ion channels incorporated
         - Sodium channel
@@ -1122,6 +1261,11 @@ def prepare_hvci_plots():
     solution_alt = None
     solution_control = None
     current_stimulus = None
+    freq_noise = None
+    noise_strength = None
+    inhibitory_synapse_stimulus_control = None
+    inhibitory_synapse_stimulus_alt = None
+
     if input_type == 'Single current pulse':
     
         i_amp = params['I_amp']
@@ -1207,25 +1351,30 @@ def prepare_hvci_plots():
         
         return input_type, v, v_, time, current_stimulus, temperature, st.session_state.hvci_current_input_list, st.session_state.hvci_frequency_control_list, st.session_state.hvci_frequency_alt_list, st.session_state.hvci_last_current_input
 
-    if input_type == 'Multiple current pulses with noise':
+    if input_type == 'Synaptic input in multiple intervals':
         
-        noise_strength = params['Noise_kick']
-        freq_noise = params['freq_noise'] 
+        input_strength = params['input_kick']
+        freq_input = params['freq_input']
+        interval_size = params['interval_size'] 
         
-        excitatory_synapse_stimulus_control = create_synapse_stimulus_array(time,
+        excitatory_synapse_stimulus_control = create_synapse_stimulus_over_intervals_array(time,
                                                 40.0,
                                                 q_gate,
-                                                0,
-                                                0,
-                                                STEP_SIZE
+                                                input_strength,
+                                                freq_input,
+                                                interval_size,
+                                                STEP_SIZE,
+                                                simulation_time
                                                 )
         
-        excitatory_synapse_stimulus_alt = create_synapse_stimulus_array(time,
+        excitatory_synapse_stimulus_alt = create_synapse_stimulus_over_intervals_array(time,
                                                 temperature,
                                                 q_gate,
-                                                0,
-                                                0,
-                                                STEP_SIZE
+                                                input_strength,
+                                                freq_input,
+                                                interval_size,
+                                                STEP_SIZE,
+                                                simulation_time
                                                 )
         
         inhibitory_synapse_stimulus_control = create_synapse_stimulus_array(time,
@@ -1261,47 +1410,51 @@ def prepare_hvci_plots():
         v = solution_control[:, 0]
         v_ = solution_alt[:, 0]
         
-        hvci_noise_input_list = st.session_state.hvci_noise_input_list
-        hvci_last_noise = st.session_state.hvci_last_noise_input
+        hvci_input_list = st.session_state.hvci_synaptic_input_list
+        hvci_last_input = st.session_state.hvci_last_synaptic_input
 
-        noise_changed = abs(noise_strength - hvci_last_noise) > 0.01
-        noise_exists = any(n == noise_strength for n in hvci_noise_input_list)
+        input_changed = abs(input_strength - hvci_last_input) > 0.01
+        input_exists = any(n == input_strength for n in hvci_input_list)
 
-        if noise_changed and not noise_exists:
+        if input_changed and not input_exists:
 
-            with st.spinner(f"Running simulation for {noise_strength:.2f} $mS/cm^{2}$..."):
+            with st.spinner(f"Running simulation for {input_strength:.2f} $mS/cm^{2}$..."):
 
-                excitatory_synapse_stimulus_control = create_synapse_stimulus_array(time,
+                excitatory_synapse_stimulus_control = create_synapse_stimulus_over_intervals_array(time,
                                                         40.0,
                                                         q_gate,
-                                                        0,
-                                                        0,
-                                                        STEP_SIZE
+                                                        input_strength,
+                                                        freq_input,
+                                                        interval_size,
+                                                        STEP_SIZE,
+                                                        simulation_time
                                                         )
                 
-                excitatory_synapse_stimulus_alt = create_synapse_stimulus_array(time,
+                excitatory_synapse_stimulus_alt = create_synapse_stimulus_over_intervals_array(time,
                                                         temperature,
                                                         q_gate,
-                                                        0,
-                                                        0,
-                                                        STEP_SIZE
+                                                        input_strength,
+                                                        freq_input,
+                                                        interval_size,
+                                                        STEP_SIZE,
+                                                        simulation_time
                                                         )
                 
                 inhibitory_synapse_stimulus_control = create_synapse_stimulus_array(time,
-                                                        40.0,
-                                                        q_gate,
-                                                        0,
-                                                        0,
-                                                        STEP_SIZE
-                                                        )
+                                                                                    40.0,
+                                                                                    q_gate,
+                                                                                    0,
+                                                                                    0,
+                                                                                    STEP_SIZE
+                                                                                    )
                 
                 inhibitory_synapse_stimulus_alt = create_synapse_stimulus_array(time,
-                                                        temperature,
-                                                        q_gate,
-                                                        0,
-                                                        0,
-                                                        STEP_SIZE
-                                                        )
+                                                                                temperature,
+                                                                                q_gate,
+                                                                                0,
+                                                                                0,
+                                                                                STEP_SIZE
+                                                                                )
                 
                 solution_control = neuron_control.simulate(time,
                                                     STEP_SIZE,                                        
@@ -1333,22 +1486,22 @@ def prepare_hvci_plots():
                 frequency_control = spike_count_control
                 frequency_alt = spike_count_alt
 
-                st.session_state.hvci_noise_input_list.append(noise_strength)
+                st.session_state.hvci_synaptic_input_list.append(input_strength)
                 st.session_state.hvci_frequency_control_list.append(frequency_control)
                 st.session_state.hvci_frequency_alt_list.append(frequency_alt)
-                st.session_state.hvci_last_noise_input = noise_strength
+                st.session_state.hvci_last_synaptic_input = input_strength
 
-                sorted_pairs = sorted(zip(st.session_state.hvci_noise_input_list, st.session_state.hvci_frequency_control_list, st.session_state.hvci_frequency_alt_list))
-                st.session_state.hvci_noise_input_list, st.session_state.hvci_frequency_control_list, st.session_state.hvci_frequency_alt_list = zip(*sorted_pairs)
-                st.session_state.hvci_noise_input_list = list(st.session_state.hvci_noise_input_list)
+                sorted_pairs = sorted(zip(st.session_state.hvci_synaptic_input_list, st.session_state.hvci_frequency_control_list, st.session_state.hvci_frequency_alt_list))
+                st.session_state.hvci_synaptic_input_list, st.session_state.hvci_frequency_control_list, st.session_state.hvci_frequency_alt_list = zip(*sorted_pairs)
+                st.session_state.hvci_synaptic_input_list = list(st.session_state.hvci_synaptic_input_list)
                 st.session_state.hvci_frequency_control_list = list(st.session_state.hvci_frequency_control_list)
                 st.session_state.hvci_frequency_alt_list = list(st.session_state.hvci_frequency_alt_list)
             
-        elif noise_exists and noise_changed:
-            st.info(f"Noise input {noise_strength:.2f} $mS/cm^{2}$ already tested")
+        elif input_exists and input_changed:
+            st.info(f"Noise input {input_strength:.2f} $mS/cm^{2}$ already tested")
         
-        st.session_state.hvci_last_noise_input = noise_strength
+        st.session_state.hvci_last_synaptic_input = input_strength
         
-        return input_type, v, v_, time, current_stimulus, temperature, st.session_state.hvci_noise_input_list, st.session_state.hvci_frequency_control_list, st.session_state.hvci_frequency_alt_list, st.session_state.hvci_last_noise_input
+        return input_type, v, v_, time, excitatory_synapse_stimulus_control, temperature, st.session_state.hvci_synaptic_input_list, st.session_state.hvci_frequency_control_list, st.session_state.hvci_frequency_alt_list, st.session_state.hvci_last_synaptic_input
 
 
