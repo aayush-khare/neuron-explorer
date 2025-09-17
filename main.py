@@ -2,6 +2,7 @@ import streamlit as st
 
 from utils import (display_introduction,
                    display_electrical_properties,
+                   display_temperature_properties,
                    display_lif_theory,
                    prepare_lif_plots,
                    display_hh_theory,
@@ -14,6 +15,7 @@ from utils import (display_introduction,
 
 from visualization import (plot_lif_membrane_potential,
                            plot_hh_membrane_potential,
+                           create_phase_plots,
                            plot_somatic_membrane_potential,
                            plot_dendritic_membrane_potential,
                            plot_somatic_membrane_potential_with_spike_counts,
@@ -34,25 +36,26 @@ st.markdown("""
             """, 
             unsafe_allow_html=True)
 
-st.title('Models for simulating and analyzing the dynamics of a neuron')
+st.title('Neuron model simulator')
 
-Neuron_class = st.selectbox('Contents',
+select_page = st.selectbox('Contents',
                              ['Introduction',
                               'Electrical Properties of a Neuron',
                               'Integrate and Fire model',
                               'Hodgkin Huxley',
                               'Temperature dependence of neural dynamics',
-                              'HVC neurons'])
+                              'HVC neurons',
+                              'Coming up!'])
 
-if Neuron_class == 'Introduction':
+if select_page == 'Introduction':
 
     display_introduction()
 
-if Neuron_class == 'Electrical Properties of a Neuron':
+if select_page == 'Electrical Properties of a Neuron':
 
     display_electrical_properties()
     
-if Neuron_class == 'Integrate and Fire model':
+if select_page == 'Integrate and Fire model':
 
     display_lif_theory()
 
@@ -67,10 +70,14 @@ if Neuron_class == 'Integrate and Fire model':
     
     st.pyplot(fig_fi)
 
-if Neuron_class == 'Hodgkin Huxley':
+if select_page == 'Temperature dependence of neural dynamics':
+
+    display_temperature_properties()
+
+if select_page == 'Hodgkin Huxley':
 
     display_hh_theory()
-    v_control, v_alt, time, current_stimulus, temperature, current_list, frequency_list_control, frequency_list_alt, last_current = prepare_hh_plots()
+    v_control, n_control, m_control,h_control, v_alt, n_alt, m_alt, h_alt, time, current_stimulus, temperature, current_list, frequency_list_control, frequency_list_alt, last_current = prepare_hh_plots()
 
     tab1, tab2 = st.tabs(['membrane potential and f-I relationship', 'Gating variables'])
 
@@ -86,15 +93,32 @@ if Neuron_class == 'Hodgkin Huxley':
                                             last_current)
 
         st.pyplot(fig_mp)
+    
+    with tab2:
+        fig_phase = create_phase_plots(time,
+                                       v_control,
+                                       m_control,
+                                       h_control,
+                                       n_control,
+                                       v_alt,
+                                       m_alt,
+                                       h_alt,
+                                       n_alt)
 
-if Neuron_class == 'HVC neurons':
+        cols = st.columns(len(fig_phase))
+        for i, fig in enumerate(fig_phase):
+            with cols[i]:
+                st.pyplot(fig)
+    
+
+if select_page == 'HVC neurons':
     
     HVC_neuron_type = st.selectbox('HVC neuron', ['Choose HVC neuron type', 'HVC(RA)', 'HVC(I)'])
     
     if HVC_neuron_type == 'HVC(RA)':
 
         display_hvcra_theory()
-        input_type, fluctuations, vs_control, vs_alt, vd_control, vd_alt, time, temperature, input_list, control_data_list, alt_data_list, last_input = prepare_hvcra_plots()
+        input_type, q_cond, fluctuations, vs_control, vs_alt, vd_control, vd_alt, time, input_array, input_array_alt, temperature, input_list, control_data_list, alt_data_list, last_input = prepare_hvcra_plots()
 
         if input_type == "Current input":
             tab1, tab2= st.tabs(['Soma membrane potential and spike frequency', 'Dendrite membrane potential'])
@@ -105,6 +129,7 @@ if Neuron_class == 'HVC neurons':
                                                                            vs_control,
                                                                            vs_alt,
                                                                            temperature,
+                                                                           input_array,
                                                                            input_list,
                                                                            control_data_list,
                                                                            alt_data_list,
@@ -131,7 +156,10 @@ if Neuron_class == 'HVC neurons':
                     fig_a = plot_somatic_membrane_potential_q10(time, 
                                                                 vs_control, 
                                                                 vs_alt, 
-                                                                temperature, 
+                                                                temperature,
+                                                                input_array, 
+                                                                input_array_alt,
+                                                                q_cond,
                                                                 input_list, 
                                                                 control_data_list, 
                                                                 alt_data_list,
@@ -176,40 +204,25 @@ if Neuron_class == 'HVC neurons':
     elif HVC_neuron_type == 'HVC(I)':
 
         display_hvci_theory()
-        input_type, v_control, v_alt, time, current_stimulus, temperature, current_list, frequency_list_control, frequency_list_alt, last_current = prepare_hvci_plots()
+        input_type, v_control, v_alt, time, input_profile, temperature, input_strength_list, frequency_list_control, frequency_list_alt, last_input_strength = prepare_hvci_plots()
 
-        if input_type == "Single current pulse":
-            tab1, tab2 = st.tabs(['membrane potential', 'gating variables'])
-            
-            with tab1:
-
-                fig_mp = plot_hvci_membrane_potential(time,
-                                                    v_control,
-                                                    v_alt,
-                                                    current_stimulus,
-                                                    temperature,
-                                                    current_list, 
-                                                    frequency_list_control,
-                                                    frequency_list_alt,
-                                                    last_current
-                                                    )
-                
-                st.pyplot(fig_mp)
+        tab1, tab2 = st.tabs(['membrane potential', 'gating variables'])
         
-        else:
-            tab1, tab2 = st.tabs(['membrane potential', 'gating variables'])
-            
-            with tab1:
+        with tab1:
 
-                fig_mp = plot_hvci_membrane_potential(time,
-                                                    v_control,
-                                                    v_alt,
-                                                    current_stimulus,
-                                                    temperature,
-                                                    current_list, 
-                                                    frequency_list_control,
-                                                    frequency_list_alt,
-                                                    last_current
-                                                    )
-                
-                st.pyplot(fig_mp)
+            fig_mp = plot_hvci_membrane_potential(time,
+                                                v_control,
+                                                v_alt,
+                                                input_profile,
+                                                temperature,
+                                                input_strength_list, 
+                                                frequency_list_control,
+                                                frequency_list_alt,
+                                                last_input_strength,
+                                                input_type
+                                                )
+            
+            st.pyplot(fig_mp)
+
+if select_page == 'Coming up!':
+    pass

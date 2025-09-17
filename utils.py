@@ -9,87 +9,330 @@ from models.hodgkin_huxley import HodgkinHuxley
 from models.hvc_projection_neuron import HvcProjectionNeuron
 from models.hvc_interneuron import HvcInterNeuron
 
+base_dir = os.path.dirname(__file__)
+image_dir = os.path.join(base_dir, "images")
+
 def display_introduction():
     
-    st.markdown('<p class="big-font"> Neurons are special type of cells that generate electrical signals and communicate with each other through electrochemical processes triggered by these electrical changes. '\
-                'The generation of the electrical signal is governed by the flow of different types of ions across the cell membrane. Our nervous system is made up of the brain and the spinal cord, and a neuron ' \
-                'cell is the fundamental unit of this system. Neuroscience is an area of research that seeks to develop an understanding of this system, and in doing so, also requires understanding how these fundamental units function.</p>', unsafe_allow_html=True) \
-
-    st.image("../streamlit_images/neuron.jpg", width=1000)
+    st.markdown('<p class="big-font"> Neurons are special type of cells that generate electrical signals and communicate with each other' \
+                ' through electrochemical processes triggered by these electrical signals. The generation of the electrical signal is '\
+                ' governed by the flow of different types of ions across the cell membrane. Neurons are the fundamental unit of our nervous '\
+                ' system. Developing an understanding of the nervous system in turn requires understanding how this fundamental unit functions. '\
+                ' </p>', unsafe_allow_html=True) \
+    
+    neuron_image = os.path.join(image_dir, "neuron.jpg")
+    st.image(neuron_image, width=1000)
         
     st.markdown('<p class="big-font"> In this interactive tool, you get to explore some models for simulating the dynamics of a neuron cell. \
-                We will start by first developing a basic understanding of the electrical properties of neuron cells. With that, we will then discuss how these electrical properties can be simulated' \
-                ' on a computer. We wil start with the Leaky-Integrate-and-Fire (LIF) neuron model. This is a simple model, yet captures effectively the most basic function of neuron cells, that is, accumulating input signals, \
-                and if the inputs cross a threshold, emitting an action potential. This model does not incorporate any complex biophysical details, but still gives a good insight into neuron function ' \
-                'We will build upon this insight by next looking at the Hodgkin-Huxley model. This model incorporates mathematical formalisms to represent the complex biophysical mechanisms involved in the ' \
-                'movement of different ions across the cell membrane, and how these govern action potential generation. These mechanisms are temperature dependent, and so we will also look into how a change in the surrounding temperatures affect the resulting dynamics of a neuron. ' \
-                'Finally you get to explore generalized biophysical models for the excitatory and inhibitory classes of neurons found in a brain region called HVC (known as proper name) in songbird species.</p>', unsafe_allow_html=True)
+                We will start by first developing a basic understanding of the electrical properties of neuron cells. With that, we will then \
+                discuss how these electrical properties can be simulated on a computer. We wil start with the Leaky-Integrate-and-Fire (LIF) \
+                neuron model. This is a simple model, yet captures effectively the most basic function of neuron cells, that is, accumulating \
+                input signals, and if the inputs cross a threshold, emitting an action potential. This model does not incorporate any complex \
+                biophysical details, but still gives a good insight into neuron function. We will build upon this insight by next looking at the \
+                Hodgkin-Huxley model. This model incorporates mathematical formalisms to represent the complex biophysical mechanisms involved in \
+                the movement of different ions across the cell membrane, and how these govern action potential generation. These mechanisms are \
+                temperature dependent, and so we will also look into how a change in the surrounding temperatures affect the resulting dynamics of \
+                a neuron. Finally you get to explore generalized biophysical models for the excitatory and inhibitory classes of neurons found in a \
+                brain region called HVC (known as proper name) in songbird species.</p>', unsafe_allow_html=True)
 
 def display_electrical_properties():
 
-    image_folder = '../neuron_parts'
+    st.markdown("                                      ")
+    st.markdown("### Parts of a neuron")
+
+    image_folder = os.path.join(image_dir, "neuron_parts")
     image_files = sorted([f for f in os.listdir(image_folder) if f.endswith(('.png'))])
 
     descriptions = [
-    "Neuron cells have a complex morphology with different parts playing different roles in the electrical properties",
-    "A neuron receives information from other neurons through a tree like strucuture called dendrite",
-    "This information is processed and translated to an electrical signal at the soma",
-    "This electrical signal is transmitted along a long cable like structure called the axon, through the ends of which this neuron can then communicate with other neurons."
+    "A Neuron cell has a complex morphology with different parts contributing to its electrical properties.",
+    "A neuron receives information from other neurons through the Dendrite, a structure that extends from the soma. The Dendrite has extensive branches, often referred \n"
+    "to as the Dendritic tree. It is this Dendritic tree where a neuron receives majority of its inputs from other neurons.",
+    "The cell body of a neuron is called the Soma which contains the nucleus. The soma can also receive inputs from other neurons, and is the site of primary electrical signal generation. \n"
+    "This electrical signal, also termed as the action potential, is characterized by a large in and out flow of specific ions in a very short time interval.",
+    "This action potential is then transmitted along a long cable like structure called the axon, that emerges out of the soma. The ends of the axon, called the axon terminals are sites \n"
+    "which contain special chemicals called neurotransmitters. When an action potential arrives at the terminals, it can trigger specific processes that result in the release of these \n"
+    "neurotransmitters. It is these neurotransmitters that are then captured at the dendrites of other neurons, triggering electrical activity in them and continuing the flow of information."
     ]
 
-    assert len(descriptions) >= len(image_files), "Not enough descriptions for the images!"
+    max_index_neuron = len(descriptions) - 1
+    min_index_neuron = 0
 
     if 'img_index' not in st.session_state:
         st.session_state.img_index = 0
 
     current_index = st.session_state.img_index
-    current_image = Image.open(os.path.join(image_folder, image_files[current_index]))
-    st.image(current_image, caption=f"{descriptions[current_index]}", width=400)
+    show_next = current_index < max_index_neuron
+    show_prev = current_index > min_index_neuron
 
-    col1, col2 = st.columns([1, 1])
+    current_image = Image.open(os.path.join(image_folder, image_files[current_index]))
+            
+    col1, col2 = st.columns([1, 5])
     with col1:
-        if st.button("⬅️ Prev") and current_index > 0:
-            st.session_state.img_index -= 1
+        if show_prev:
+            if st.button("Prev ") and current_index > 0:
+                st.session_state.img_index -= 1
+                current_index = st.session_state.img_index
+                current_image = Image.open(os.path.join(image_folder, image_files[current_index]))
 
     with col2:
-        if st.button("Next ➡️") and current_index < len(image_files) - 1:
-            st.session_state.img_index += 1
+        if show_next:
+            if st.button("Next ") and current_index < len(image_files) - 1:
+                st.session_state.img_index += 1
+                current_index = st.session_state.img_index
+                current_image = Image.open(os.path.join(image_folder, image_files[current_index]))
 
+    st.image(current_image, width=400)
+    st.markdown(f"{descriptions[current_index]}")
 
-    image_folder_ = '../neuron_dynamics'
+    st.markdown("                                      ")
+    st.markdown("### Action potential generation in a neuron")
+    image_folder_ = os.path.join(image_dir, "neuron_dynamics")
     image_files_ = sorted([f for f in os.listdir(image_folder_) if f.endswith(('.png'))])
 
     descriptions_ = [
-    "Neuron cells have a complex morphology with different parts playing different roles in the electrical properties",
-    "A neuron receives information from other neurons through a tree like strucuture called dendrite",
-    "This information is processed and translated to an electrical signal at the soma",
-    "This electrical signal is transmitted along a long cable like structure called the axon, through the ends of which this neuron can then communicate with other neurons.",
-    "a",
-    "b"
+    "The electrical properties of a neuron can be attributed to a difference in the potential on either side of the cell membrane. This potential is maintained in the resting conditions \n"
+    "such that the inside of the cell is at a negative potential with respect to the outside environment. This potential difference is known as the membrane potential of the neuron, and \n"
+    "denotes the state of the neuron.",
+    "There is a concentration gradient of ions of different types across the membrane. The membrane is typically impermeable to the flow of these ions. The membrane contains various ion \n"
+    "channels that allow for the movement of ions. These channels are selective for specific types of ions. These channels open and close, a process dependent on change in the conformational \n"
+    "states of the proteins making up the channel. The rates at which these conformation states change, and in turn result in the opening or closing of the channels are dependent on the membrane \n"
+    "potential. ",
+    "An excitatory input or injected current serves to elevate the membrane potential. This process is called membrane depolarization.",
+    "As the membrane depolarizes, ion channels permeable to sodium ions open, allowing an influx of sodium ions that further aids depolarization. At a certain membrane potential called \n"
+    "the threshold potential, a large positive feedback loop emerges, resulting in rapid depolarization",
+    "The rapid depolarization subsequently opens voltage-gated potassium channels. The resulting efflux of potassium ions repolarizes the membrane back toward its resting potential.",
+    "The rapid depolarization followed by repolarization which typically occurs within a millisecond in most neurons is known as an action potential. It is this sharp pulse that is \n"
+    "generated at the region near where the axon originates from the soma, and is carried along the axon."
     ]
 
-    assert len(descriptions_) >= len(image_files_), "Not enough descriptions for the images!"
+    max_index_dynamics = len(descriptions_) - 1
+    min_index_dynamics = 0
 
     if 'img_index_' not in st.session_state:
         st.session_state.img_index_ = 0
 
     current_index_ = st.session_state.img_index_
+    show_next_ = current_index_ < max_index_dynamics
+    show_prev_ = current_index_ > min_index_dynamics
+
     current_image_ = Image.open(os.path.join(image_folder_, image_files_[current_index_]))
-    st.image(current_image_, width=700)
 
-    st.markdown(f"{descriptions_[current_index_]}")
-
-    col1, col2 = st.columns(2)
+    col1, col2 = st.columns([1, 2])
     with col1:
-        if st.button("Prev") and current_index_ > 0:
-            st.session_state.img_index_ -= 1
+        if show_prev_:
+            if st.button("Prev") and current_index_ > 0:
+                st.session_state.img_index_ -= 1
+                current_index_ = st.session_state.img_index_
+                current_image_ = Image.open(os.path.join(image_folder_, image_files_[current_index_]))
+    
+    with col2:
+        if show_next_:
+            if st.button("Next") and current_index_ < len(image_files_) - 1:
+                st.session_state.img_index_ += 1
+                current_index_ = st.session_state.img_index_
+                current_image_ = Image.open(os.path.join(image_folder_, image_files_[current_index_]))
+
+    st.image(current_image_, width=700)
+    st.markdown(f"{descriptions_[current_index_]}")
+    
+    st.markdown("                                      ")
+    st.markdown("### Biophysics behing modeling the dynamics of a neuron")
+
+def display_temperature_properties():
+
+    st.markdown("                                      ")
+    st.markdown("### Temperature dependence of biophysical mechanisms governing neural dynamics")
+
+    image_folder = os.path.join(image_dir, "temperature")
+    image_files = sorted([f for f in os.listdir(image_folder) if f.endswith(('.png'))])
+
+    descriptions = [
+        'The movement of ions through the cellular medium is governed by a process called diffusion. This process affects the various conductances involved in the ion channel currents.'
+        'The temperature dependence of this process is weak, quantifies by a $Q_{10}$ value typically in the range 1.2 - 1.4',
+        'The conformational changes governing the opening and closing rates of ion channels are strongly affected by temperature changes. There temperature dependence can be quantified'
+        'by $Q_{10}$ values typically in the range 2 - 4.'
+    ]
+
+    max_index_neuron = len(descriptions) - 1
+    min_index_neuron = 0
+
+    if 'img_index' not in st.session_state:
+        st.session_state.img_index = 0
+
+    current_index = st.session_state.img_index
+    show_next = current_index < max_index_neuron
+    show_prev = current_index > min_index_neuron
+
+    current_image = Image.open(os.path.join(image_folder, image_files[current_index]))
+            
+    col1, col2 = st.columns([1, 4])
+    with col1:
+        if show_prev:
+            if st.button("Prev ") and current_index > 0:
+                st.session_state.img_index -= 1
+                current_index = st.session_state.img_index
+                current_image = Image.open(os.path.join(image_folder, image_files[current_index]))
 
     with col2:
-        if st.button("Next") and current_index_ < len(image_files_) - 1:
-            st.session_state.img_index_ += 1
-    st.markdown('Under resting state conditions, there exists a difference in potential across the membrane of neuron cells. The intracellular medium is at a much negative potential \
-                 compared to the extracellular medium. This difference in the potential is termed as the membrane potential and is used to denote the state of a neuron. If the membrane \
-                 potential rises to values towards 0 mV, the neuron is said to be depolarized. ')
+        if show_next:
+            if st.button("Next ") and current_index < len(image_files) - 1:
+                st.session_state.img_index += 1
+                current_index = st.session_state.img_index
+                current_image = Image.open(os.path.join(image_folder, image_files[current_index]))
+
+    st.image(current_image, width=800)
+    st.markdown(f"{descriptions[current_index]}")
+
+    st.markdown("                                      ")
+
+def display_lif_theory():
+    """
+    Display the theoretical background of the Leaky Integrate and Fire model
+    """
+
+    st.markdown("""
+    <style>
+    .streamlit-expanderHeader {
+        font-size: 150px !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    with st.expander('**About the Leaky Integrate and Fire Model**'):
+        st.markdown(f"""
+    
+    The Leaky Integrate and Fire (LIF) model is a simple mathematical model that effectively \
+    explains the most basic neuron function, i.e., integrating inputs to produce an output \
+    spike. 
+
+                    
+    The Leaky in the LIF model corresponds to the incorporation of a leaky ion channel \
+    in the model, that ensures that the membrane potential exponentially decays back to the \
+    resting-state value in the absence of any inputs. This is the only ion channel incorporated \
+    in the model. The membrane potential dynamics of the model are described by the equation """)
+        
+        st.latex(r''' C\frac{dV}{dt} = I_L + I_{inj} ''')
+
+        st.markdown(f"""Here the first term on RHS is the leak current given by""")
+
+        st.latex(r''' I_L = g_L(E_L - V)''')
+
+        st.markdown(f""" In the presence of a constant current input, the differential equation has an analytical solution for the time evolution of the membrane potential given by""")
+
+        st.latex(r''' V(t) = E_L + I_{inj}R + (V(0) - E_L - I_{inj}R)e^{-\frac{t}{\tau}}''')
+
+        st.markdown(f""" Here $R = \\frac{{{1}}}{{g_L}}$  and the time constant $\\tau = RC$. 
+                    This equation, holding for any value of the membrane potential below the threshold
+                    value, can be used to obtain a response time for the LIF model. This response time, say
+                    $t'$ corresponds to the time it takes for the neuron to fire an action potential from the
+                    time at which the current pulse starts. Setting $V(0) = E_L$ and $V(t') = V_{{th}}$, the threshold
+                    membrane potential, we get""")
+        
+        st.latex(r''' t' = \tau ln(\frac{I_{inj}R}{I_{inj}R + V(0) - V_{th}})''')
+
+        st.markdown(f"""In the following setup, we have defined the threshold to be -50 mV. Each time the membrane potential crosses the threshold, we artificially set the membrane potential back to a reset value
+                    which in this case is the same as the leak reversal potential. If the current pulse is still active, it would again depolarize the membrane potential towards the threshold. 
+                    This means we can get an expression for the response time, and in turn the firing rate the LIF model will exhibit and its dependence on model parameters.""")
+
+        st.markdown(f"""As can be seen, increasing the current can increase the firing rate. Additionally, it should be noted that the closer the initial value is to threshold membrane potential
+                    the higher would be the firing rate, or faster the response.
+    """)
+
+def display_hh_theory():
+    """
+    Display the theoretical background of the Hodgkin-Huxley model.
+    """
+
+    with st.expander('About Hodgkin-Huxley model'):
+        st.markdown("""
+        ## About Hodgkin Huxley (HH) model
+        
+        Hodgkin Huxley model is a mathematical model that approximates the biophysical mechanisms involved in action potential generation. \
+        Developed in 1952 by Alan Hodgkin and Andrew Huxley by studying the ionic mechanisms behind axon potential generation and propagation \
+        in the squid giant axon, this model forms a basis for biophysical models describing neural dynamics for different classes of neurons, 
+        and earned them the Nobel Prize in Physiology or Medicince.
+        The HH model treats the cell membrane as a Capacitor, and voltage-dependent ion channels as variable resistors (variable as the resistance 
+        or conductance at any instance depends on the membrane potential at that instant), that impart non-linearity to the model dynamics. \
+        The mathematical form for the current flowing through the membrane is described as """)
+
+        st.latex(r''' C\frac{dV}{dt} = I_{Na} + I_{K} + I_L + I_{inj} ''')
+
+        st.markdown("""$I_{L}$ is the leak current and follows the same form as that in the LIF model. The sodium and potassium channel currents are described by """)
+
+        st.latex(r''' I_{Na} = g_{Na}m^3h(V_{Na} - V)''')
+
+        st.latex(r''' I_K = g_Kn^4(V_K - V)''')
+
+        st.markdown(""" $g_{Na}$ and $g_K$ are fixed and are determined by the surface density of the respective channels on the membrane. The variability in the ion channel 
+                    conductances arises from the fraction of the channels that are either open or closed. This is governed by the dynamics of the gating variables $n$, $m$ and $h$, 
+                    which follow first order kinetics""")
+        
+        st.latex(r''' \frac{dx}{dt} = \alpha_x(V)(1 - x) - \beta_x(V)x''')
+
+        st.markdown(r"""Here $x = n, m, h$ and $\alpha$ and $\beta$ are the opening and closing rates for the voltage dependent ion channel""")
+
+        st.markdown(""" The mathematical form for the voltage-dependent opening and closing rates of ion channels was determined using the voltage-clamp technique. This method 
+                    holds the membrane potential constant at a specific value while measuring the resulting ionic current. By repeating this process across different membrane 
+                    potentials and analyzing the resulting current curves, Hodgkin and Huxley could determine the voltage-dependent kinetics of channel opening and closing.""")
+        
+        st.markdown("""The temperature at which the experiments performed by Hodgkin and Huxley was around 6 - 7$^{o}C$. As seen in the section of temperature dependence, 
+                    the incorporation of biophysical details in the Hodgkin Huxley model allows for exploring the model dynamics at various temperatures and analyzing how various aspects
+                    of action potential generation change upon temperature. One such aspect is the excitability and the action potential firing rate under the injection of a current pulse. 
+                    In the interactive tool below, you can explore these dynamics. First, change the injected current while keeping other parameters constant and observe how the action 
+                    potential changes. You can also modify other parameters like Q10 values or temperature and then vary the current to see their effects.""")
+        try:
+            image = Image.open("../streamlit_images/HH.png")
+            st.image(image, caption="HH model", use_container_width=True)
+        except FileNotFoundError:
+            st.info("Image not found")
+
+def display_hvcra_theory():
+    """
+    Display the theoretical background of the HVC(RA) model.
+    """
+    with st.expander('About HVC(RA) model'):
+        st.markdown("""
+        ## About HVC(RA) model
+
+        A complex dynamical model that mimics the biophysical mechanisms involved in action potential generation
+        for an excitatory class of neurons in the premotor brain region HVC in songbirds. This model involves the
+        complex morphology of the HVC(RA) neurons broken down into two compartments, a dendrite and a soma which
+        are coupled via ohmic coupling. The dendritic compartment contains a Calcium ion channel, which imparts 
+        the model with eliciting a wide calcium spike. This in turn drives 4-5 tightly chunked sodium ion spikes
+        in the somatic compartment. This behavior of the model is representative of the bursting behavior observed 
+        in HVC(RA) neurons.
+
+        ### Ion channels incorporated
+            Dendrite:
+                - Calcium channel
+                - Calcium concentration dependent Potassium channel
+                - Leak channel
+                    
+            Soma:
+                - Sodium channel
+                - Potassium channel
+                - Leak channel
+        """)
+
+def display_hvci_theory():
+    """
+    Display the theoretical background for HVCI.
+    """
+    with st.expander('About HVC(I)) model'):
+        st.markdown("""
+        ## About HVC(I) model
+
+        A complex dynamical model that mimics the biophysical mechanisms involved in action potential generation
+        for an inhibitory class of neurons in the premotor brain region HVC in songbirds. This model involves the
+        complex morphology of the HVC(I) neuron broken down to a single somatic compartment, which exhibits fast-spiking
+        behavior, representative of the behavior observed in HVC(I) neurons.
+
+        ### Ion channels incorporated
+                - Sodium channel
+                - Delay rectified Potassium channel
+                - Fast Potassium channel
+                - Leak channel
+        """)
 
 def create_current_stimulus_array(time_array, i_amp, i_start, i_end):
     '''
@@ -165,7 +408,6 @@ def create_synapse_stimulus_over_intervals_array(time_array, temp, q_gate, g_max
     event_time = 0.0
     np.random.seed(1995)
     num_steps = int(simulation_time / step_size)
-    print(num_steps)
 
     for i in range(num_steps):
         
@@ -175,7 +417,6 @@ def create_synapse_stimulus_over_intervals_array(time_array, temp, q_gate, g_max
         if make_input:
             while True:
                 if (i + 0.5) * step_size <= event_time < (i + 1.5) * step_size:
-                    print('false')
                     event_count += 1
                     event_time = generate_poisson_events(event_time, freq)
                 elif event_time < (i + 0.5) * step_size:
@@ -186,7 +427,7 @@ def create_synapse_stimulus_over_intervals_array(time_array, temp, q_gate, g_max
         kick_strength = 0
         if event_count == 0:
             if synapse_stimulus[i-1] != 0:
-                synapse_stimulus[i] = synapse_stimulus[i-1] * exp(-step_size / (2 * q_gate))
+                synapse_stimulus[i] = synapse_stimulus[i-1] * exp(-step_size / (2 * q))
         else:
             for _ in range(event_count):
                 kick_strength += np.random.uniform(0.0, 1.0) * g_max
@@ -359,59 +600,6 @@ def prepare_lif_plots():
     
     return v, time, current_stimulus, st.session_state.lif_current_list, st.session_state.lif_frequency_list, st.session_state.lif_last_current
 
-def display_lif_theory():
-    """
-    Display the theoretical background of the Leaky Integrate and Fire model
-    """
-
-    st.markdown("""
-    <style>
-    .streamlit-expanderHeader {
-        font-size: 150px !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
-    with st.expander('**About the Leaky Integrate and Fire Model**'):
-        st.markdown(f"""
-    
-    The Leaky Integrate and Fire (LIF) model is a simple mathematical model that effectively \
-    explains the most basic neuron function, i.e., integrating inputs to produce an output \
-    spike. 
-
-                    
-    The Leaky in the LIF model corresponds to the incorporation of a leaky ion channel \
-    in the model, that ensures that the membrane potential exponentially decays back to the \
-    resting-state value in the absence of any inputs. This is the only ion channel incorporated \
-    in the model. The membrane potential dynamics of the model can be given by the equation """)
-        
-        st.latex(r''' C\frac{dV}{dt} = I_L + I_{inj} ''')
-
-        st.markdown(f"""Here the first term on RHS is the leak current given by""")
-
-        st.latex(r''' I_L = g_L(E_L - V)''')
-
-        st.markdown(f""" In the presence of a constant current input, the differential equation has an analytical solution for the time evolution of the membrane potential given by""")
-
-        st.latex(r''' V(t) = E_L + I_{inj}R + (V(0) - E_L - I_{inj}R)e^{-\frac{t}{\tau}}''')
-
-        st.markdown(f""" Here $R = \\frac{{{1}}}{{g_L}}$  and the time constant $\\tau = RC$. 
-                    This equation, holding for any value of the membrane potential below the threshold
-                    value, can be used to obtain a response time for the LIF model. This response time, say
-                    $t'$ corresponds to the time it takes for the neuron to fire an action potential from the
-                    time at which the current pulse starts. Setting $V(0) = E_L$ and $V(t') = V_{{th}}$, the threshold
-                    membrane potential, we get""")
-        
-        st.latex(r''' t' = \tau ln(\frac{I_{inj}R}{I_{inj}R + V(0) - V_{th}})''')
-
-        st.markdown(f"""In the following setup, we have defined the threshold to be -50 mV. Each time the membrane potential crosses the threshold, we artificially set the membrane potential back to a reset value
-                    which in this case is the same as the leak reversal potential. If the current pulse is still active, it would again depolarize the membrane potential towards the threshold. 
-                    This means we can get an expression for the response time, and in turn the firing rate the LIF model will exhibit and its dependence on model parameters.""")
-
-        st.markdown(f"""As can be seen, increasing the current can increase the firing rate. Additionally, it should be noted that the closer the initial value is to threshold membrane potential
-                    the higher would be the firing rate, or faster the response.
-    """)
-
 def create_sidebar_controls_hh():
     '''
     Sidebar controls for the Hodgkin Huxley (HH) neuron model
@@ -452,7 +640,7 @@ def create_sidebar_controls_hh():
     q_cond = st.sidebar.slider('Q10 for diffusion dependent processes', 1.0, 2.0, 1.3, 0.1, on_change=handle_reset)
 
     st.sidebar.subheader('Current stimulus settings')
-    i_amp = st.sidebar.slider('Current amplitude ($\mu A/cm^2$)', -1.0, 15.0, 1.0, 1.0, format="%0.1f", key=f'i_amp_{hh_reset_key}')
+    i_amp = st.sidebar.slider('Current amplitude ($\mu A/cm^2$)', -1.0, 15.0, 0.0, 1.0, key=f'i_amp_{hh_reset_key}')
     
     temperature = st.selectbox('Temperature in Celsius (control fixed at 6.3 Celsius)', [0.0, 10.0, -10.0], width=300, on_change=handle_reset) # control temperature = 6.3 celsius
 
@@ -484,19 +672,10 @@ def prepare_hh_plots():
     SIMULATION_TIME = 300.0 # ms
     time = np.arange(0, SIMULATION_TIME, STEP_SIZE)
 
-    solution_alt = None
-    solution_control = None
- 
     i_amp = params['I_amp']
     i_start = 50.0
     i_end = SIMULATION_TIME - 50.0
 
-    hh_current_list = st.session_state.hh_current_list
-    hh_last_current = st.session_state.hh_last_current
-
-    current_changed = abs(i_amp - hh_last_current) >= 0.5
-    current_exists = any(abs(c - i_amp) == 0.00 for c in hh_current_list)
-    
     current_stimulus = create_current_stimulus_array(time,
                                                     i_amp,
                                                     i_start,
@@ -508,7 +687,19 @@ def prepare_hh_plots():
     solution_alt = neuron_alt.simulate(time, STEP_SIZE, current_stimulus_array=current_stimulus)
 
     v = solution_control[:, 0]
+    n = solution_control[:, 1]
+    m = solution_control[:, 2]
+    h = solution_control[:, 3]
     v_ = solution_alt[:, 0]
+    n_ = solution_alt[:, 1]
+    m_ = solution_alt[:, 2]
+    h_ = solution_alt[:, 3]
+
+    hh_current_list = st.session_state.hh_current_list
+    hh_last_current = st.session_state.hh_last_current
+
+    current_changed = abs(i_amp - hh_last_current) >= 0.5
+    current_exists = any(abs(c - i_amp) == 0.00 for c in hh_current_list)    
 
     if current_changed and not current_exists:
 
@@ -521,7 +712,13 @@ def prepare_hh_plots():
             solution_alt = neuron_alt.simulate(time, STEP_SIZE, current_stimulus_array=current_stimulus)
         
             v = solution_control[:, 0]
+            n = solution_control[:, 1]
+            m = solution_control[:, 2]
+            h = solution_control[:, 3]
             v_ = solution_alt[:, 0]
+            n_ = solution_alt[:, 1]
+            m_ = solution_alt[:, 2]
+            h_ = solution_alt[:, 3]
 
             st.session_state.hh_current_list.append(i_amp)
 
@@ -555,12 +752,12 @@ def prepare_hh_plots():
             
             st.success(f"Added: {i_amp:.1f} $\mu A/cm^{2}$")
     
-    else:
+    elif current_exists and current_changed:
         st.info(f"Current {i_amp:.1f} $\mu A/cm^2$ already tested")
 
     st.session_state.hh_last_current = i_amp    
 
-    return v, v_, time, current_stimulus, temperature, st.session_state.hh_current_list, st.session_state.hh_frequency_list_control, st.session_state.hh_frequency_list_alt, st.session_state.hh_last_current
+    return v, n, m, h, v_, n_, m_, h_, time, current_stimulus, temperature, st.session_state.hh_current_list, st.session_state.hh_frequency_list_control, st.session_state.hh_frequency_list_alt, st.session_state.hh_last_current
 
 def create_sidebar_controls_hvcra():
     '''
@@ -795,7 +992,7 @@ def create_sidebar_controls_hvci():
 
         st.sidebar.subheader('Current stimulus settings')
 
-        i_amp = st.sidebar.slider(f'Current amplitude ($\mu A/cm^{2}$)', 0.0, 15.0, 0.0, 1.0, key=f'i_amp_{hvci_reset_key}')
+        i_amp = st.sidebar.slider(f'Current amplitude ($\mu A/cm^{2}$)', 0.0, 20.0, 0.0, 2.5, key=f'i_amp_{hvci_reset_key}')
         
         return {
             'temperature': temperature,
@@ -855,60 +1052,6 @@ def create_sidebar_controls_hvci():
             'input_kick': g_max,
             'interval_size': interval_size
         }
-
-def display_hh_theory():
-    """
-    Display the theoretical background of the Hodgkin-Huxley model.
-    """
-
-    with st.expander('About Hodgkin-Huxley model'):
-        st.markdown("""
-        ## About Hodgkin Huxley (HH) model
-        
-        A complex dynamical model that mimics the biophysical mechanisms involved in action potential generation. \
-        Unlike the LIF model, the HH model incorporates voltage-gated ion channels, that impart non-linear features \
-        to the model dynamics. The exact mathematical form for these voltage-gated ion channels was determined \
-        through electrophysiological experiments 
-        
-        ### Ion channels incorporated
-        - Sodium channel
-        - Potassium channel
-        - Leak Channel
-        """)
-        
-        try:
-            image = Image.open("../streamlit_images/HH.png")
-            st.image(image, caption="HH model", use_container_width=True)
-        except FileNotFoundError:
-            st.info("Image not found")
-
-def display_hvcra_theory():
-    """
-    Display the theoretical background of the HVC(RA) model.
-    """
-    with st.expander('About HVC(RA) model'):
-        st.markdown("""
-        ## About HVC(RA) model
-
-        A complex dynamical model that mimics the biophysical mechanisms involved in action potential generation
-        for an excitatory class of neurons in the premotor brain region HVC in songbirds. This model involves the
-        complex morphology of the HVC(RA) neurons broken down into two compartments, a dendrite and a soma which
-        are coupled via ohmic coupling. The dendritic compartment contains a Calcium ion channel, which imparts 
-        the model with eliciting a wide calcium spike. This in turn drives 4-5 tightly chunked sodium ion spikes
-        in the somatic compartment. This behavior of the model is representative of the bursting behavior observed 
-        in HVC(RA) neurons.
-
-        ### Ion channels incorporated
-            Dendrite:
-                - Calcium channel
-                - Calcium concentration dependent Potassium channel
-                - Leak channel
-                    
-            Soma:
-                - Sodium channel
-                - Potassium channel
-                - Leak channel
-        """)
 
 def prepare_hvcra_plots():
     """
@@ -1026,7 +1169,7 @@ def prepare_hvcra_plots():
         
         st.session_state.hvcra_last_current_input = i_amp
 
-        return input_type, fluctuations, vs, vs_, vd, vd_, time, temperature, st.session_state.hvcra_current_input_list, st.session_state.hvcra_frequency_control_list, st.session_state.hvcra_frequency_alt_list, st.session_state.hvcra_last_current_input
+        return input_type, q_cond, fluctuations, vs, vs_, vd, vd_, time, current_stimulus, current_stimulus, temperature, st.session_state.hvcra_current_input_list, st.session_state.hvcra_frequency_control_list, st.session_state.hvcra_frequency_alt_list, st.session_state.hvcra_last_current_input
  
     if input_type == 'Synaptic input':
 
@@ -1211,27 +1354,7 @@ def prepare_hvcra_plots():
             st.info(f"Synaptic input {ge_max:.2f} $mS/cm^{2}$ already tested")
             st.session_state.hvcra_last_synaptic_input = ge_max
             
-        return input_type, fluctuations, vs, vs_, vd, vd_, time, temperature, st.session_state.hvcra_synaptic_input_list, st.session_state.response_time_control_list, st.session_state.response_time_alt_list, st.session_state.hvcra_last_synaptic_input
-
-def display_hvci_theory():
-    """
-    Display the theoretical background for HVCI.
-    """
-    with st.expander('About HVC(I)) model'):
-        st.markdown("""
-        ## About HVC(I) model
-
-        A complex dynamical model that mimics the biophysical mechanisms involved in action potential generation
-        for an inhibitory class of neurons in the premotor brain region HVC in songbirds. This model involves the
-        complex morphology of the HVC(I) neuron broken down to a single somatic compartment, which exhibits fast-spiking
-        behavior, representative of the behavior observed in HVC(I) neurons.
-
-        ### Ion channels incorporated
-                - Sodium channel
-                - Delay rectified Potassium channel
-                - Fast Potassium channel
-                - Leak channel
-        """)
+        return input_type, q_cond, fluctuations, vs, vs_, vd, vd_, time, excitatory_synapse_stimulus_control, excitatory_synapse_stimulus_alt, temperature, st.session_state.hvcra_synaptic_input_list, st.session_state.response_time_control_list, st.session_state.response_time_alt_list, st.session_state.hvcra_last_synaptic_input
 
 def prepare_hvci_plots():
     """
@@ -1483,8 +1606,8 @@ def prepare_hvci_plots():
                     if v_[i-1] < threshold and v_[i] >= threshold:
                         spike_count_alt += 1
                     
-                frequency_control = spike_count_control
-                frequency_alt = spike_count_alt
+                frequency_control = spike_count_control * 1000 / simulation_time
+                frequency_alt = spike_count_alt * 1000 / simulation_time
 
                 st.session_state.hvci_synaptic_input_list.append(input_strength)
                 st.session_state.hvci_frequency_control_list.append(frequency_control)
@@ -1498,7 +1621,7 @@ def prepare_hvci_plots():
                 st.session_state.hvci_frequency_alt_list = list(st.session_state.hvci_frequency_alt_list)
             
         elif input_exists and input_changed:
-            st.info(f"Noise input {input_strength:.2f} $mS/cm^{2}$ already tested")
+            st.info(f"Synaptic input {input_strength:.2f} $mS/cm^{2}$ already tested")
         
         st.session_state.hvci_last_synaptic_input = input_strength
         

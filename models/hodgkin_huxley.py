@@ -11,16 +11,6 @@ class HodgkinHuxley:
     CAPACITANCE = 1.0 # muF/cm^2
     TEMPERATURE_BASELINE = 6.3
 
-    #AN3D1 constants
-    A1 = -0.4526683126055039
-    A2 = -0.4842227708685013
-    A3 = 1.9368910834740051
-
-    B1 = 1.0 / 6.0
-    B2 = -0.005430430675258792
-    B3 = 2.0 / 3.0
-    B4 = 0.1720970973419255
-
     def __init__(self, temperature_expt, q_gate, q_cond):
         
         # temperature related parameters coming from the control bars
@@ -94,60 +84,6 @@ class HodgkinHuxley:
 
         return i_ion_total + i_injected
     
-    def an3d1_step(self, step_size, state):
-
-        h1v = state[0]
-        h1n = state[1]
-        h1m = state[2]
-        h1h = state[3]
-        h1i = state[4]
-
-        a1n = self.nmh_update(h1n, self.alpha_n(h1v), self.beta_n(h1v))
-        a1m = self.nmh_update(h1m, self.alpha_m(h1v), self.beta_m(h1v))
-        a1h = self.nmh_update(h1h, self.alpha_h(h1v), self.beta_h(h1v))
-        a1v = self.dv_dt(h1v, h1n, h1m, h1h, h1i)
-
-        h2n = h1n + step_size * a1n
-        h2m = h1m + step_size * a1m
-        h2h = h1h + step_size * a1h
-        h2v = h1v + step_size * a1v
-        h2i = state[4]
-
-        a2n = self.nmh_update(h2n, self.alpha_n(h2v), self.beta_n(h2v))
-        a2m = self.nmh_update(h2m, self.alpha_m(h2v), self.beta_m(h2v))
-        a2h = self.nmh_update(h2h, self.alpha_h(h2v), self.beta_h(h2v))
-        a2v = self.dv_dt(h2v, h2n, h2m, h2h, h2i)
-
-        h3n = h1n + step_size * (3 * a1n + a2n) / 8.0
-        h3m = h1m + step_size * (3 * a1m + a2m) / 8.0
-        h3h = h1h + step_size * (3 * a1h + a2h) / 8.0
-        h3v = h1v + step_size * (3 * a1v + a2v) / 8.0
-        h3i = state[4]
-
-        a3n = self.nmh_update(h3n, self.alpha_n(h3v), self.beta_n(h3v))
-        a3m = self.nmh_update(h3m, self.alpha_m(h3v), self.beta_m(h3v))
-        a3h = self.nmh_update(h3h, self.alpha_h(h3v), self.beta_h(h3v))
-        a3v = self.dv_dt(h3v, h3n, h3m, h3h, h3i)
-
-        h4n = h1n + step_size * (self.A1 * a1n + self.A2 * a2n + self.A3 * a3n)
-        h4m = h1m + step_size * (self.A1 * a1m + self.A2 * a2m + self.A3 * a3m)
-        h4h = h1h + step_size * (self.A1 * a1h + self.A2 * a2h + self.A3 * a3h)
-        h4v = h1v + step_size * (self.A1 * a1v + self.A2 * a2v + self.A3 * a3v)
-        h4i = state[4]
-
-        a4n = self.nmh_update(h4n, self.alpha_n(h4v), self.beta_n(h4v))
-        a4m = self.nmh_update(h4m, self.alpha_m(h4v), self.beta_m(h4v))
-        a4h = self.nmh_update(h4h, self.alpha_h(h4v), self.beta_h(h4v))
-        a4v = self.dv_dt(h4v, h4n, h4m, h4h, h4i)
-
-        h5n = h1n + step_size * (self.B1 * a1n + self.B2 * a2n + self.B3 * a3n + self.B4 * a4n)
-        h5m = h1m + step_size * (self.B1 * a1m + self.B2 * a2m + self.B3 * a3m + self.B4 * a4m)
-        h5h = h1h + step_size * (self.B1 * a1h + self.B2 * a2h + self.B3 * a3h + self.B4 * a4h)
-        h5v = h1v + step_size * (self.B1 * a1v + self.B2 * a2v + self.B3 * a3v + self.B4 * a4v)
-        h5i = state[4]
-
-        return [h5v, h5n, h5m, h5h, h5i]
-
     def rk4_step(self, step_size, state):
 
         h1v = state[0]

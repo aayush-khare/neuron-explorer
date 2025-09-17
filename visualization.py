@@ -1,24 +1,45 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
 
-def plot_somatic_membrane_potential_with_spike_counts(time, vs_control, vs_alt, temperature, input_list, control_data_list, alt_data_list, last_input):
+def plot_somatic_membrane_potential_with_spike_counts(time, vs_control, vs_alt, temperature, input_array, input_list, control_data_list, alt_data_list, last_input):
     """
-    Plots the somatic membrane potential with spike counts for two conditions.
-    Args:
-        time: Time vector.
-        vs_control: Membrane potential for the control condition.
-        vs_alt: Membrane potential for the alternative condition.
-        temperature: Temperature for the alternative condition.
-        input_list: List of current inputs.
-        control_data_list: Spike counts for the control condition.
-        alt_data_list: Spike counts for the alternative condition.
-        last_input: The last current input value entered.
+    Plot somatic membrane potential for HVC(RA) neuron with spike counts for two experimental 
+    conditions (control condition 40 degree Celsius and an alternative condition for a different temperature)
 
-    Returns:
-        A matplotlib figure containing the plots.
+    Parameters
+    ----------
+    time : array_like
+        Time vector for the membrane potential traces.
+    vs_control : array_like
+        Somatic membrane potential values for the control condition.
+    vs_alt : array_like
+        Somatic membrane potential values for the alternative condition.
+    temperature : float
+        Temperature (in °C) used for the alternative experimental condition.
+    input_list : list
+        List of input current values applied during the experiment.
+    control_data_list : list
+        Spike count data corresponding to each input current for the control condition.
+    alt_data_list : list
+        Spike count data corresponding to each input current for the alternative condition.
+    last_input : float
+        The most recent input current value that was applied.
+
+    Returns
+    -------
+    matplotlib.figure.Figure
+        A matplotlib figure object containing the membrane potential traces
+        and spike count plots for both experimental conditions.
+
     """
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
+    fig = plt.figure(figsize=(16, 8))
+    gs = gridspec.GridSpec(2, 2, height_ratios=[1, 1], width_ratios=[1, 1], figure=fig)
+    ax1 = fig.add_subplot(gs[0, 0])
+    ax3 = fig.add_subplot(gs[1, 0], sharex=ax1)
+
+    ax2 = fig.add_subplot(gs[:, 1])
 
     ax1.plot(time, vs_control, 'r', label='40.0$^o$ C')
     ax1.plot(time, vs_alt, 'b', label=f'{temperature}$^o$ C')
@@ -27,8 +48,14 @@ def plot_somatic_membrane_potential_with_spike_counts(time, vs_control, vs_alt, 
     ax1.set_xlim(100, 200)
     ax1.set_ylim(-100, 100)
     ax1.grid(True, alpha=0.3)
-
     ax1.set_title('Membrane Potential for the somatic compartment')
+
+    ax3.plot(time, input_array, 'tab:green', linestyle='--')
+    ax3.set_ylabel(f'input current ($\mu A/cm^{2}$)', color='tab:green', fontsize=12)
+    ax3.tick_params(axis='y', labelcolor='tab:green')
+    ax3.set_ylim(-0.3, 1.1)
+    ax3.set_xlim(100, 200)
+    ax3.set_xlabel('Time (ms)', fontsize=12)
 
     if len(input_list) > 0:
         sorted_pairs = sorted(zip(input_list, control_data_list, alt_data_list))
@@ -51,7 +78,7 @@ def plot_somatic_membrane_potential_with_spike_counts(time, vs_control, vs_alt, 
             ax2.plot(last_input, current_alt_data, 'o', color='blue', markersize=10,
                     label=f'{last_input:.1f} $\mu A/cm^{2}$, {current_alt_data} spikes')
         
-        ax2.set_xlabel(f'Current input ($\mu A/cm^{2}$)', fontsize=12)
+        ax2.set_xlabel(f'input current ($\mu A/cm^{2}$)', fontsize=12)
         ax2.set_ylabel('num spikes', fontsize=12)
         ax2.set_title('Somatic spikes vs current injected', fontsize=14)
         ax2.set_xticks([-0.2, 0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
@@ -60,7 +87,7 @@ def plot_somatic_membrane_potential_with_spike_counts(time, vs_control, vs_alt, 
         ax2.legend()
         
     else:
-        ax2.set_xlabel(f'Current input ($\mu A/cm^{2}$)', fontsize=12)
+        ax2.set_xlabel(f'input current ($\mu A/cm^{2}$)', fontsize=12)
         ax2.set_ylabel('num spikes', fontsize=12)
         ax2.set_title('Somatic spikes vs current injected', fontsize=14)
         ax2.grid(True, alpha=0.3)
@@ -70,25 +97,51 @@ def plot_somatic_membrane_potential_with_spike_counts(time, vs_control, vs_alt, 
     plt.tight_layout()
     return fig
 
-def plot_somatic_membrane_potential_q10(time, vs_control, vs_alt, temperature, synaptic_input_list, response_time_control_list, responase_time_alt_list, last_synaptic_input):
+def plot_somatic_membrane_potential_q10(time, vs_control, vs_alt, temperature, input_array, input_array_alt, q_cond, synaptic_input_list, response_time_control_list, responase_time_alt_list, last_synaptic_input):
     """
-    Plots the somatic membrane potential $Q_{10}$ for two conditions.
+    Plot somatic membrane potential and Q10 analysis for two temperature conditions.
 
-    Args:
-        time: Time vector.
-        vs_control: Membrane potential for the control condition.
-        vs_alt: Membrane potential for the alternative condition.
-        temperature: Temperature for the alternative condition.
-        synaptic_input_list: List of synaptic inputs.
-        response_time_control_list: Response times for the control condition.
-        response_time_alt_list: Response times for the alternative condition.
-        last_synaptic_input: The last synaptic input value entered.
+    This function creates visualizations comparing membrane potential responses, a
+    single synaptic input's profile and their temperature sensitivity (Q10) between 
+    a control condition (40 degree Celsius) and an alternative temperature condition, 
+    analyzing response times across different synaptic input strengths. 
 
-    Returns:
-        A matplotlib figure containing the plots.
+    Parameters
+    ----------
+    time : array_like
+        Time vector for the membrane potential traces.
+    vs_control : array_like
+        Somatic membrane potential values for the control condition.
+    vs_alt : array_like
+        Somatic membrane potential values for the alternative temperature condition.
+    temperature : float
+        Temperature (in °C) used for the alternative experimental condition.
+    synaptic_input_list : list
+        List of synaptic input strength values applied during the experiment.
+    response_time_control_list : list
+        Response time measurements corresponding to each synaptic input 
+        for the control condition.
+    response_time_alt_list : list
+        Response time measurements corresponding to each synaptic input 
+        for the alternative temperature condition.
+    last_synaptic_input : float
+        The most recent synaptic input strength value that was applied.
+
+    Returns
+    -------
+    matplotlib.figure.Figure
+        A matplotlib figure object containing membrane potential traces, synpatic
+        input trace and Q10 analysis plots comparing both temperature conditions.
 
     """
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
+
+    input_array_alt = [g / q_cond for g in input_array_alt]
+    fig = plt.figure(figsize=(16, 8))
+    gs = gridspec.GridSpec(2, 2, height_ratios=[1, 1], width_ratios=[1, 1], figure=fig)
+    ax1 = fig.add_subplot(gs[0, 0])
+    ax3 = fig.add_subplot(gs[1, 0], sharex=ax1)
+
+    ax2 = fig.add_subplot(gs[:, 1])
 
     ax1.plot(time, vs_control, 'red', label='40.0$^o$ C')
     ax1.plot(time, vs_alt, 'blue', label=f'{temperature}$^o$ C')
@@ -104,6 +157,14 @@ def plot_somatic_membrane_potential_q10(time, vs_control, vs_alt, temperature, s
 
     lines1, labels1 = ax1.get_legend_handles_labels()
     ax1.legend(lines1, labels1, loc='upper right')
+
+    ax3.plot(time, input_array, 'red', label='40.0$^o$ C', linestyle='-')
+    ax3.plot(time, input_array_alt, 'blue', label=f'{temperature}$^o$ C', linestyle='-')
+    ax3.set_ylabel(f'synaptic input ($mS/cm^{2}$)', fontsize=12)
+    ax3.tick_params(axis='y')
+    ax3.set_ylim(-0.3, 1.1)
+    ax3.set_xlim(100, 200)
+    ax3.set_xlabel('Time (ms)', fontsize=12)
 
     if len(synaptic_input_list) > 0:
         sorted_pairs = sorted(zip(synaptic_input_list, response_time_control_list, responase_time_alt_list))
@@ -210,7 +271,7 @@ def plot_dendritic_membrane_potential(time, vd_control, vd_alt, temperature):
     plt.tight_layout()
     return fig
 
-def plot_hvci_membrane_potential(time, v_control, v_alt, stimulus, temperature, current_list, frequency_list_control, frequency_list_alt, last_current):
+def plot_hvci_membrane_potential(time, v_control, v_alt, input_profile, temperature, input_strength_list, frequency_list_control, frequency_list_alt, last_input_strength, input_type):
 
     """
     Plots the membrane potential for the HVCI neuron.
@@ -225,31 +286,63 @@ def plot_hvci_membrane_potential(time, v_control, v_alt, stimulus, temperature, 
         frequency_list_control: Firing frequencies for the control condition.
         frequency_list_alt: Firing frequencies for the alternative condition.
         last_current: The last injected current.
+        input_type: To indicate if the input is a single current pulse or synaptic input over multiple time intervals
 
     Returns:
         A matplotlib figure containing the plots.
     """
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
-    ax3 = ax1.twinx()
-    ax3.plot(time, stimulus, 'tab:green', linestyle='--')
-    ax3.set_ylabel(f'current stimulus ($\mu A/cm^{2})$', color='tab:green', fontsize=12)
-    ax3.tick_params(axis='y', labelcolor='tab:green')
-    ax3.set_ylim(-3.5, 15.5) 
-    ax3.set_xlim(400, 600)   
 
+    if input_type == 'Single current pulse':
+        x_label = 'Injected Current ($\mu A/cm^{2}$)'
+        y_label = f'current stimulus ($\mu A/cm^{2}$)'
+        plot_title = 'Membrane Potential and input profile'
+        input_strength = 'current amplitude'
+        input_units = f'$\mu A/cm^{2}$'
+        xmax = 300   
+        ymax = 20.5
+        y_ticks_list = [0.0, 5.0, 10.0, 15.0, 20.0,]
+        linestyle = '--'
+    
+    elif input_type == 'Synaptic input in multiple intervals':
+        x_label = 'max synaptic kick($mS/cm^{2}$)'
+        y_label = f'synapse stimulus ($mS/cm^{2}$)'        
+        plot_title = 'Membrane Potential and input profile'
+        input_strength = 'input max kick'
+        input_units = f'$mS/cm^{2}$'
+        xmax = 600
+        ymax = 5.5
+        y_ticks_list = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0]
+        linestyle = '-'
 
-    ax1.plot(time, v_control, 'r', label='40.0$^o$ C')
+    xmin = 0
+    ymin = -1
+
+    fig = plt.figure(figsize=(16, 8))
+    gs = gridspec.GridSpec(2, 2, height_ratios=[1, 1], width_ratios=[1, 1], figure=fig)
+    ax1 = fig.add_subplot(gs[0, 0])
+    ax3 = fig.add_subplot(gs[1, 0], sharex=ax1)
+
+    ax2 = fig.add_subplot(gs[:, 1])
+
     ax1.plot(time, v_alt, 'b', label=f'{temperature}$^o$ C')
-    ax1.set_xlabel('Time (ms)', fontsize=12)
+    ax1.plot(time, v_control, 'r', label='40.0$^o$ C', alpha=0.5)
     ax1.set_ylabel('Membrane Potential (mV)', fontsize=12)
     ax1.set_ylim(-90, 50)
-    ax1.set_xlim(400, 600)
+    ax1.set_xlim(xmin, xmax)
     ax1.grid(True, alpha=0.3)
     ax1.legend()
-    ax1.set_title('Membrane Potential and Stimulus Current')
+    ax1.set_title(plot_title)    
 
-    if len(current_list) > 0:
-        sorted_pairs = sorted(zip(current_list, frequency_list_control, frequency_list_alt))
+    ax3.plot(time, input_profile, 'tab:green', linestyle=linestyle)
+    ax3.set_ylabel(y_label, color='tab:green', fontsize=12)
+    ax3.tick_params(axis='y', labelcolor='tab:green')
+    ax3.set_ylim(ymin, ymax)
+    ax3.set_xlim(xmin, xmax)
+    ax3.set_xlabel('Time (ms)', fontsize=12)
+    ax3.set_yticks(y_ticks_list)
+
+    if len(input_strength_list) > 0:
+        sorted_pairs = sorted(zip(input_strength_list, frequency_list_control, frequency_list_alt))
         sorted_current, sorted_frequency_control, sorted_frequency_alt = zip(*sorted_pairs)
         sorted_current = list(sorted_current)
         sorted_frequency_control = list(sorted_frequency_control)
@@ -260,29 +353,28 @@ def plot_hvci_membrane_potential(time, v_control, v_alt, stimulus, temperature, 
         ax2.plot(sorted_current, sorted_frequency_alt,
                  'bo-', linewidth=1, markersize=4, alpha=0.7)
         
-        if last_current in [c for c in sorted_current if c == last_current]:
-            idx = next(i for i, c in enumerate(sorted_current) if c == last_current)
+        if last_input_strength in [c for c in sorted_current if c == last_input_strength]:
+            idx = next(i for i, c in enumerate(sorted_current) if c == last_input_strength)
             current_freq_control = sorted_frequency_control[idx]
             current_freq_alt = sorted_frequency_alt[idx]
-            ax2.plot(last_current, current_freq_control, 'o', color='red', markersize=10,
-                    label=f'{last_current:.1f} $\mu A/cm^{2}$, {current_freq_control:.1f} Hz')
-            ax2.plot(last_current, current_freq_alt, 'o', color='blue', markersize=10,
-                    label=f'{last_current:.1f} $\mu A/cm^{2}$, {current_freq_alt:.1f} Hz')   
+            ax2.plot(last_input_strength, current_freq_control, 'o', color='red', markersize=10,
+                    label=f'{last_input_strength:.1f} {input_units}, {current_freq_control:.1f} Hz')
+            ax2.plot(last_input_strength, current_freq_alt, 'o', color='blue', markersize=10,
+                    label=f'{last_input_strength:.1f} {input_units}, {current_freq_alt:.1f} Hz')   
         
-        ax2.set_xlabel('Injected Current ($\mu A/cm^{2}$)', fontsize=12)
+        ax2.set_xlabel(x_label, fontsize=12)
         ax2.set_ylabel('Firing Frequency (Hz)', fontsize=12)
-        ax2.set_title('Current-Frequency (F-I) Relationship', fontsize=14)
+        ax2.set_title('Input-Frequency Relationship', fontsize=14)
         ax2.grid(True, alpha=0.3)
         ax2.legend()
       
     else:
-        ax2.set_xlabel('Injected Current ($\mu A/cm^{2}$)', fontsize=12)
+        ax2.set_xlabel(x_label, fontsize=12)
         ax2.set_ylabel('Firing Frequency (Hz)', fontsize=12)
-        ax2.set_title('Current-Frequency (F-I) Relationship', fontsize=14)
+        ax2.set_title('Input-Frequency Relationship', fontsize=14)
         ax2.grid(True, alpha=0.3)
-        ax2.text(0.5, 0.5, 'No data points yet\nAdjust current and observe', 
+        ax2.text(0.5, 0.5, f'No data points yet\nAdjust {input_strength} and observe', 
                 transform=ax2.transAxes, ha='center', va='center', fontsize=12)
-
 
     plt.tight_layout()
     return fig
@@ -305,13 +397,12 @@ def plot_hh_membrane_potential(time, v_control, v_alt, stimulus, temperature, cu
     Returns:
         A matplotlib figure containing the plots.
     """
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
-    ax3 = ax1.twinx()
-    ax3.plot(time, stimulus, 'tab:green', linestyle='--')
-    ax3.set_ylabel(f'current stimulus ($\mu A/cm^{2})$', color='tab:green', fontsize=12)
-    ax3.tick_params(axis='y', labelcolor='tab:green')
-    ax3.set_ylim(-3.5, 15.5)    
+    fig = plt.figure(figsize=(16, 8))
+    gs = gridspec.GridSpec(2, 2, height_ratios=[1, 1], width_ratios=[1, 1], figure=fig)
+    ax1 = fig.add_subplot(gs[0, 0])
+    ax3 = fig.add_subplot(gs[1, 0], sharex=ax1)
 
+    ax2 = fig.add_subplot(gs[:, 1])
 
     ax1.plot(time, v_control, 'r', label='6.3$^o$ C')
     ax1.plot(time, v_alt, 'b', label=f'{temperature}$^o$ C')
@@ -321,6 +412,12 @@ def plot_hh_membrane_potential(time, v_control, v_alt, stimulus, temperature, cu
     ax1.grid(True, alpha=0.3)
     ax1.legend()
     ax1.set_title('Membrane Potential and Stimulus Current')
+
+    ax3.plot(time, stimulus, 'tab:green', linestyle='--')
+    ax3.set_ylabel(f'input current ($\mu A/cm^{2}$)', color='tab:green', fontsize=12)
+    ax3.tick_params(axis='y', labelcolor='tab:green')
+    ax3.set_ylim(-2, 16)
+    ax3.set_xlabel('Time (ms)', fontsize=12)
 
     if len(current_list) > 0:
         sorted_pairs = sorted(zip(current_list, frequency_list_control, frequency_list_alt))
@@ -431,17 +528,20 @@ def plot_lif_membrane_potential(time, v, current, current_list, frequency_list, 
     plt.tight_layout()
     return fig
 
-def create_phase_plots(V, m, h, n, dt):
+def create_phase_plots(time, v, m, h, n, v_, m_, h_, n_):
     """
     Create phase plots for visualizing neuron dynamics
     
     Parameters:
     -----------
-    V, m, h, n : array-like
-        Membrane potential and gate variables
-    dt : float
-        Time step (ms)
-        
+    time : array-like
+        time array
+    v, m, h, n : array-like
+        Membrane potential and gate variables at control temperature
+
+    v_, m_, h_, n_ : array-like
+        Membrane potential and gate variables at altered temperature
+    
     Returns:
     --------
     figs : list
@@ -450,41 +550,40 @@ def create_phase_plots(V, m, h, n, dt):
     figs = []
     
     fig1, ax1 = plt.subplots(figsize=(6, 6))
-    ax1.plot(V, n, 'g')
-    ax1.set_xlabel('Membrane Potential (mV)')
+    ax1.plot(time, n)
+    ax1.plot(time, n_,)
+    ax1.set_xlabel('Time (ms)')
     ax1.set_ylabel('n (K⁺ activation)')
+    #ax1.set_xlim(-90, 50)
+    ax1.set_ylim(-0.1, 1.1)
     ax1.grid(True, alpha=0.3)
     ax1.set_title('K⁺ Activation Phase Plot')
     plt.tight_layout()
     figs.append(fig1)
     
     fig2, ax2 = plt.subplots(figsize=(6, 6))
-    ax2.plot(V, m, 'r')
-    ax2.set_xlabel('Membrane Potential (mV)')
+    ax2.plot(time, m)
+    ax2.plot(time, m_)
+    ax2.set_xlabel('Time (ms)')
     ax2.set_ylabel('m (Na⁺ activation)')
+    #ax2.set_xlim(-90, 50)
+    ax2.set_ylim(-0.1, 1.1)
     ax2.grid(True, alpha=0.3)
     ax2.set_title('Na⁺ Activation Phase Plot')
     plt.tight_layout()
     figs.append(fig2)
     
     fig3, ax3 = plt.subplots(figsize=(6, 6))
-    ax3.plot(V, h, 'b')
-    ax3.set_xlabel('Membrane Potential (mV)')
+    ax3.plot(time, h)
+    ax3.plot(time, h_)
+    ax3.set_xlabel('Time (ms)')
     ax3.set_ylabel('h (Na⁺ inactivation)')
+    #ax3.set_xlim(-90, 50)
+    ax3.set_ylim(-0.1, 1.1)
     ax3.grid(True, alpha=0.3)
     ax3.set_title('Na⁺ Inactivation Phase Plot')
     plt.tight_layout()
     figs.append(fig3)
-    
-    dVdt = np.gradient(V, dt)
-    fig4, ax4 = plt.subplots(figsize=(6, 6))
-    ax4.plot(V[:-1], dVdt[:-1], 'k')
-    ax4.set_xlabel('Membrane Potential (mV)')
-    ax4.set_ylabel('dV/dt (mV/ms)')
-    ax4.grid(True, alpha=0.3)
-    ax4.set_title('Phase Plane Plot')
-    plt.tight_layout()
-    figs.append(fig4)
     
     return figs
 
