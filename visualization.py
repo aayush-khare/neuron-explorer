@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 
-def plot_somatic_membrane_potential_with_spike_counts(time, vs_control, vs_alt, temperature, input_array, input_list, control_data_list, alt_data_list, last_input):
+def plot_somatic_membrane_potential_with_spike_counts(time, vs_control, vs_alt, temperature, input_current, input_list, control_data_list, alt_data_list, last_input):
     """
     Plot somatic membrane potential for HVC(RA) neuron with spike counts for two experimental 
     conditions (control condition 40 degree Celsius and an alternative condition for a different temperature)
@@ -17,6 +17,8 @@ def plot_somatic_membrane_potential_with_spike_counts(time, vs_control, vs_alt, 
         Somatic membrane potential values for the alternative condition.
     temperature : float
         Temperature (in °C) used for the alternative experimental condition.
+    input_current : array_like
+        Input current values
     input_list : list
         List of input current values applied during the experiment.
     control_data_list : list
@@ -30,7 +32,7 @@ def plot_somatic_membrane_potential_with_spike_counts(time, vs_control, vs_alt, 
     -------
     matplotlib.figure.Figure
         A matplotlib figure object containing the membrane potential traces
-        and spike count plots for both experimental conditions.
+        and spike count plot for both experimental conditions.
 
     """
 
@@ -50,7 +52,7 @@ def plot_somatic_membrane_potential_with_spike_counts(time, vs_control, vs_alt, 
     ax1.grid(True, alpha=0.3)
     ax1.set_title('Membrane Potential for the somatic compartment')
 
-    ax3.plot(time, input_array, 'tab:green', linestyle='--')
+    ax3.plot(time, input_current, 'tab:green', linestyle='--')
     ax3.set_ylabel(f'input current ($\mu A/cm^{2}$)', color='tab:green', fontsize=12)
     ax3.tick_params(axis='y', labelcolor='tab:green')
     ax3.set_ylim(-0.3, 1.1)
@@ -97,9 +99,9 @@ def plot_somatic_membrane_potential_with_spike_counts(time, vs_control, vs_alt, 
     plt.tight_layout()
     return fig
 
-def plot_somatic_membrane_potential_q10(time, vs_control, vs_alt, temperature, input_array, input_array_alt, q_cond, synaptic_input_list, response_time_control_list, responase_time_alt_list, last_synaptic_input):
+def plot_somatic_membrane_potential_q10(time, vs_control, vs_alt, temperature, input_synapse, input_synapse_alt, q_cond, synaptic_input_list, response_time_control_list, responase_time_alt_list, last_synaptic_input):
     """
-    Plot somatic membrane potential and Q10 analysis for two temperature conditions.
+    Plot somatic membrane potential for HVC(RA) neuron and Q10 analysis for two temperature conditions.
 
     This function creates visualizations comparing membrane potential responses, a
     single synaptic input's profile and their temperature sensitivity (Q10) between 
@@ -116,6 +118,12 @@ def plot_somatic_membrane_potential_q10(time, vs_control, vs_alt, temperature, i
         Somatic membrane potential values for the alternative temperature condition.
     temperature : float
         Temperature (in °C) used for the alternative experimental condition.
+    input_synapse " array_like
+        Input synapse values' array for the control condition
+    input_synapse_alt : array_like
+        Input synapse values' array for the alternative condition
+    q_cond : float
+        Q10 value set for diffusion dependent processes
     synaptic_input_list : list
         List of synaptic input strength values applied during the experiment.
     response_time_control_list : list
@@ -135,7 +143,7 @@ def plot_somatic_membrane_potential_q10(time, vs_control, vs_alt, temperature, i
 
     """
 
-    input_array_alt = [g / q_cond for g in input_array_alt]
+    input_synapse_alt = [g / q_cond for g in input_synapse_alt]
     fig = plt.figure(figsize=(16, 8))
     gs = gridspec.GridSpec(2, 2, height_ratios=[1, 1], width_ratios=[1, 1], figure=fig)
     ax1 = fig.add_subplot(gs[0, 0])
@@ -158,8 +166,8 @@ def plot_somatic_membrane_potential_q10(time, vs_control, vs_alt, temperature, i
     lines1, labels1 = ax1.get_legend_handles_labels()
     ax1.legend(lines1, labels1, loc='upper right')
 
-    ax3.plot(time, input_array, 'red', label='40.0$^o$ C', linestyle='-')
-    ax3.plot(time, input_array_alt, 'blue', label=f'{temperature}$^o$ C', linestyle='-')
+    ax3.plot(time, input_synapse, 'red', label='40.0$^o$ C', linestyle='-')
+    ax3.plot(time, input_synapse_alt, 'blue', label=f'{temperature}$^o$ C', linestyle='-')
     ax3.set_ylabel(f'synaptic input ($mS/cm^{2}$)', fontsize=12)
     ax3.tick_params(axis='y')
     ax3.set_ylim(-0.3, 1.1)
@@ -207,16 +215,24 @@ def plot_somatic_membrane_potential_q10(time, vs_control, vs_alt, temperature, i
 
 def plot_somatic_membrane_potential(time, vs_control, vs_alt, temperature):
     """
-    Plots the somatic membrane potential for two different temperatures.
+    Plot the somatic membrane potential for the HVC(RA) neuron under a control 
+    temperature (40 degree celsius) and an alternative temperature condition.
 
-    Args:
-        time: Time vector.
-        vs_control: Membrane potential for the control condition.
-        vs_alt: Membrane potential for the alternative condition.
-        temperature: Temperature for the alternative condition.
+    Parameters
+    ----------
+    time : array_like
+        Time vector for the membrane potential traces.
+    vs_control : array_like
+        Somatic membrane potential values for the control condition.
+    vs_alt : array_like
+        Somatic membrane potential values for the alternative condition.
+    temperature : float
+        Temperature (in °C) used for the alternative experimental condition.
 
-    Returns:
-        A matplotlib figure containing the plots.
+    Returns
+    -------
+    matplotlib.figure.Figure
+        A matplotlib figure object containing the somatic membrane potential traces for both conditions.
     """
 
     fig, ax1 = plt.subplots(figsize=(15, 6))
@@ -241,16 +257,24 @@ def plot_somatic_membrane_potential(time, vs_control, vs_alt, temperature):
 def plot_dendritic_membrane_potential(time, vd_control, vd_alt, temperature):
 
     """
-    Plots the dendritic membrane potential for two different temperatures.
+    Plot the dendritic membrane potential for the HVC(RA) neuron under a control 
+    temperature (40 degree celsius) and an alternative temperature condition.
 
-    Args:
-        time: Time vector.
-        vd_control: Membrane potential for the control condition.
-        vd_alt: Membrane potential for the alternative condition.
-        temperature: Temperature for the alternative condition.
+    Parameters
+    ----------
+    time : array_like
+        Time vector for the membrane potential traces.
+    vd_control : array_like
+        Dendritic membrane potential values for the control condition.
+    vd_alt : array_like
+        Dendritic membrane potential values for the alternative condition.
+    temperature : float
+        Temperature (in °C) used for the alternative experimental condition.
 
-    Returns:
-        A matplotlib figure containing the plots.
+    Returns
+    -------
+    matplotlib.figure.Figure
+        A matplotlib figure object containing the dendritic membrane potential traces for both conditions.
     """
     fig, ax1 = plt.subplots(figsize=(15, 6))
 
@@ -274,22 +298,36 @@ def plot_dendritic_membrane_potential(time, vd_control, vd_alt, temperature):
 def plot_hvci_membrane_potential(time, v_control, v_alt, input_profile, temperature, input_strength_list, frequency_list_control, frequency_list_alt, last_input_strength, input_type):
 
     """
-    Plots the membrane potential for the HVCI neuron.
+    Plot the membrane potential for the HVC(I) neuron under a control 
+    temperature (40 degree celsius) and an alternative temperature condition.
 
-    Args:
-        time: Time vector.
-        v_control: Membrane potential for the control condition.
-        v_alt: Membrane potential for the alternative condition.
-        stimulus: Current stimulus.
-        temperature: Temperature for the alternative condition.
-        current_list: List of injected currents.
-        frequency_list_control: Firing frequencies for the control condition.
-        frequency_list_alt: Firing frequencies for the alternative condition.
-        last_current: The last injected current.
-        input_type: To indicate if the input is a single current pulse or synaptic input over multiple time intervals
-
-    Returns:
-        A matplotlib figure containing the plots.
+    Parameters
+    ----------
+    time : array_like
+        Time vector for the membrane potential traces.
+    v_control : array_like
+        Membrane potential values for the control condition.
+    v_alt : array_like
+        Membrane potential values for the alternative condition.
+    input_profile : array_like
+        Vector containing values of the input made over the simulation time (either current or synaptic depending on the input type)
+    temperature : float
+        Temperature (in °C) used for the alternative experimental condition.
+    input_strength_list : array_like
+        List of input strength values applied during the experiment (either current pulse strength or the maximal synaptic kick strength)
+    frequency_list_control : array_like
+        List of firing rate values calculated for all the applied input strengths so far under the control condition
+    frequency_list_alt: array_like
+        List of firing rate values calculated for all the applied input strengths so far under the alternative condition
+    last_input_strength : float
+        The most recent input strength value that was applied.
+    input_type : str
+        Either a 'Single current pulse' or 'Synaptic input in multiple intervals'
+    Returns
+    -------
+    matplotlib.figure.Figure
+        A matplotlib figure object containing plots for the membrane potential traces 
+        and the firing rate vs maximum input strength applied for both conditions. 
     """
 
     if input_type == 'Single current pulse':
@@ -379,23 +417,38 @@ def plot_hvci_membrane_potential(time, v_control, v_alt, input_profile, temperat
     plt.tight_layout()
     return fig
 
-def plot_hh_membrane_potential(time, v_control, v_alt, stimulus, temperature, current_list, frequency_list_control, frequency_list_alt, last_current):
+def plot_hh_membrane_potential(time, v_control, v_alt, current, temperature, current_list, frequency_list_control, frequency_list_alt, last_current):
+    
     """
-    Plots the membrane potential for the Hodgkin-Huxley neuron model.
+    Plot the membrane potential for the Hodgkin Huxley neuron model under a control 
+    temperature (6.3 degree celsius) and an alternative temperature condition.
 
-    Args:
-        time: Time vector.
-        v_control: Membrane potential for the control condition.
-        v_alt: Membrane potential for the alternative condition.
-        stimulus: Current stimulus.
-        temperature: Temperature for the alternative condition.
-        current_list: List of injected currents.
-        frequency_list_control: Firing frequencies for the control condition.
-        frequency_list_alt: Firing frequencies for the alternative condition.
-        last_current: The last injected current.
-
-    Returns:
-        A matplotlib figure containing the plots.
+    Parameters
+    ----------
+    time : array_like
+        Time vector for the membrane potential traces.
+    v_control : array_like
+        Membrane potential values for the control condition.
+    v_alt : array_like
+        Membrane potential values for the alternative condition.
+    current : array_like
+        Vector containing values of the current input made over the simulation time
+    temperature : float
+        Temperature (in °C) used for the alternative experimental condition.
+    current_list : array_like
+        List of current input strength values applied during the experiment
+    frequency_list_control : array_like
+        List of firing rate values calculated for all the applied current strengths so far under the control condition
+    frequency_list_alt: array_like
+        List of firing rate values calculated for all the applied current strengths so far under the alternative condition
+    last_current : float
+        The most recent current input value that was applied.
+    
+    Returns
+    -------
+    matplotlib.figure.Figure
+        A matplotlib figure object containing plots for the membrane potential traces 
+        and the firing rate vs current input strength applied for both conditions. 
     """
     fig = plt.figure(figsize=(16, 8))
     gs = gridspec.GridSpec(2, 2, height_ratios=[1, 1], width_ratios=[1, 1], figure=fig)
@@ -413,7 +466,7 @@ def plot_hh_membrane_potential(time, v_control, v_alt, stimulus, temperature, cu
     ax1.legend()
     ax1.set_title('Membrane Potential and Stimulus Current')
 
-    ax3.plot(time, stimulus, 'tab:green', linestyle='--')
+    ax3.plot(time, current, 'tab:green', linestyle='--')
     ax3.set_ylabel(f'input current ($\mu A/cm^{2}$)', color='tab:green', fontsize=12)
     ax3.tick_params(axis='y', labelcolor='tab:green')
     ax3.set_ylim(-2, 16)
@@ -460,18 +513,28 @@ def plot_hh_membrane_potential(time, v_control, v_alt, stimulus, temperature, cu
 
 def plot_lif_membrane_potential(time, v, current, current_list, frequency_list, last_current):
     """
-    Plots the membrane potential for the LIF neuron model.
+    Plot the membrane potential for the LIF neuron model.
 
-    Args:
-        time: Time vector.
-        v: Membrane potential.
-        current: Current stimulus.
-        current_list: List of injected currents.
-        frequency_list: Firing frequencies.
-        last_current: The last injected current.
-
-    Returns:
-        A matplotlib figure containing the plots.
+    Parameters
+    ----------
+    time : array_like
+        Time vector for the membrane potential trace.
+    v : array_like
+        Membrane potential values.
+    current : array_like
+        Vector containing values of the current input made over the simulation time
+    current_list : array_like
+        List of current input strength values applied during the experiment
+    frequency_list : array_like
+        List of firing rate values calculated for all the applied current strengths so far
+    last_current : float
+        The most recent current input value that was applied.
+    
+    Returns
+    -------
+    matplotlib.figure.Figure
+        A matplotlib figure object containing plots for the membrane potential traces 
+        and the firing rate vs current input strength applied. 
     """
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
@@ -527,65 +590,6 @@ def plot_lif_membrane_potential(time, v, current, current_list, frequency_list, 
     
     plt.tight_layout()
     return fig
-
-def create_phase_plots(time, v, m, h, n, v_, m_, h_, n_):
-    """
-    Create phase plots for visualizing neuron dynamics
-    
-    Parameters:
-    -----------
-    time : array-like
-        time array
-    v, m, h, n : array-like
-        Membrane potential and gate variables at control temperature
-
-    v_, m_, h_, n_ : array-like
-        Membrane potential and gate variables at altered temperature
-    
-    Returns:
-    --------
-    figs : list
-        List of figure objects
-    """
-    figs = []
-    
-    fig1, ax1 = plt.subplots(figsize=(6, 6))
-    ax1.plot(time, n)
-    ax1.plot(time, n_,)
-    ax1.set_xlabel('Time (ms)')
-    ax1.set_ylabel('n (K⁺ activation)')
-    #ax1.set_xlim(-90, 50)
-    ax1.set_ylim(-0.1, 1.1)
-    ax1.grid(True, alpha=0.3)
-    ax1.set_title('K⁺ Activation Phase Plot')
-    plt.tight_layout()
-    figs.append(fig1)
-    
-    fig2, ax2 = plt.subplots(figsize=(6, 6))
-    ax2.plot(time, m)
-    ax2.plot(time, m_)
-    ax2.set_xlabel('Time (ms)')
-    ax2.set_ylabel('m (Na⁺ activation)')
-    #ax2.set_xlim(-90, 50)
-    ax2.set_ylim(-0.1, 1.1)
-    ax2.grid(True, alpha=0.3)
-    ax2.set_title('Na⁺ Activation Phase Plot')
-    plt.tight_layout()
-    figs.append(fig2)
-    
-    fig3, ax3 = plt.subplots(figsize=(6, 6))
-    ax3.plot(time, h)
-    ax3.plot(time, h_)
-    ax3.set_xlabel('Time (ms)')
-    ax3.set_ylabel('h (Na⁺ inactivation)')
-    #ax3.set_xlim(-90, 50)
-    ax3.set_ylim(-0.1, 1.1)
-    ax3.grid(True, alpha=0.3)
-    ax3.set_title('Na⁺ Inactivation Phase Plot')
-    plt.tight_layout()
-    figs.append(fig3)
-    
-    return figs
 
 def response_time(time, vd, vs, current_amplitude=None, current_input_start_time=None, excitatory_input_start_time=None, excitatory_input_strength=None, threshold=-20):
     """

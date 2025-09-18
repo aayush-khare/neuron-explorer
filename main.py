@@ -2,7 +2,6 @@ import streamlit as st
 
 from utils import (display_introduction,
                    display_electrical_properties,
-                   display_temperature_properties,
                    display_lif_theory,
                    prepare_lif_plots,
                    display_hh_theory,
@@ -15,7 +14,6 @@ from utils import (display_introduction,
 
 from visualization import (plot_lif_membrane_potential,
                            plot_hh_membrane_potential,
-                           create_phase_plots,
                            plot_somatic_membrane_potential,
                            plot_dendritic_membrane_potential,
                            plot_somatic_membrane_potential_with_spike_counts,
@@ -43,7 +41,6 @@ select_page = st.selectbox('Contents',
                               'Electrical Properties of a Neuron',
                               'Integrate and Fire model',
                               'Hodgkin Huxley',
-                              'Temperature dependence of neural dynamics',
                               'HVC neurons',
                               'Coming up!'])
 
@@ -70,10 +67,6 @@ if select_page == 'Integrate and Fire model':
     
     st.pyplot(fig_fi)
 
-if select_page == 'Temperature dependence of neural dynamics':
-
-    display_temperature_properties()
-
 if select_page == 'Hodgkin Huxley':
 
     display_hh_theory()
@@ -92,24 +85,7 @@ if select_page == 'Hodgkin Huxley':
                                             frequency_list_alt,
                                             last_current)
 
-        st.pyplot(fig_mp)
-    
-    with tab2:
-        fig_phase = create_phase_plots(time,
-                                       v_control,
-                                       m_control,
-                                       h_control,
-                                       n_control,
-                                       v_alt,
-                                       m_alt,
-                                       h_alt,
-                                       n_alt)
-
-        cols = st.columns(len(fig_phase))
-        for i, fig in enumerate(fig_phase):
-            with cols[i]:
-                st.pyplot(fig)
-    
+        st.pyplot(fig_mp)    
 
 if select_page == 'HVC neurons':
     
@@ -225,4 +201,5 @@ if select_page == 'HVC neurons':
             st.pyplot(fig_mp)
 
 if select_page == 'Coming up!':
-    pass
+    st.markdown(""" Thank you for going over this interactive neuron model simulator! If you have any feedback to share, do reach out to me. 
+                And I will be continuing to work on more such interactive tools catering to computational neuroscience, so keep checking this streamlit page""")
