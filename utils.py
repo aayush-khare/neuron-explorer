@@ -17,22 +17,23 @@ def display_introduction():
     Display text for the introduction page.
     """
     
-    st.markdown('<p class="big-font"> Neurons are a special type of cells that generate electrical signals and communicate with each other' \
-                ' through electrochemical processes triggered by these electrical signals. Neurons are the fundamental unit of our nervous '\
-                ' system, and developing an understanding of the brain works requires understanding how these fundamental units receive, ' \
-                'process and transmit information. '\
-                ' </p>', unsafe_allow_html=True) \
+    st.markdown('<p class="big-font"> Neurons are excitable cells that generate electrical signals known as action potentials or simply spikes. ' \
+                'A spike in a neuron triggers release of chemical messengers known as neurotransmitters. Depending on the type of neurotransmitter ' \
+                'released (which in turn depends on the neuron type), it can in turn stimulate or inhibit spike generation in other neurons. ' \
+                'It is through these electrical and chemical processes that neurons communicate with each other and the resulting pattern of activity ' \
+                'encodes for information in the brain. ' \
+                'Neurons are the fundamental units of our nervous system. To understand how this system functions, particularly our brain, we must first' \
+                'understand how these cells receive, process and transmit information. </p>', unsafe_allow_html=True) \
     
     neuron_image = os.path.join(image_dir, "neuron.jpg")
     st.image(neuron_image, width=1000)
         
-    st.markdown('<p class="big-font"> In this interactive tool, you get to explore some computational models for simulating the dynamics of a neuron cell. \
-                We will start by developing a basic understanding of the electrical properties of neuron cells. We will also discuss how ' \
-                'temperature affects neural dynamics. We will next discuss how these electrical properties can be simulated using numerical methods. ' \
-                'In doing so, we will explore simple models that ignore any complex biophysical details, as well as models that incorporate some of these details.' \
-                'We also discuss how temperature dependence is incorporated into the neuron models, and visualize effects' \
-                'of temperature change on certain aspects of neural dynamics. Finally you get to explore biophysical models used to simulate dynamics ' \
-                'types of neurons found in a brain region called HVC (known as proper name) in songbirds.</p>', unsafe_allow_html=True)
+    st.markdown('<p class="big-font"> In this interactive tool, you get to explore some computational models that are used for simulating the dynamics of a neuron cell. \
+                 You will start by learning about the parts of a neuron, and the function they serve. You will also learn about the electrical properties and how Physics concepts can ' \
+                 'be utilized along with biological details to mathematically model neural dynamics and simulate them on a computer. ' \
+                 'We will also discuss how the various processes behind neural function depend on temperature, and how that affects properties associated with ' \
+                 'neural activity. </p>', unsafe_allow_html=True)
+
 
 def display_electrical_properties():
     """
@@ -47,14 +48,15 @@ def display_electrical_properties():
     image_files_0 = sorted([f for f in os.listdir(image_folder_0) if f.endswith(('.png'))])
 
     descriptions_0 = [
-    "A Neuron cell has a complex morphology with different parts contributing to its electrical properties.",
-    "A neuron receives information from other neurons through the Dendrite, a structure that extends from the soma. The Dendrite has extensive branches, often referred \n"
-    "to as the Dendritic tree. It is this Dendritic tree where a neuron receives majority of its inputs from other neurons.",
-    "The cell body of a neuron is called the Soma which contains the nucleus. The soma can also receive inputs from other neurons, and is the site of primary electrical signal generation. \n"
-    "This electrical signal, also termed as the action potential, is characterized by a large in and out flow of specific ions in a very short time interval.",
-    "This action potential is then transmitted along a long cable like structure called the axon, that emerges out of the soma. The ends of the axon, called the axon terminals are sites \n"
-    "which contain special chemicals called neurotransmitters. When an action potential arrives at the terminals, it triggers specific processes that result in the release of these \n"
-    "neurotransmitters. These neurotransmitters that are then captured at the dendrites of other neurons, triggering electrical activity in them and continuing the flow of information."
+    "A Neuron cell has a complex morphology with 3 main parts, the dendrite, the soma and the axon.",
+    "A neuron receives information or inputs from other neurons through the Dendrite. The Dendrite has extensive branches, often referred \n"
+    "to as the Dendritic tree, which is where a neuron receives majority of its inputs from other neurons.",
+    "The cell body of a neuron is called the Soma which contains the nucleus. The soma can also receive inputs from other neurons, and is the site of spike generation. ",
+    "The spike is generated at the axon-hillock, the part of the soma that connects to the axon. ",
+    "The spike is transmitted along the axon, a long cable like structure emerging from the soma. The ends of the axon, called the axon terminals are sites \n"
+    "which contain the neurotransmitters. ",
+    "A spike arriving at the terminals triggers the neurotransmitter release in the extracellular space. \n"
+    "The neurotransmitters bind to receptors on the dendrites of other neurons, triggering electrical activity and continuing the flow of information."
     ]
 
     max_index_neuron = len(descriptions_0) - 1
@@ -62,28 +64,22 @@ def display_electrical_properties():
 
     if 'img_index' not in st.session_state:
         st.session_state.img_index = 0
-
-    current_index = st.session_state.img_index
-    show_next = current_index < max_index_neuron
-    show_prev = current_index > min_index_neuron
-
-    current_image = Image.open(os.path.join(image_folder_0, image_files_0[current_index]))
             
     col1, col2 = st.columns([1, 5])
     with col1:
-        if show_prev:
-            if st.button("Prev ") and current_index > 0:
+        if st.session_state.img_index > min_index_neuron:
+            if st.button("Prev "):
                 st.session_state.img_index -= 1
-                current_index = st.session_state.img_index
-                current_image = Image.open(os.path.join(image_folder_0, image_files_0[current_index]))
+                st.rerun()
 
     with col2:
-        if show_next:
-            if st.button("Next ") and current_index < len(image_files_0) - 1:
+        if st.session_state.img_index < max_index_neuron:
+            if st.button("Next "):
                 st.session_state.img_index += 1
-                current_index = st.session_state.img_index
-                current_image = Image.open(os.path.join(image_folder_0, image_files_0[current_index]))
-
+                st.rerun()
+    
+    current_index = st.session_state.img_index
+    current_image = Image.open(os.path.join(image_folder_0, image_files_0[current_index]))
     st.image(current_image, width=400)
     st.markdown(f"{descriptions_0[current_index]}")
 
@@ -95,10 +91,13 @@ def display_electrical_properties():
     image_files_1 = sorted([f for f in os.listdir(image_folder_1) if f.endswith(('.png'))])
 
     descriptions_1 = [
-    "The electrical properties of a neuron can be attributed to a difference in the potential on either side of the cell membrane. This potential is maintained in the resting conditions \n"
-    "such that the inside of the cell is at a negative potential with respect to the outside environment. This potential difference is known as the membrane potential of the neuron, and \n"
-    "denotes the state of the neuron.",
-    "There is a concentration gradient of ions of different types across the membrane. The membrane is typically impermeable to the flow of these ions. The membrane contains various ion \n"
+    "There exists a difference in the potential on either side of the cell membrane. This difference, given by $V_{in} - V_{out} = V$ will be referred to as the membrane potential, "
+    "or simply the voltage of the neuron and denotes the state of the neuron. In the resting state, this voltage is typically in the range of -65 to -80 mV. \n"
+    "",
+    "In addition to a potential difference, there also exists a concentration difference of ions on either side of the membrane. For instance, the concentration of Sodium ions is "
+    "much higher outside the cell than the inside. On the other hand, Potassium ions have a higher concentration inside the cell than outside. "
+    "The neuronal membrane is a lipid layer and typically impermeable to the flow of these ions in the resting state. However the presence of ion channels can allow the in and out "
+    "flow of ions. The membrane contains various ion \n"
     "channels that allow for the movement of ions. These channels are selective for specific types of ions. These channels open and close, by a process dependent on change in the conformational \n"
     "states of the proteins making up the channel. The rates at which these conformation states change, and in turn result in the opening or closing of the channels are dependent on the membrane \n"
     "potential. Due to this membrane potential, or voltage dependence, these channels are also known as voltage-gated ion channels.",
@@ -116,27 +115,21 @@ def display_electrical_properties():
     if 'img_index_1' not in st.session_state:
         st.session_state.img_index_1 = 0
 
-    current_index_1 = st.session_state.img_index_1
-    show_next_1 = current_index_1 < max_index_dynamics
-    show_prev_1 = current_index_1 > min_index_dynamics
-
-    current_image_1 = Image.open(os.path.join(image_folder_1, image_files_1[current_index_1]))
-
     col1, col2 = st.columns([1, 2])
     with col1:
-        if show_prev_1:
-            if st.button("Prev") and current_index_1 > 0:
+        if st.session_state.img_index_1 > min_index_dynamics:
+            if st.button("Prev"):
                 st.session_state.img_index_1 -= 1
-                current_index_1 = st.session_state.img_index_1
-                current_image_1 = Image.open(os.path.join(image_folder_1, image_files_1[current_index_1]))
-    
+                st.rerun()
+                
     with col2:
-        if show_next_1:
-            if st.button("Next") and current_index_1 < len(image_files_1) - 1:
+        if st.session_state.img_index_1 < max_index_dynamics:
+            if st.button("Next"): 
                 st.session_state.img_index_1 += 1
-                current_index_1 = st.session_state.img_index_1
-                current_image_1 = Image.open(os.path.join(image_folder_1, image_files_1[current_index_1]))
+                st.rerun()
 
+    current_index_1 = st.session_state.img_index_1
+    current_image_1 = Image.open(os.path.join(image_folder_1, image_files_1[current_index_1]))
     st.image(current_image_1, width=700)
     st.markdown(f"{descriptions_1[current_index_1]}")
     
@@ -145,18 +138,34 @@ def display_electrical_properties():
     st.markdown("                                      ")
     st.markdown("### Biophysics behind modeling the dynamics of a neuron")
 
+    biophysics_image = os.path.join(image_dir, "biophysics.png")
+    st.image(biophysics_image, width=1000)
+    st.markdown("" \
+        "To simulate the dynamics of a neuron, we can treat a patch of surface of the neuronal membrane as a capacitor due to the charge separation " \
+        "across it. The assumption is that the membrane is isopotential, and the charge separation and resulting potential difference changes as ions " \
+        "flow in and out of the neuron. " \
+        "The ion channel conductances are not all constant, as channels open and close following first order kinetics, with voltage-dependent rates. " \
+        "Under equilibrium, the charge separation stays constant and there is no ion flow or current. An injected current or synaptic input can push the neuron " \
+        "away from equilibrium, setting the discharge of the capacitor and ion channel currents due the opening and subsequent closing of the channels." \
+        "at any instant. The flow of ions is not just governed by the potential difference alone, but the repulsive electric forces also affect the direction of ion current." \
+        "This is denoted by a reversal potential, which is simply a membrane potential value at which the direction of an ion current switches. This reversal potential depends " \
+        "on both the charge concentrations in and out of the neuron cell as well as the temperature $T$ and is given by "
+        )
+    
+    st.latex(r''' E_{rev} = \frac{k_BT}{qz}ln(\frac{[conc]_{out}}{[conc]_{in}})''')
     st.markdown(
-        "In this tool, we will focus on models for simulating neuron dynamics that treat a patch or surface of the neuronal membrane "
-        "as a Capacitor, owing to the charge separation across the membrane that results in a potential difference across the membrane. "
-        "This charge separation or potential difference changes as various types of ions flow across the membrane, "
-        "or in other words, due to various ion channel currents that operate in parallel. The ion channel currents are typically not constant, "
-        "as specific channels permitting the flow of a specific ion type open and close as a function of the potential difference at a given "
-        "instant of time. Such models, known as conductance-based models rely on the surface density of ion channels and the voltage-dependent"
-        "opening and closing rates of these channels for the neural dynamics. We will also look at a much simplified model, the leaky integrate and fire model, "
+        "Here q is the elementary charge, z the charge number, $k_B$ the Boltzmann constant."
+    )
+    st.markdown(
+        "In this tool, we will focus on models that are conductance-based compartment models, with either a single compartment representing the soma "
+        "or two compartments, one for a dendrite and one for the soma. "
+        "We will start with a much simplified model, the leaky integrate and fire model, that only incoporates a constant leak conductance without any of " \
+        "the complex biophysical details discussed above. "
         "which does not take into account these complex details, but just a constant leak conductance that is always open and plays the role of bringing back"
         "the membrane potential back to its resting value when there are no inputs to a neuron.",
     )
 
+#####################################################################################################
     st.markdown("                                      ")
     st.markdown("### Temperature dependence of neural dynamics")
 
@@ -193,26 +202,21 @@ def display_electrical_properties():
     if 'img_index_2' not in st.session_state:
         st.session_state.img_index_2 = 0
 
-    current_index_2 = st.session_state.img_index_2
-    show_next = current_index_2 < max_index_temperature
-    show_prev = current_index_2 > min_index_temperature
-
-    current_image = Image.open(os.path.join(image_folder_2, image_files_2[current_index_2]))
-            
     col1, col2 = st.columns([1, 4])
     with col1:
-        if show_prev:
-            if st.button("Prev  ") and current_index_2 > 0:
+        if st.session_state.img_index_2 > min_index_temperature:
+            if st.button("Prev  "):
                 st.session_state.img_index_2 -= 1
-                current_index_2 = st.session_state.img_index_2
-                current_image = Image.open(os.path.join(image_folder_2, image_files_2[current_index_2]))
-
+                st.rerun()
+                
     with col2:
-        if show_next:
-            if st.button("Next  ") and current_index_2 < len(image_files_2) - 1:
+        if st.session_state.img_index_2 < max_index_temperature:
+            if st.button("Next  "):
                 st.session_state.img_index_2 += 1
-                current_index_2 = st.session_state.img_index_2
-                current_image = Image.open(os.path.join(image_folder_2, image_files_2[current_index_2]))
+                st.rerun()
+                
+    current_index_2 = st.session_state.img_index_2
+    current_image = Image.open(os.path.join(image_folder_2, image_files_2[current_index_2]))
 
     st.image(current_image, width=800)
     st.markdown(f"{descriptions_2[current_index_2]}")
