@@ -53,7 +53,7 @@ def plot_somatic_membrane_potential_with_spike_counts(time, vs_control, vs_alt, 
     ax1.set_title('Membrane Potential for the somatic compartment')
 
     ax3.plot(time, input_current, 'tab:green', linestyle='--')
-    ax3.set_ylabel(f'input current ($\mu A/cm^{2}$)', color='tab:green', fontsize=12)
+    ax3.set_ylabel(f'input current ($\\mu A/cm^{2}$)', color='tab:green', fontsize=12)
     ax3.tick_params(axis='y', labelcolor='tab:green')
     ax3.set_ylim(-0.3, 1.1)
     ax3.set_xlim(100, 200)
@@ -76,11 +76,11 @@ def plot_somatic_membrane_potential_with_spike_counts(time, vs_control, vs_alt, 
             current_control_data = sorted_control_data[idx]
             current_alt_data = sorted_alt_data[idx]
             ax2.plot(last_input, current_control_data, 'o', color='red', markersize=10,
-                    label=f'{last_input:.1f} $\mu A/cm^{2}$, {current_control_data} spikes')
+                    label=f'{last_input:.1f} $\\mu A/cm^{2}$, {current_control_data} spikes')
             ax2.plot(last_input, current_alt_data, 'o', color='blue', markersize=10,
-                    label=f'{last_input:.1f} $\mu A/cm^{2}$, {current_alt_data} spikes')
+                    label=f'{last_input:.1f} $\\mu A/cm^{2}$, {current_alt_data} spikes')
         
-        ax2.set_xlabel(f'input current ($\mu A/cm^{2}$)', fontsize=12)
+        ax2.set_xlabel(f'input current ($\\mu A/cm^{2}$)', fontsize=12)
         ax2.set_ylabel('num spikes', fontsize=12)
         ax2.set_title('Somatic spikes vs current injected', fontsize=14)
         ax2.set_xticks([-0.2, 0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
@@ -89,7 +89,7 @@ def plot_somatic_membrane_potential_with_spike_counts(time, vs_control, vs_alt, 
         ax2.legend()
         
     else:
-        ax2.set_xlabel(f'input current ($\mu A/cm^{2}$)', fontsize=12)
+        ax2.set_xlabel(f'input current ($\\mu A/cm^{2}$)', fontsize=12)
         ax2.set_ylabel('num spikes', fontsize=12)
         ax2.set_title('Somatic spikes vs current injected', fontsize=14)
         ax2.grid(True, alpha=0.3)
@@ -331,11 +331,11 @@ def plot_hvci_membrane_potential(time, v_control, v_alt, input_profile, temperat
     """
 
     if input_type == 'Single current pulse':
-        x_label = 'Injected Current ($\mu A/cm^{2}$)'
-        y_label = f'current stimulus ($\mu A/cm^{2}$)'
+        x_label = 'Injected Current ($\\mu A/cm^{2}$)'
+        y_label = f'current stimulus ($\\mu A/cm^{2}$)'
         plot_title = 'Membrane Potential and input profile'
         input_strength = 'current amplitude'
-        input_units = f'$\mu A/cm^{2}$'
+        input_units = f'$\\mu A/cm^{2}$'
         xmax = 300   
         ymax = 20.5
         y_ticks_list = [0.0, 5.0, 10.0, 15.0, 20.0,]
@@ -467,7 +467,7 @@ def plot_hh_membrane_potential(time, v_control, v_alt, current, temperature, cur
     ax1.set_title('Membrane Potential and Stimulus Current')
 
     ax3.plot(time, current, 'tab:green', linestyle='--')
-    ax3.set_ylabel(f'input current ($\mu A/cm^{2}$)', color='tab:green', fontsize=12)
+    ax3.set_ylabel(f'input current ($\\mu A/cm^{2}$)', color='tab:green', fontsize=12)
     ax3.tick_params(axis='y', labelcolor='tab:green')
     ax3.set_ylim(-2, 16)
     ax3.set_xlabel('Time (ms)', fontsize=12)
@@ -489,18 +489,18 @@ def plot_hh_membrane_potential(time, v_control, v_alt, current, temperature, cur
             current_freq_control = sorted_frequency_control[idx]
             current_freq_alt = sorted_frequency_alt[idx]
             ax2.plot(last_current, current_freq_control, 'o', color='red', markersize=10,
-                    label=f'{last_current:.1f} $\mu A/cm^{2}$, {current_freq_control:.1f} Hz')
+                    label=f'{last_current:.1f} $\\mu A/cm^{2}$, {current_freq_control:.1f} Hz')
             ax2.plot(last_current, current_freq_alt, 'o', color='blue', markersize=10,
-                    label=f'{last_current:.1f} $\mu A/cm^{2}$, {current_freq_alt:.1f} Hz')   
+                    label=f'{last_current:.1f} $\\mu A/cm^{2}$, {current_freq_alt:.1f} Hz')   
         
-        ax2.set_xlabel('Injected Current ($\mu A/cm^{2}$)', fontsize=12)
+        ax2.set_xlabel('Injected Current ($\\mu A/cm^{2}$)', fontsize=12)
         ax2.set_ylabel('Firing Frequency (Hz)', fontsize=12)
         ax2.set_title('Current-Frequency (F-I) Relationship', fontsize=14)
         ax2.grid(True, alpha=0.3)
         ax2.legend()
       
     else:
-        ax2.set_xlabel('Injected Current ($\mu A/cm^{2}$)', fontsize=12)
+        ax2.set_xlabel('Injected Current ($\\mu A/cm^{2}$)', fontsize=12)
         ax2.set_ylabel('Firing Frequency (Hz)', fontsize=12)
         ax2.set_title('Current-Frequency (F-I) Relationship', fontsize=14)
         ax2.grid(True, alpha=0.3)
@@ -549,9 +549,9 @@ def plot_lif_membrane_potential(time, v, current, current_list, frequency_list, 
 
     ax3 = ax1.twinx()
 
-    ax3.plot(time, current, 'tab:pink', linestyle='--')
-    ax3.set_ylabel(f'current stimulus ($\mu A/cm^{2})$', color='tab:pink')
-    ax3.tick_params(axis='y', labelcolor='tab:pink')
+    ax3.plot(time, current, 'tab:green', linestyle='--')
+    ax3.set_ylabel(f'current stimulus ($\\mu A/cm^{2})$', color='tab:green')
+    ax3.tick_params(axis='y', labelcolor='tab:green')
     ax3.set_ylim(-1.5, 3.5)
 
     if len(current_list) > 0:
@@ -567,9 +567,9 @@ def plot_lif_membrane_potential(time, v, current, current_list, frequency_list, 
             idx = next(i for i, c in enumerate(sorted_current) if c == last_current)
             current_freq = sorted_frequency[idx]
             ax2.plot(last_current, current_freq, 'ro', markersize=6,
-                    label=f'{last_current:.2f} $\mu A/cm^{2}$, {current_freq:.1f} Hz')
+                    label=f'{last_current:.2f} $\\mu A/cm^{2}$, {current_freq:.1f} Hz')
         
-        ax2.set_xlabel(f'Injected Current ($\mu A/cm^{2}$)', fontsize=10)
+        ax2.set_xlabel(f'Injected Current ($\\mu A/cm^{2}$)', fontsize=10)
         ax2.set_ylabel('Firing Frequency (Hz)', fontsize=10)
         ax2.set_title('Current-Frequency (F-I) Relationship', fontsize=14)
         ax2.grid(True, alpha=0.3)
@@ -590,46 +590,3 @@ def plot_lif_membrane_potential(time, v, current, current_list, frequency_list, 
     
     plt.tight_layout()
     return fig
-
-def response_time(time, vd, vs, current_amplitude=None, current_input_start_time=None, excitatory_input_start_time=None, excitatory_input_strength=None, threshold=-20):
-    """
-    Assess whether the neuron spiked or not and return a response time
-    The response time is defined as the time to peak somatic membrane 
-    potential in case the peak is below threshold or the time to threshold
-    from input time
-
-    Parameters:
-    -----------
-
-    Returns:
-    --------
-
-    """
-    time = time.tolist()
-    vs = vs.tolist()
-    vd = vd.tolist()
-
-    if current_amplitude is not None:
-        if current_amplitude > 0:
-
-            if max(vd) > threshold and max(vs) > threshold:
-                rise_time = np.round(time[next(x[0] for x in enumerate(vs) if x[1] > threshold)] - current_input_start_time, 3)
-                return rise_time
-            elif max(vd) < threshold and max(vs) > threshold:
-                rise_time = np.round(time[next(x[0] for x in enumerate(vs) if x[1] > threshold)] - current_input_start_time, 3)
-                return rise_time
-            elif max(vd) < threshold and max(vs) < threshold:
-                rise_time = np.round(time[vs.index(max(vs))] - current_input_start_time, 3)
-                return rise_time
-    
-    elif excitatory_input_strength is not None:
-        if excitatory_input_strength > 0:
-            if max(vd) > threshold and max(vs) > threshold:
-                rise_time = np.round(time[next(x[0] for x in enumerate(vs) if x[1] > threshold)] - excitatory_input_start_time, 3)
-                return rise_time
-            elif max(vd) < threshold and max(vs) > threshold:
-                rise_time = np.round(time[next(x[0] for x in enumerate(vs) if x[1] > threshold)] - excitatory_input_start_time, 3)
-                return rise_time
-            elif max(vd) < threshold and max(vs) < threshold:
-                rise_time = np.round(time[vs.index(max(vs))] - excitatory_input_start_time, 3)
-                return rise_time

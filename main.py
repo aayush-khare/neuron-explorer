@@ -70,22 +70,21 @@ if select_page == 'Integrate and Fire model':
 if select_page == 'Hodgkin Huxley':
 
     display_hh_theory()
-    v_control, n_control, m_control,h_control, v_alt, n_alt, m_alt, h_alt, time, current_stimulus, temperature, current_list, frequency_list_control, frequency_list_alt, last_current = prepare_hh_plots()
+    v_control, v_alt, time, current_stimulus, temperature, current_list, frequency_list_control, frequency_list_alt, last_current = prepare_hh_plots()
 
-    tab1, tab2 = st.tabs(['membrane potential and f-I relationship', 'Gating variables'])
+    st.markdown("## Hodgkin Huxley model: Membrane potential and F-I relationship")
 
-    with tab1:
-        fig_mp = plot_hh_membrane_potential(time,
-                                            v_control,
-                                            v_alt,
-                                            current_stimulus,
-                                            temperature,
-                                            current_list,
-                                            frequency_list_control,
-                                            frequency_list_alt,
-                                            last_current)
+    fig_mp = plot_hh_membrane_potential(time,
+                                        v_control,
+                                        v_alt,
+                                        current_stimulus,
+                                        temperature,
+                                        current_list,
+                                        frequency_list_control,
+                                        frequency_list_alt,
+                                        last_current)
 
-        st.pyplot(fig_mp)    
+    st.pyplot(fig_mp)    
 
 if select_page == 'HVC neurons':
     
