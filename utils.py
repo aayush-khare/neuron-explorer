@@ -130,8 +130,15 @@ def display_electrical_properties():
 
     current_index_1 = st.session_state.img_index_1
     current_image_1 = Image.open(os.path.join(image_folder_1, image_files_1[current_index_1]))
-    st.image(current_image_1, width=700)
-    st.markdown(f"{descriptions_1[current_index_1]}")
+    st.image(current_image_1, width=1000)
+    
+    description_placeholder = st.empty()
+    with description_placeholder.container():
+        st.markdown(f"""
+            <div style="min-height: 200px; padding: 10px;">
+                {descriptions_1[current_index_1]}
+            </div>
+        """, unsafe_allow_html=True)
     
 ######################################################################################################
 
