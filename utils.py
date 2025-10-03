@@ -171,7 +171,7 @@ def display_electrical_properties():
     st.latex(r''' I_{ion} = \overline{g}_{ion}p^{x}(V - E_{rev, ion})''')
 
     st.markdown("$p$ denotes the probability of activation for a subunit constituting an ion channel, and the exponent denotes how many " \
-    "such subunits must be independently activated or deactivated. $\overline{g}_{ion}$ denotes the maximum conductance for a given ion channel. " \
+    "such subunits must be independently activated or deactivated. $\\overline{g}_{ion}$ denotes the maximum conductance for a given ion channel. " \
     "Hence the driving force for an ionic current depends both on the state of the channel denoted by $p$ and the difference " \
     "$V - E_{rev, ion}$, not simply V. This additional term $E_{rev, ion}$, is the reversal potential." \
     "It is the membrane potential value at which the direction of an ionic current reverses. " \
@@ -208,7 +208,7 @@ def display_electrical_properties():
 
     st.markdown("Synaptic currents follow the form $I_{syn} = g_{syn}(V - E_{rev, syn})$. The reversal potential for excitatory " \
     "synapses is typically taken to be 0 mV, while for inhibitory synapses is set to the resting voltage of the neuron. " \
-    "Every time a neuron receives a synaptic input, the synaptic conductance undergoes a step increase $g \longrightarrow g + G$ " \
+    "Every time a neuron receives a synaptic input, the synaptic conductance undergoes a step increase $g \\longrightarrow g + G$ " \
     "by an amount corresponding to the strength ($\\textit{G}$) of the synaptic connection. In between synpatic inputs, the " \
     "synaptic conductance undergoes exponential decay given by ")
 
@@ -275,7 +275,7 @@ def display_electrical_properties():
     st.image(current_image, width=800)
     st.markdown(f"{descriptions_2[current_index_2]}")
 
-    st.markdown("Reversal potentials are also directly proportional to the temperature (in Kelvin) $E_{rev} \propto T_K$. Finally any time constants are "
+    st.markdown("Reversal potentials are also directly proportional to the temperature (in Kelvin) $E_{rev} \\propto T_K$. Finally any time constants are "
     "inverse of activation and inactivation rates. Hence if rates have a $Q_{10}$ of 3, time constants would have a $Q_{10}$ = $\\frac{1}{3}$. " \
     "For a $Q_{10} = 1.3$ for conductances, when temperature decreases by 10$^{o}$ C, all conductances scale down by a factor of 1.3 " \
     "For a $Q_{10} = 3.0$ for rates, when temperature decreases by 10$^{o}$ C, all rates scale down by 3, while all time constants scale up by 3.")
@@ -371,7 +371,7 @@ def display_hh_theory():
 
         st.latex(r''' I_K = \overline{g}_Kn^4(V - V_K)''')
 
-        st.markdown(""" $\overline{g}_{Na}$ and $\overline{g}_K$ are fixed and are determined by the surface density of the respective channels 
+        st.markdown(""" $\\overline{g}_{Na}$ and $\\overline{g}_K$ are fixed and are determined by the surface density of the respective channels 
                     on the membrane. The variability in the ion channel conductances arises from the fraction of the channels that are either open 
                     or closed. This is governed by the dynamics of the gating variables $n$, $m$ and $h$, which follow first order kinetics""")
         
@@ -853,7 +853,7 @@ def create_sidebar_controls_hh():
     q_cond = st.sidebar.slider('$Q_{10}$ for diffusion dependent processes', 1.0, 2.0, 1.3, 0.1, on_change=handle_reset)
 
     st.sidebar.subheader('Current stimulus settings')
-    i_amp = st.sidebar.slider('Current amplitude ($\\mu A/cm^2$)', -1.0, 15.0, 0.0, 1.0, key=f'i_amp_{hh_reset_key}')
+    i_amp = st.sidebar.slider('Current amplitude ($\\mu A/cm^2$)', 0.0, 15.0, 0.0, 1.0, key=f'i_amp_{hh_reset_key}')
     
     temperature = st.selectbox('Temperature in Celsius (control fixed at 6.3 Celsius)', [0.0, 10.0, -10.0], width=300, on_change=handle_reset) # control temperature = 6.3 celsius
 
@@ -935,7 +935,7 @@ def prepare_hh_plots():
             else:
                 frequency_control = 0
 
-            if len(spike_indices_) > 0 and not any(c < 0 for c in st.session_state.hh_current_list):
+            if len(spike_indices_) > 0:
                 duration_ = i_end - i_start
                 frequency_alt = 1000 * len(spike_indices_) / duration_
             else:
@@ -1005,7 +1005,7 @@ def create_sidebar_controls_hvcra():
 
         st.sidebar.subheader('Current stimulus settings')
 
-        i_amp = st.sidebar.slider(f'Current amplitude ($\\mu A/cm^{2}$)', -0.2, 1.0, 0.00, 0.1, key=f'i_amp_{hvcra_reset_key}')
+        i_amp = st.sidebar.slider(f'Current amplitude ($\\mu A/cm^{2}$)', 0.0, 1.0, 0.00, 0.1, key=f'i_amp_{hvcra_reset_key}')
 
         return {
             'temperature': temperature,
