@@ -6,6 +6,7 @@ from utils import (display_introduction,
                    prepare_lif_plots,
                    display_hh_theory,
                    prepare_hh_plots,
+                   display_hvc_background,
                    display_hvcra_theory,
                    prepare_hvcra_plots,
                    display_hvci_theory,
@@ -87,6 +88,8 @@ if select_page == 'Hodgkin Huxley':
     st.pyplot(fig_mp)    
 
 if select_page == 'HVC neurons':
+
+    display_hvc_background()
     
     HVC_neuron_type = st.selectbox('HVC neuron', ['Choose HVC neuron type', 'HVC(RA)', 'HVC(I)'])
     

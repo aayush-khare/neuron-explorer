@@ -213,6 +213,10 @@ def display_electrical_properties():
     "synaptic conductance undergoes exponential decay given by ")
 
     st.latex(r''' \tau \frac{dg}{dt} = -g''')
+    col1, col2, col3 = st.columns([4, 4, 1])
+    with col2:
+        synapse_image = os.path.join(image_dir, "synapse.png")
+        st.image(synapse_image, width=200)
 
     st.markdown("The time constant for decays is set to 2 ms.")
 #####################################################################################################
@@ -410,7 +414,51 @@ def display_hh_theory():
                     First, change the injected current while keeping other parameters constant and observe how the neural response particularly the firing
                     rate differs in the control condition (6.3$^{o}$ C) and an altered condition corresponding to a different temperature. You can 
                     also modify other parameters like $Q_{10}$ values or temperature and then repeat the current change experiment to see the respective effects.""")
+
+def display_hvc_background():
+    """
+    Display the background behind the role of brain area HVC in birdsong.
+    """ 
+
+    with st.expander("About HVC"):
+        st.markdown("HVC (used as a proper name) is a brain area in the brain of songbirds that has been hypothesized to encode for features of birdsong " \
+        "such as the duration of various song elements (syllables, silent gaps in between syllables), often referred to as song timing features. HVC is " \
+        "analogous to the premotor cortex in human brain (associated with motor planning and execution).")
+
+        descriptions = ["Zebra finches is a species of songbirds that is extensively studied to gain insights about the underlying neural circuitry and "
+        "mechanisms that control behavior that is composed of a sequence of actions. The motivation arises from the simplicity of the song (composed of "
+        "a fixed sequence of syllables) and the experimental tractability of probing the different brain regions.", 
+        "HVC forms a part of the premotor pathway, projecting connections to downstream region Robust nucleus of the Arcopallium (RA), which in turn "
+        "projects to the tracheosyringeal portion of the brainstem (nXIIts) that contains motoneurons controlling the vocal muscles. "]
         
+        image_folder = os.path.join(image_dir, "zf")
+        image_files = sorted([f for f in os.listdir(image_folder) if f.endswith(('.png'))])
+
+        max_index = len(image_files) - 1
+        min_index = 0
+
+        if 'img_index_' not in st.session_state:
+            st.session_state.img_index_ = 0
+
+        col1, col2 = st.columns([1, 4])
+        with col1:
+            if st.session_state.img_index_ > min_index:
+                if st.button("Prev  "):
+                    st.session_state.img_index_ -= 1
+                    st.rerun()
+                    
+        with col2:
+            if st.session_state.img_index_ < max_index:
+                if st.button("Next  "):
+                    st.session_state.img_index_ += 1
+                    st.rerun()
+                    
+        current_index_ = st.session_state.img_index_
+        current_image_ = Image.open(os.path.join(image_folder, image_files[current_index_]))
+
+        st.image(current_image_, width=500)
+        st.markdown(f"{descriptions[current_index_]}")
+
 def display_hvcra_theory():
     """
     Display the theoretical background of the HVC(RA) model.
@@ -435,21 +483,28 @@ def display_hvcra_theory():
         The dendritic compartment contains a Calcium channel, and two Calcium concentration dependent Potassium ion channels. The dendritic compartment
         integrates injected current inputs as well as any synaptic from other neurons, and elicits a wide calcium spike. This Calcium spike, in turn due to the
         coupling between the two compartments, drives 4-5 tightly chunked sodium ion spikes in the somatic compartment. The model behavior is representative 
-        of the bursting behavior observed in HVC(RA) neurons. \\
+        of the bursting behavior observed in HVC(RA) neurons. 
+                    """)
+        model_image = os.path.join(image_dir, "hvcra.png")
+        col1, col2 = st.columns([1, 2])
+        with col2:
+            st.image(model_image, width=300)
+        st.markdown("""
                     
-        With this interactive tool, you get to explore how the number of spikes generated in the somatic compartment is roughly constant irrespective 
-        of the input strength. The incorporation of temperature dependence exhibits the same result as seen in Hodgkin Huxley model, that of a higher 
-        excitability at lower temperatures, and decreased spike frequency. Furthermore, the tool lets you explore the model behavior under the application
-        of a single excitatory synaptic input. Through this exploration, you can determine how neural response changes as a function of input strength, 
-        as well as the temperature sensitivity of the response, given by the $Q_{10}$ for rise/response time. The model behavior to an excitatory synaptic 
-        input and its temperature dependence has important implications towards emphasizing the role of a neural cicruit localized within HVC towards 
-        governing the timing features of birdsong. For more details of the same, please refer to the research work done in the following 
-        computational [study](https://www.biorxiv.org/content/10.1101/2025.03.06.641874v1.full.pdf) """) 
+        With this interactive tool, you get to explore two aspects of model behavior. The first aspect involves how the number of spikes generated in the 
+        somatic compartment is constant irrespective of the input strength. The incorporation of temperature dependence exhibits the same result as seen 
+        in Hodgkin Huxley model, corresponding to the higher excitability at lower temperatures, and decreased spike frequency. The second aspect involves
+        exploring the model behavior under the application of a single excitatory synaptic input. Through this, you can note how neural response changes 
+        as a function of input strength, as well as the temperature sensitivity of the response, given by the $Q_{10}$ for rise/response time. The model 
+        behavior to an excitatory synaptic input and its temperature dependence has important implications towards emphasizing the role of a neural cicruit 
+        localized within HVC towards governing the timing features of birdsong. For more details of the same, please refer to the research work done in the 
+        following computational [study](https://www.biorxiv.org/content/10.1101/2025.03.06.641874v1.full.pdf) """) 
         
         st.markdown("""            
-        To explore the model behavior, choose either the current input or synaptic input, and then vary the respective input strength from the sidebar. 
-        You can also change the $Q_{10}$ values or the temperature and repeat the analysis for model behavior and its temperature dependence as input 
-        strength is varied. 
+        To explore the model behavior, choose either the current input (for number of spikes) or synaptic input (for rise time $Q_{10}$), and then vary the 
+        respective input strength from the sidebar. You can also change the $Q_{10}$ values or the temperature and repeat the analysis for model behavior 
+        and its temperature dependence as input strength is varied. In both cases, input is made on the dendritic compartment, and the somatic membrane potential 
+        is tracked.
         """)
 
 def display_hvci_theory():
@@ -467,8 +522,14 @@ def display_hvci_theory():
         This model is a minimal model that breaks the morphology of the HVC(I) neurons into a single somatic compartment. This model 
         is similar to the Hodgkin-Huxley model in terms of its ionic compositions, with the additional incorporation of a high-threshold 
         potassium channel that imparts a fast-spiking behavior to these neurons, representative of the HVC(I) neurons in songbirds.
-        \\
-                    
+        """)
+
+        model_image = os.path.join(image_dir, "hvci.png")
+        col1, col2 = st.columns([1, 2])
+        with col2:
+            st.image(model_image, width=300)
+        
+        st.markdown("""
         With this interactive tool, you get to explore how the spike frequency generated in the somatic compartment changes as a function 
         of the input strength. The incorporation of temperature dependence helps visualize how this feature changes at different temperatures, 
         as well as how a particular input profile that is consistent with experiments shapes the firing rate statistics and its temperature dependence.

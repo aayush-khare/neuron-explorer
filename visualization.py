@@ -356,28 +356,33 @@ def plot_hvci_membrane_potential(time, v_control, v_alt, input_profile, temperat
     ymin = -1
 
     fig = plt.figure(figsize=(16, 8))
-    gs = gridspec.GridSpec(2, 2, height_ratios=[1, 1], width_ratios=[1, 1], figure=fig)
+    gs = gridspec.GridSpec(3, 2, height_ratios=[1, 1, 1], width_ratios=[2, 1], figure=fig)
     ax1 = fig.add_subplot(gs[0, 0])
     ax3 = fig.add_subplot(gs[1, 0], sharex=ax1)
-
+    ax4 = fig.add_subplot(gs[2, 0], sharex=ax1)
     ax2 = fig.add_subplot(gs[:, 1])
 
-    ax1.plot(time, v_alt, 'b', label=f'{temperature}$^o$ C', alpha=0.75)
-    ax1.plot(time, v_control, 'r', label='40.0$^o$ C')
+    ax1.plot(time, v_control, 'r')
     ax1.set_ylabel('Membrane Potential (mV)', fontsize=12)
     ax1.set_ylim(-90, 50)
     ax1.set_xlim(xmin, xmax)
     ax1.grid(True, alpha=0.3)
-    ax1.legend()
-    ax1.set_title(plot_title)    
+    ax1.set_title(plot_title + ' (40.0$^o$ C)') 
 
-    ax3.plot(time, input_profile, 'tab:green', linestyle=linestyle)
-    ax3.set_ylabel(y_label, color='tab:green', fontsize=12)
-    ax3.tick_params(axis='y', labelcolor='tab:green')
-    ax3.set_ylim(ymin, ymax)
+    ax3.plot(time, v_alt, 'b')
+    ax3.set_ylabel('Membrane Potential (mV)', fontsize=12)
+    ax3.set_ylim(-90, 50)
     ax3.set_xlim(xmin, xmax)
-    ax3.set_xlabel('Time (ms)', fontsize=12)
-    ax3.set_yticks(y_ticks_list)
+    ax3.grid(True, alpha=0.3)
+    ax3.set_title(plot_title + f' ({temperature}$^o$ C)')    
+
+    ax4.plot(time, input_profile, 'tab:green', linestyle=linestyle)
+    ax4.set_ylabel(y_label, color='tab:green', fontsize=12)
+    ax4.tick_params(axis='y', labelcolor='tab:green')
+    ax4.set_ylim(ymin, ymax)
+    ax4.set_xlim(xmin, xmax)
+    ax4.set_xlabel('Time (ms)', fontsize=12)
+    ax4.set_yticks(y_ticks_list)
 
     if len(input_strength_list) > 0:
         sorted_pairs = sorted(zip(input_strength_list, frequency_list_control, frequency_list_alt))
