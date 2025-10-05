@@ -180,24 +180,21 @@ if select_page == 'HVC neurons':
 
         display_hvci_theory()
         input_type, v_control, v_alt, time, input_profile, temperature, input_strength_list, frequency_list_control, frequency_list_alt, last_input_strength = prepare_hvci_plots()
-
-        tab1, tab2 = st.tabs(['membrane potential', 'gating variables'])
         
-        with tab1:
 
-            fig_mp = plot_hvci_membrane_potential(time,
-                                                v_control,
-                                                v_alt,
-                                                input_profile,
-                                                temperature,
-                                                input_strength_list, 
-                                                frequency_list_control,
-                                                frequency_list_alt,
-                                                last_input_strength,
-                                                input_type
-                                                )
-            
-            st.pyplot(fig_mp)
+        fig_mp = plot_hvci_membrane_potential(time,
+                                            v_control,
+                                            v_alt,
+                                            input_profile,
+                                            temperature,
+                                            input_strength_list, 
+                                            frequency_list_control,
+                                            frequency_list_alt,
+                                            last_input_strength,
+                                            input_type
+                                            )
+        
+        st.pyplot(fig_mp)
 
 if select_page == 'Coming up!':
     st.markdown(""" Thank you for going over this interactive neuron model simulator! If you have any feedback to share, do reach out to me. 

@@ -1710,19 +1710,19 @@ def prepare_hvci_plots():
                                                                             )
         
         inhibitory_synapse_stimulus_alt = create_synapse_stimulus_array(time,
-                                                temperature,
-                                                q_gate,
-                                                0,
-                                                0,
-                                                STEP_SIZE
-                                                )
+                                                                        temperature,
+                                                                        q_gate,
+                                                                        0,
+                                                                        0,
+                                                                        STEP_SIZE
+                                                                        )
         
         solution_control = neuron_control.simulate(time,
-                                            STEP_SIZE,                                        
-                                            excitatory_synapse_stimulus_array=excitatory_synapse_stimulus_control,
-                                            inhibitory_synapse_stimulus_array=inhibitory_synapse_stimulus_control,
-                                            noise_freq=freq_noise,
-                                            noise_strength=noise_strength)
+                                                    STEP_SIZE,                                        
+                                                    excitatory_synapse_stimulus_array=excitatory_synapse_stimulus_control,
+                                                    inhibitory_synapse_stimulus_array=inhibitory_synapse_stimulus_control,
+                                                    noise_freq=freq_noise,
+                                                    noise_strength=noise_strength)
         
         solution_alt = neuron_alt.simulate(time,
                                             STEP_SIZE,
@@ -1807,8 +1807,8 @@ def prepare_hvci_plots():
                     if v_alt[i-1] < threshold and v_alt[i] >= threshold:
                         spike_count_alt += 1
                     
-                frequency_control = spike_count_control * 1000 / simulation_time
-                frequency_alt = spike_count_alt * 1000 / simulation_time
+                frequency_control = spike_count_control #* 1000 / simulation_time
+                frequency_alt = spike_count_alt #* 1000 / simulation_time
 
                 st.session_state.hvci_synaptic_input_list.append(input_strength)
                 st.session_state.hvci_frequency_control_list.append(frequency_control)

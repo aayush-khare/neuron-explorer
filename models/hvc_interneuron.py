@@ -415,12 +415,12 @@ class HvcInterNeuron:
 
             if noise_freq is not None:
                 current_state[7], current_state[8], current_state[9] = self.g_noise_update(t,
-                                                                                              current_state[7],
-                                                                                              current_state[8],
-                                                                                              current_state[9],
-                                                                                              noise_strength,
-                                                                                              noise_freq,
-                                                                                              step_size)
+                                                                                           current_state[7],
+                                                                                           current_state[8],
+                                                                                           current_state[9],
+                                                                                           noise_strength,
+                                                                                           noise_freq,
+                                                                                           step_size)
                 
             current_state = self.rk4_step_alt(step_size, current_state)
 

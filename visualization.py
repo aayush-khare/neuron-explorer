@@ -347,7 +347,7 @@ def plot_hvci_membrane_potential(time, v_control, v_alt, input_profile, temperat
         plot_title = 'Membrane Potential and input profile'
         input_strength = 'input max kick'
         input_units = f'$mS/cm^{2}$'
-        xmax = 600
+        xmax = 1000
         ymax = 5.5
         y_ticks_list = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0]
         linestyle = '-'
@@ -362,8 +362,8 @@ def plot_hvci_membrane_potential(time, v_control, v_alt, input_profile, temperat
 
     ax2 = fig.add_subplot(gs[:, 1])
 
-    ax1.plot(time, v_alt, 'b', label=f'{temperature}$^o$ C')
-    ax1.plot(time, v_control, 'r', label='40.0$^o$ C', alpha=0.5)
+    ax1.plot(time, v_alt, 'b', label=f'{temperature}$^o$ C', alpha=0.75)
+    ax1.plot(time, v_control, 'r', label='40.0$^o$ C')
     ax1.set_ylabel('Membrane Potential (mV)', fontsize=12)
     ax1.set_ylim(-90, 50)
     ax1.set_xlim(xmin, xmax)
