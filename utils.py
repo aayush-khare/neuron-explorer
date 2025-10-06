@@ -40,7 +40,6 @@ def display_electrical_properties():
     and temperature dependence of neural dynamics.
     """
 
-    st.markdown("                                      ")
     st.markdown("### Parts of a neuron")
 
     image_folder_0 = os.path.join(image_dir, "neuron_parts")
@@ -64,7 +63,7 @@ def display_electrical_properties():
     if 'img_index' not in st.session_state:
         st.session_state.img_index = 0
             
-    col1, col2 = st.columns([1, 5])
+    col1, col2 = st.columns([0.5, 0.8])
     with col1:
         if st.session_state.img_index > min_index_neuron:
             if st.button("Prev "):
@@ -79,7 +78,7 @@ def display_electrical_properties():
     
     current_index = st.session_state.img_index
     current_image = Image.open(os.path.join(image_folder_0, image_files_0[current_index]))
-    st.image(current_image, width=400)
+    st.image(current_image, width=700)
     st.markdown(f"{descriptions_0[current_index]}")
 
 ######################################################################################################
@@ -89,7 +88,7 @@ def display_electrical_properties():
     image_files_1 = sorted([f for f in os.listdir(image_folder_1) if f.endswith(('.png'))])
 
     descriptions_1 = [
-    "There exists a difference in the potential on either side of the cell membrane. This difference, given by $V_{in} - V_{out} = V$ "
+    "There exists a difference in the potential on either side of the cell membrane. This difference, typically denoted by V "
     "will be referred to as the membrane potential, or simply the voltage of the neuron. In the resting state, this voltage is typically "
     "in the range of -65 to -80 mV.",
 
@@ -124,7 +123,7 @@ def display_electrical_properties():
     if 'img_index_1' not in st.session_state:
         st.session_state.img_index_1 = 0
 
-    col1, col2 = st.columns([1, 2])
+    col1, col2 = st.columns([1, 0.75])
     with col1:
         if st.session_state.img_index_1 > min_index_dynamics:
             if st.button("Prev"):
@@ -193,7 +192,7 @@ def display_electrical_properties():
 
     st.markdown("A positive injected current causes depolarization while a negative current causes hyperpolarization (makes the membrane " \
     "potential more negative with respect to the resting state).")
-    st.markdown("                                      ")
+
     st.markdown("### Synaptic inputs")
 
     st.markdown("In addition to an experimentally injected current, neurons can be depolarized or hyperpolarized due to synaptic inputs. These are " \
@@ -220,7 +219,7 @@ def display_electrical_properties():
 
     st.markdown("The time constant for decays is set to 2 ms.")
 #####################################################################################################
-    st.markdown("                                      ")
+
     st.markdown("### Temperature dependence of neural dynamics")
 
     st.markdown("Most biological and biochemical processes depend on the temperature of the environment in which they occur. " \
@@ -248,10 +247,10 @@ def display_electrical_properties():
     image_files_2 = sorted([f for f in os.listdir(image_folder_2) if f.endswith(('.png'))])
 
     descriptions_2 = [
-        'The movement of ions through the cellular medium is governed by a process called diffusion. This process affects the various conductances involved in the ion channel currents.'
-        'The temperature dependence of this process is weak, quantifies by a $Q_{10}$ value typically in the range 1.2 - 1.4',
-        'The conformational changes governing the opening and closing rates of ion channels are strongly affected by temperature changes. There temperature dependence can be quantified'
-        'by $Q_{10}$ values typically in the range 2 - 4.'
+        "The movement of ions through the cellular medium is governed by a process called diffusion. This process affects the various conductances involved in the ion channel currents. "
+        "The temperature dependence of this process is weak, quantified by a Q10 value typically in the range 1.2 - 1.4",
+        "The conformational changes governing the opening and closing rates of ion channels are strongly affected by temperature changes. There temperature dependence can be quantified"
+        "by Q10 values typically in the range 2 - 4."
     ]
 
     max_index_temperature = len(descriptions_2) - 1
@@ -260,7 +259,7 @@ def display_electrical_properties():
     if 'img_index_2' not in st.session_state:
         st.session_state.img_index_2 = 0
 
-    col1, col2 = st.columns([1, 4])
+    col1, col2 = st.columns([0.5, 0.6])
     with col1:
         if st.session_state.img_index_2 > min_index_temperature:
             if st.button("Prev  "):
@@ -277,7 +276,14 @@ def display_electrical_properties():
     current_image = Image.open(os.path.join(image_folder_2, image_files_2[current_index_2]))
 
     st.image(current_image, width=800)
-    st.markdown(f"{descriptions_2[current_index_2]}")
+
+    description_placeholder = st.empty()
+    with description_placeholder.container():
+        st.markdown(f"""
+            <div style="min-height: 100px; padding: 10px;">
+                {descriptions_2[current_index_2]}
+            </div>
+        """, unsafe_allow_html=True)
 
     st.markdown("Reversal potentials are also directly proportional to the temperature (in Kelvin) $E_{rev} \\propto T_K$. Finally any time constants are "
     "inverse of activation and inactivation rates. Hence if rates have a $Q_{10}$ of 3, time constants would have a $Q_{10}$ = $\\frac{1}{3}$. " \
@@ -364,7 +370,7 @@ def display_hh_theory():
         st.latex(r''' C\frac{dV}{dt} = - I_{Na} - I_{K} - I_L + I_{inj} ''')
 
         hh_image = os.path.join(image_dir, "hh/hh.png")
-        col1, col2, col3 = st.columns([0.5, 2, 0.5])
+        col1, col2, col3 = st.columns([0.5, 1, 0.5])
         with col2:
             st.image(hh_image, width=600)
 
@@ -488,7 +494,7 @@ def display_hvcra_theory():
         model_image = os.path.join(image_dir, "hvcra.png")
         col1, col2 = st.columns([1, 2])
         with col2:
-            st.image(model_image, width=300)
+            st.image(model_image, width=400)
         st.markdown("""
                     
         With this interactive tool, you get to explore two aspects of model behavior. The first aspect involves how the number of spikes generated in the 
@@ -527,7 +533,7 @@ def display_hvci_theory():
         model_image = os.path.join(image_dir, "hvci.png")
         col1, col2 = st.columns([1, 2])
         with col2:
-            st.image(model_image, width=300)
+            st.image(model_image, width=400)
         
         st.markdown("""
         With this interactive tool, you get to explore how the spike frequency generated in the somatic compartment changes as a function 
@@ -1034,7 +1040,6 @@ def create_sidebar_controls_hvcra():
     st.sidebar.header('Model Parameters')
     st.sidebar.subheader('Temperature and $Q_{10}$ values')
 
-    
     input_type = st.selectbox('Input type', ['Current input', 'Synaptic input'], width=200)
 
     if input_type == 'Current input':   
@@ -1118,7 +1123,7 @@ def create_sidebar_controls_hvcra():
         '''
         st.sidebar.subheader('Synaptic Input Settings')
 
-        ge_max = st.sidebar.slider('Excitatory Synapse Strength (mS/cm^2)', 0.01, 1.0, 0.01, 0.01, key=f'ge_max_{hvcra_reset_key}')
+        ge_max = st.sidebar.slider('Excitatory Synapse Strength $(mS/cm^{2})$', 0.01, 1.0, 0.01, 0.01, key=f'ge_max_{hvcra_reset_key}')
 
         gi_max = 0.0 #st.sidebar.slider('inhibitory synapse strength (mS/cm^2)', 0.0, 0.5, 0.0, 0.05, key=f'gi_max_{hvcra_reset_key}')
         gi_start = 0.0 #st.sidebar.slider('inhibitory synapse start time (ms)', 100.0, 200.0, 150.0, 0.5, key=f'gi_start_{hvcra_reset_key}')
@@ -1334,13 +1339,13 @@ def prepare_hvcra_plots():
     input_type = params['Input_type']
 
     STEP_SIZE = 0.01  # ms
-    SIMULATION_TIME = 300.0 # ms
+    SIMULATION_TIME = 250.0 # ms
     time = np.arange(0, SIMULATION_TIME, STEP_SIZE)
 
-    vs_control = np.full((30000, 1), 0)
-    vs_alt = np.full((30000, 1), 0)
-    vd_control = np.full((30000, 1), 0)
-    vd_alt = np.full((30000, 1), 0)
+    vs_control = np.full((25000, 1), 0)
+    vs_alt = np.full((25000, 1), 0)
+    vd_control = np.full((25000, 1), 0)
+    vd_alt = np.full((25000, 1), 0)
 
     solution_alt = None
     solution_control = None

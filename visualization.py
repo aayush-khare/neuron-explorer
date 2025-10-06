@@ -57,6 +57,7 @@ def plot_somatic_membrane_potential_with_spike_counts(time, vs_control, vs_alt, 
     ax3.tick_params(axis='y', labelcolor='tab:green')
     ax3.set_ylim(-0.3, 1.1)
     ax3.set_xlim(100, 200)
+    ax3.grid(True, alpha=0.3)
     ax3.set_xlabel('Time (ms)', fontsize=12)
 
     if len(input_list) > 0:
@@ -172,6 +173,7 @@ def plot_somatic_membrane_potential_q10(time, vs_control, vs_alt, temperature, i
     ax3.tick_params(axis='y')
     ax3.set_ylim(-0.3, 1.1)
     ax3.set_xlim(100, 200)
+    ax3.grid(True, alpha=0.3)
     ax3.set_xlabel('Time (ms)', fontsize=12)
 
     if len(synaptic_input_list) > 0:
@@ -333,9 +335,10 @@ def plot_hvci_membrane_potential(time, v_control, v_alt, input_profile, temperat
     if input_type == 'Single current pulse':
         x_label = 'Injected Current ($\\mu A/cm^{2}$)'
         y_label = f'current stimulus ($\\mu A/cm^{2}$)'
-        plot_title = 'Membrane Potential and input profile'
+        plot_title = 'Membrane Potential'
         input_strength = 'current amplitude'
         input_units = f'$\\mu A/cm^{2}$'
+        input_title = 'Current input profile'
         xmax = 300   
         ymax = 20.5
         y_ticks_list = [0.0, 5.0, 10.0, 15.0, 20.0,]
@@ -344,9 +347,10 @@ def plot_hvci_membrane_potential(time, v_control, v_alt, input_profile, temperat
     elif input_type == 'Synaptic input in multiple intervals':
         x_label = 'max synaptic kick($mS/cm^{2}$)'
         y_label = f'synapse stimulus ($mS/cm^{2}$)'        
-        plot_title = 'Membrane Potential and input profile'
+        plot_title = 'Membrane Potential'
         input_strength = 'input max kick'
         input_units = f'$mS/cm^{2}$'
+        input_title = 'Synaptic input profile'
         xmax = 1000
         ymax = 5.5
         y_ticks_list = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0]
@@ -383,6 +387,8 @@ def plot_hvci_membrane_potential(time, v_control, v_alt, input_profile, temperat
     ax4.set_xlim(xmin, xmax)
     ax4.set_xlabel('Time (ms)', fontsize=12)
     ax4.set_yticks(y_ticks_list)
+    ax4.set_title(input_title)
+    ax4.grid(True, alpha=0.3)
 
     if len(input_strength_list) > 0:
         sorted_pairs = sorted(zip(input_strength_list, frequency_list_control, frequency_list_alt))
@@ -469,12 +475,14 @@ def plot_hh_membrane_potential(time, v_control, v_alt, current, temperature, cur
     ax1.set_ylim(-90, 50)
     ax1.grid(True, alpha=0.3)
     ax1.legend()
-    ax1.set_title('Membrane Potential and Stimulus Current')
+    ax1.set_title('Membrane Potential')
 
     ax3.plot(time, current, 'tab:green', linestyle='--')
     ax3.set_ylabel(f'input current ($\\mu A/cm^{2}$)', color='tab:green', fontsize=12)
     ax3.tick_params(axis='y', labelcolor='tab:green')
     ax3.set_ylim(-2, 16)
+    ax3.set_title('Stimulus Current')
+    ax3.grid(True, alpha=0.3)
     ax3.set_xlabel('Time (ms)', fontsize=12)
 
     if len(current_list) > 0:
