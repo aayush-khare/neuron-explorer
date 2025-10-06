@@ -35,9 +35,9 @@ st.markdown("""
             """, 
             unsafe_allow_html=True)
 
-st.title('Neuron model simulator')
 
-select_page = st.selectbox('Contents',
+
+select_page = st.sidebar.selectbox('Contents',
                              ['Introduction',
                               'Electrical Properties of a Neuron',
                               'Integrate and Fire model',
@@ -46,158 +46,187 @@ select_page = st.selectbox('Contents',
                               'Coming up!'])
 
 if select_page == 'Introduction':
-
+    
+    st.title('Neuron model simulator')
     display_introduction()
 
 if select_page == 'Electrical Properties of a Neuron':
-
+    
+    st.title('Neuron Biophysics')
     display_electrical_properties()
     
 if select_page == 'Integrate and Fire model':
 
-    display_lif_theory()
+    st.title('Leaky Integrate and Fire (LIF) model')
+    select = st.sidebar.selectbox('LIF model contents', ['Theory', 'Plots'])
 
-    v, time, current_stimulus, current_list, frequency_list, last_current = prepare_lif_plots()
+    if select == 'Theory':
 
-    fig_fi = plot_lif_membrane_potential(time,
-                                         v,
-                                         current_stimulus,
-                                         current_list,
-                                         frequency_list,
-                                         last_current)
-    
-    st.pyplot(fig_fi)
+        display_lif_theory()
+
+    else:
+        v, time, current_stimulus, current_list, frequency_list, last_current = prepare_lif_plots()
+
+        fig_fi = plot_lif_membrane_potential(time,
+                                            v,
+                                            current_stimulus,
+                                            current_list,
+                                            frequency_list,
+                                            last_current)
+        
+        st.pyplot(fig_fi)
 
 if select_page == 'Hodgkin Huxley':
 
-    display_hh_theory()
-    v_control, v_alt, time, current_stimulus, temperature, current_list, frequency_list_control, frequency_list_alt, last_current = prepare_hh_plots()
+    st.title('Hodgkin-Huxley (HH) model')
+    select = st.sidebar.selectbox('HH model contents', ['Theory', 'Plots'])
 
-    st.markdown("## Hodgkin Huxley model: Membrane potential and F-I relationship")
+    if select == 'Theory':
+        display_hh_theory()
+    
+    else:
+        v_control, v_alt, time, current_stimulus, temperature, current_list, frequency_list_control, frequency_list_alt, last_current = prepare_hh_plots()
 
-    fig_mp = plot_hh_membrane_potential(time,
-                                        v_control,
-                                        v_alt,
-                                        current_stimulus,
-                                        temperature,
-                                        current_list,
-                                        frequency_list_control,
-                                        frequency_list_alt,
-                                        last_current)
+        st.markdown("## Hodgkin Huxley model: Membrane potential and F-I relationship")
 
-    st.pyplot(fig_mp)    
+        fig_mp = plot_hh_membrane_potential(time,
+                                            v_control,
+                                            v_alt,
+                                            current_stimulus,
+                                            temperature,
+                                            current_list,
+                                            frequency_list_control,
+                                            frequency_list_alt,
+                                            last_current)
+
+        st.pyplot(fig_mp)    
 
 if select_page == 'HVC neurons':
 
-    display_hvc_background()
+    st.title('HVC neuron model')
+    select = st.sidebar.selectbox('HVC model contents', ['HVC background', 'HVC models'])
+
+    if select == 'HVC background':
+        display_hvc_background()
     
-    HVC_neuron_type = st.selectbox('HVC neuron', ['Choose HVC neuron type', 'HVC(RA)', 'HVC(I)'])
-    
-    if HVC_neuron_type == 'HVC(RA)':
+    else:
+        HVC_neuron_type = st.sidebar.selectbox('HVC neuron', ['Choose HVC neuron type', 'HVC(RA)', 'HVC(I)'])
+        
+        if HVC_neuron_type == 'HVC(RA)':
 
-        display_hvcra_theory()
-        input_type, q_cond, fluctuations, vs_control, vs_alt, vd_control, vd_alt, time, input_array, input_array_alt, temperature, input_list, control_data_list, alt_data_list, last_input = prepare_hvcra_plots()
+            select_ = st.sidebar.selectbox('HVC(RA) model contents', ['Theory', 'Plots'])
 
-        if input_type == "Current input":
-            tab1, tab2= st.tabs(['Soma membrane potential and spike frequency', 'Dendrite membrane potential'])
-
-            with tab1:
-                
-                fig_mp = plot_somatic_membrane_potential_with_spike_counts(time, 
-                                                                           vs_control,
-                                                                           vs_alt,
-                                                                           temperature,
-                                                                           input_array,
-                                                                           input_list,
-                                                                           control_data_list,
-                                                                           alt_data_list,
-                                                                           last_input)
-
-                st.pyplot(fig_mp)
-
-            with tab2:
-
-                fig_mp = plot_dendritic_membrane_potential(time,
-                                                           vd_control,
-                                                           vd_alt,
-                                                           temperature
-                                                           )
-
-                st.pyplot(fig_mp)
-
-        elif input_type == "Synaptic input":
-            if fluctuations == 'off':
-                tab1, tab2 = st.tabs(['Soma membrane potential and response time Q10', 'Dendrite membrane potential'])
-
-                with tab1:
-
-                    fig_a = plot_somatic_membrane_potential_q10(time, 
-                                                                vs_control, 
-                                                                vs_alt, 
-                                                                temperature,
-                                                                input_array, 
-                                                                input_array_alt,
-                                                                q_cond,
-                                                                input_list, 
-                                                                control_data_list, 
-                                                                alt_data_list,
-                                                                last_input
-                                                                )
-
-                    st.pyplot(fig_a)
-
-                with tab2:
-
-                    fig_mp = plot_dendritic_membrane_potential(time,
-                                                               vd_control,
-                                                               vd_alt,
-                                                               temperature
-                                                               )
-
-                    st.pyplot(fig_mp)
+            if select_ == 'Theory':
+                display_hvcra_theory()
             
             else:
-                tab1, tab2 = st.tabs(['Soma membrane potential', 'Dendrite membrane potential'])
+                input_type, q_cond, fluctuations, vs_control, vs_alt, vd_control, vd_alt, time, input_array, input_array_alt, temperature, input_list, control_data_list, alt_data_list, last_input = prepare_hvcra_plots()
 
-                with tab1:
+                if input_type == "Current input":
+                    tab1, tab2= st.tabs(['Soma membrane potential and spike frequency', 'Dendrite membrane potential'])
 
-                    fig_mp = plot_somatic_membrane_potential(time, 
-                                                             vs_control, 
-                                                             vs_alt, 
-                                                             temperature
-                                                            )
+                    with tab1:
+                        
+                        fig_mp = plot_somatic_membrane_potential_with_spike_counts(time, 
+                                                                                vs_control,
+                                                                                vs_alt,
+                                                                                temperature,
+                                                                                input_array,
+                                                                                input_list,
+                                                                                control_data_list,
+                                                                                alt_data_list,
+                                                                                last_input)
 
-                    st.pyplot(fig_mp)
+                        st.pyplot(fig_mp)
 
-                with tab2:
+                    with tab2:
 
-                    fig_mp = plot_dendritic_membrane_potential(time,
-                                                               vd_control,
-                                                               vd_alt,
-                                                               temperature
-                                                               )
+                        fig_mp = plot_dendritic_membrane_potential(time,
+                                                                vd_control,
+                                                                vd_alt,
+                                                                temperature
+                                                                )
 
-                    st.pyplot(fig_mp)
+                        st.pyplot(fig_mp)
 
-    elif HVC_neuron_type == 'HVC(I)':
+                elif input_type == "Synaptic input":
+                    if fluctuations == 'off':
+                        tab1, tab2 = st.tabs(['Soma membrane potential and response time Q10', 'Dendrite membrane potential'])
 
-        display_hvci_theory()
-        input_type, v_control, v_alt, time, input_profile, temperature, input_strength_list, frequency_list_control, frequency_list_alt, last_input_strength = prepare_hvci_plots()
-        
+                        with tab1:
 
-        fig_mp = plot_hvci_membrane_potential(time,
-                                            v_control,
-                                            v_alt,
-                                            input_profile,
-                                            temperature,
-                                            input_strength_list, 
-                                            frequency_list_control,
-                                            frequency_list_alt,
-                                            last_input_strength,
-                                            input_type
-                                            )
-        
-        st.pyplot(fig_mp)
+                            fig_a = plot_somatic_membrane_potential_q10(time, 
+                                                                        vs_control, 
+                                                                        vs_alt, 
+                                                                        temperature,
+                                                                        input_array, 
+                                                                        input_array_alt,
+                                                                        q_cond,
+                                                                        input_list, 
+                                                                        control_data_list, 
+                                                                        alt_data_list,
+                                                                        last_input
+                                                                        )
+
+                            st.pyplot(fig_a)
+
+                        with tab2:
+
+                            fig_mp = plot_dendritic_membrane_potential(time,
+                                                                    vd_control,
+                                                                    vd_alt,
+                                                                    temperature
+                                                                    )
+
+                            st.pyplot(fig_mp)
+                    
+                    else:
+                        tab1, tab2 = st.tabs(['Soma membrane potential', 'Dendrite membrane potential'])
+
+                        with tab1:
+
+                            fig_mp = plot_somatic_membrane_potential(time, 
+                                                                    vs_control, 
+                                                                    vs_alt, 
+                                                                    temperature
+                                                                    )
+
+                            st.pyplot(fig_mp)
+
+                        with tab2:
+
+                            fig_mp = plot_dendritic_membrane_potential(time,
+                                                                    vd_control,
+                                                                    vd_alt,
+                                                                    temperature
+                                                                    )
+
+                            st.pyplot(fig_mp)
+
+        elif HVC_neuron_type == 'HVC(I)':
+
+            select_ = st.sidebar.selectbox('HVC(I) model contents', ['Theory', 'Plots'])
+
+            if select_ == 'Theory':
+                display_hvci_theory()
+
+            else:
+                input_type, v_control, v_alt, time, input_profile, temperature, input_strength_list, frequency_list_control, frequency_list_alt, last_input_strength = prepare_hvci_plots()
+                
+
+                fig_mp = plot_hvci_membrane_potential(time,
+                                                    v_control,
+                                                    v_alt,
+                                                    input_profile,
+                                                    temperature,
+                                                    input_strength_list, 
+                                                    frequency_list_control,
+                                                    frequency_list_alt,
+                                                    last_input_strength,
+                                                    input_type
+                                                    )
+                
+                st.pyplot(fig_mp)
 
 if select_page == 'Coming up!':
     st.markdown(""" Thank you for going over this interactive neuron model simulator! If you have any feedback to share, do reach out to me. 

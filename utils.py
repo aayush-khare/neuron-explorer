@@ -303,250 +303,246 @@ def display_lif_theory():
     </style>
     """, unsafe_allow_html=True)
 
-    with st.expander('**About the Leaky Integrate and Fire Model**'):
-        st.markdown(f"""
+    st.markdown(f"""
+
+The Leaky Integrate and Fire (LIF) model is a simple mathematical model that effectively \
+explains the most basic neuron function, i.e., integrating inputs to produce an output \
+spike. 
+
+                
+The Leaky in the LIF model corresponds to the incorporation of a leaky ion channel \
+in the model, that ensures that the membrane potential exponentially decays back to the \
+resting-state value in the absence of any inputs. This is the only ion channel incorporated \
+in the model. The membrane potential dynamics of the model are described by the equation """)
     
-    The Leaky Integrate and Fire (LIF) model is a simple mathematical model that effectively \
-    explains the most basic neuron function, i.e., integrating inputs to produce an output \
-    spike. 
+    st.latex(r''' C\frac{dV}{dt} = - I_L + I_{inj} ''')
 
-                    
-    The Leaky in the LIF model corresponds to the incorporation of a leaky ion channel \
-    in the model, that ensures that the membrane potential exponentially decays back to the \
-    resting-state value in the absence of any inputs. This is the only ion channel incorporated \
-    in the model. The membrane potential dynamics of the model are described by the equation """)
-        
-        st.latex(r''' C\frac{dV}{dt} = - I_L + I_{inj} ''')
+    st.markdown(f"""Here the first term on RHS is the leak current given by""")
 
-        st.markdown(f"""Here the first term on RHS is the leak current given by""")
+    st.latex(r''' I_L = g_L(V - E_L)''')
 
-        st.latex(r''' I_L = g_L(V - E_L)''')
+    st.markdown(f""" In the presence of a constant current input, the differential equation has an analytical solution for the time evolution of the membrane potential given by""")
 
-        st.markdown(f""" In the presence of a constant current input, the differential equation has an analytical solution for the time evolution of the membrane potential given by""")
+    st.latex(r''' V(t) = E_L + I_{inj}R + (V(0) - E_L - I_{inj}R)e^{-\frac{t}{\tau}}''')
 
-        st.latex(r''' V(t) = E_L + I_{inj}R + (V(0) - E_L - I_{inj}R)e^{-\frac{t}{\tau}}''')
+    st.markdown(f""" Here $R = \\frac{{{1}}}{{g_L}}$  and the time constant $\\tau = RC$. 
+                This equation, holding for any value of the membrane potential below the threshold
+                value, can be used to obtain a response time for the LIF model. This response time, say
+                $t'$ corresponds to the time it takes for the neuron to fire an action potential from the
+                time at which the current pulse starts. Setting $V(0) = E_L$ and $V(t') = V_{{th}}$, the threshold
+                membrane potential, we get""")
+    
+    st.latex(r''' t' = \tau ln(\frac{I_{inj}R}{I_{inj}R + V(0) - V_{th}})''')
 
-        st.markdown(f""" Here $R = \\frac{{{1}}}{{g_L}}$  and the time constant $\\tau = RC$. 
-                    This equation, holding for any value of the membrane potential below the threshold
-                    value, can be used to obtain a response time for the LIF model. This response time, say
-                    $t'$ corresponds to the time it takes for the neuron to fire an action potential from the
-                    time at which the current pulse starts. Setting $V(0) = E_L$ and $V(t') = V_{{th}}$, the threshold
-                    membrane potential, we get""")
-        
-        st.latex(r''' t' = \tau ln(\frac{I_{inj}R}{I_{inj}R + V(0) - V_{th}})''')
+    st.markdown(f"""Rearranging the above equation """)
 
-        st.markdown(f"""Rearranging the above equation """)
+    st.latex(r'''t' = \tau ln(\frac{1}{1 + \frac{V(0) - V_{th}}{I_{inj}R}})''')
 
-        st.latex(r'''t' = \tau ln(\frac{1}{1 + \frac{V(0) - V_{th}}{I_{inj}R}})''')
+    st.markdown(f"""and using the approximation that $ln(1+x) \\approx x$ we get""")
+    st.latex(r''' t' \approx C\frac{V_{th} - V(0)}{I_{inj}}''')
 
-        st.markdown(f"""and using the approximation that $ln(1+x) \\approx x$ we get""")
-        st.latex(r''' t' \approx C\frac{V_{th} - V(0)}{I_{inj}}''')
-
-        st.markdown(f"""As can be seen, increasing the current would decrease the response time or increase the firing rate (inverse of the response time). Additionally, it should 
-                        be noted that the closer the initial value is to threshold membrane potential, faster the response.""")
-        
-        st.markdown(f"""In the following setup, we have defined the threshold to be -50 mV. Each time the membrane potential crosses the threshold, 
-                    it is reset to a value same as the leak reversal potential. As long as the current pulse is present, the membrane again depolarizes 
-                    towards the threshold. Here you can explore how increasing in the injected current increases the firing rate of the LIF neuron model.
-                    """)
+    st.markdown(f"""As can be seen, increasing the current would decrease the response time or increase the firing rate (inverse of the response time). Additionally, it should 
+                    be noted that the closer the initial value is to threshold membrane potential, faster the response.""")
+    
+    st.markdown(f""" Click on the Plots tab to explore how increasing the injected current increases the firing rate of the LIF neuron model.
+                In this setup, we have defined the threshold to be -50 mV. Each time the membrane potential crosses the threshold, 
+                a spike is generated and the membrane potential is reset to a value same as the leak reversal potential (-65 mV). If the 
+                current pulse is present for sufficient time, the neuron would depolarize to the threshold and spike again.
+                """)
 
 def display_hh_theory():
     """
     Display the theoretical background of the Hodgkin-Huxley model.
     """
 
-    with st.expander('About Hodgkin-Huxley model'):
-        st.markdown("""
-        ## About Hodgkin Huxley (HH) model
-        
-        Hodgkin Huxley model is a mathematical model that approximates the biophysical mechanisms involved in action potential generation. \
-        Developed in 1952 by Alan Hodgkin and Andrew Huxley by studying the ionic mechanisms behind axon potential generation and propagation \
-        in the squid giant axon, this model forms a basis for biophysical models describing neural dynamics for different classes of neurons, 
-        and earned them the Nobel Prize in Physiology or Medicince.
-        The HH model treats the cell membrane as a Capacitor, and voltage-dependent ion channels as variable resistors (variable as the resistance 
-        or conductance at any instance depends on the membrane potential at that instant), that impart non-linearity to the model dynamics. \
-        The mathematical form for the current flowing through the membrane is described as """)
+    st.markdown("""
+    
+    Hodgkin Huxley model is a mathematical model that approximates the biophysical mechanisms involved in action potential generation. \
+    Developed in 1952 by Alan Hodgkin and Andrew Huxley by studying the ionic mechanisms behind axon potential generation and propagation \
+    in the squid giant axon, this model forms a basis for biophysical models describing neural dynamics for different classes of neurons, 
+    and earned them the Nobel Prize in Physiology or Medicince.
+    The HH model treats the cell membrane as a Capacitor, and voltage-dependent ion channels as variable resistors (variable as the resistance 
+    or conductance at any instance depends on the membrane potential at that instant), that impart non-linearity to the model dynamics. \
+    The mathematical form for the current flowing through the membrane is described as """)
 
-        st.latex(r''' C\frac{dV}{dt} = - I_{Na} - I_{K} - I_L + I_{inj} ''')
+    st.latex(r''' C\frac{dV}{dt} = - I_{Na} - I_{K} - I_L + I_{inj} ''')
 
-        hh_image = os.path.join(image_dir, "hh/hh.png")
-        col1, col2, col3 = st.columns([0.5, 1, 0.5])
-        with col2:
-            st.image(hh_image, width=600)
+    hh_image = os.path.join(image_dir, "hh/hh.png")
+    col1, col2, col3 = st.columns([0.5, 1, 0.5])
+    with col2:
+        st.image(hh_image, width=600)
 
-        st.markdown("""$I_{L}$ is the leak current and follows the same form as that in the LIF model. The sodium and potassium channel currents 
-                    are described by """)
+    st.markdown("""$I_{L}$ is the leak current and follows the same form as that in the LIF model. The sodium and potassium channel currents 
+                are described by """)
 
-        st.latex(r''' I_{Na} = \overline{g}_{Na}m^3h(V - V_{Na})''')
+    st.latex(r''' I_{Na} = \overline{g}_{Na}m^3h(V - V_{Na})''')
 
-        st.latex(r''' I_K = \overline{g}_Kn^4(V - V_K)''')
+    st.latex(r''' I_K = \overline{g}_Kn^4(V - V_K)''')
 
-        st.markdown(""" $\\overline{g}_{Na}$ and $\\overline{g}_K$ are fixed and are determined by the surface density of the respective channels 
-                    on the membrane. The variability in the ion channel conductances arises from the fraction of the channels that are either open 
-                    or closed. This is governed by the dynamics of the gating variables $n$, $m$ and $h$, which follow first order kinetics""")
-        
-        st.latex(r''' \frac{dx}{dt} = \alpha_x(V)(1 - x) - \beta_x(V)x''')
+    st.markdown(""" $\\overline{g}_{Na}$ and $\\overline{g}_K$ are fixed and are determined by the surface density of the respective channels 
+                on the membrane. The variability in the ion channel conductances arises from the fraction of the channels that are either open 
+                or closed. This is governed by the dynamics of the gating variables $n$, $m$ and $h$, which follow first order kinetics""")
+    
+    st.latex(r''' \frac{dx}{dt} = \alpha_x(V)(1 - x) - \beta_x(V)x''')
 
-        st.markdown(r"""Here $x = n, m, h$ and $\alpha$ and $\beta$ are the opening and closing rates for the voltage dependent ion channel.""")
+    st.markdown(r"""Here $x = n, m, h$ and $\alpha$ and $\beta$ are the opening and closing rates for the voltage dependent ion channel.""")
 
-        st.markdown(""" The mathematical form for the voltage-dependent opening and closing rates of ion channels was determined using the voltage-clamp technique. This method 
-                    holds the membrane potential constant at a specific value while measuring the resulting ionic current. By repeating this process across different membrane 
-                    potentials and analyzing the resulting current curves, Hodgkin and Huxley could determine the voltage-dependent kinetics of channel opening ($\\alpha$)and closing ($\\beta$).
-                    The mathematical form for these kinetics typically is an exponential function or some combination of a linear and exponential function of the membrane potential. For the Hodgkin-Huxley
-                    model, these rates are as follows""")
+    st.markdown(""" The mathematical form for the voltage-dependent opening and closing rates of ion channels was determined using the voltage-clamp technique. This method 
+                holds the membrane potential constant at a specific value while measuring the resulting ionic current. By repeating this process across different membrane 
+                potentials and analyzing the resulting current curves, Hodgkin and Huxley could determine the voltage-dependent kinetics of channel opening ($\\alpha$)and closing ($\\beta$).
+                The mathematical form for these kinetics typically is an exponential function or some combination of a linear and exponential function of the membrane potential. For the Hodgkin-Huxley
+                model, these rates are as follows""")
 
-        col1, col2 = st.columns(2)
-        with col1:
-            st.latex(r'''\alpha_n(V) = \frac{0.01(V + 55)}{1 - e^{-\frac{V + 55}{10}}}   ''')
-        with col2:
-            st.latex(r'''\beta_n(V) = 0.125e^{-\frac{V+65}{60}}''')
-        
-        col1, col2 = st.columns(2)
-        with col1:
-            st.latex(r'''\alpha_m(V) = \frac{0.1(V+40)}{1 - e^{-\frac{V+40}{10}}}''')
-        with col2:
-            st.latex(r'''\beta_m(V) = 4e^{-\frac{V+65}{18}}''')
-        
-        col1, col2 = st.columns(2)
-        with col1:
-            st.latex(r'''\alpha_h(V) = 0.07e^{-\frac{V+65}{20}}''')
-        with col2:
-            st.latex(r'''\beta_h(V) = \frac{1}{1 + e^{-\frac{V+35}{10}}}''')
-        
-        st.markdown("""Hodgkin and Huxley performed their experiments at around 6 - 7$^{o}C$. As mentioned in the section of temperature dependence, 
-                    incorporation of biophysical details in the Hodgkin Huxley model allows us to explore the model dynamics at various temperatures 
-                    and analyze how various aspects of action potential generation change upon temperature. One such aspect is the excitability and 
-                    the action potential firing rate under the injection of a current pulse. In this interactive tool, you can explore these dynamics. 
-                    First, change the injected current while keeping other parameters constant and observe how the neural response particularly the firing
-                    rate differs in the control condition (6.3$^{o}$ C) and an altered condition corresponding to a different temperature. You can 
-                    also modify other parameters like $Q_{10}$ values or temperature and then repeat the current change experiment to see the respective effects.""")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.latex(r'''\alpha_n(V) = \frac{0.01(V + 55)}{1 - e^{-\frac{V + 55}{10}}}   ''')
+    with col2:
+        st.latex(r'''\beta_n(V) = 0.125e^{-\frac{V+65}{60}}''')
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.latex(r'''\alpha_m(V) = \frac{0.1(V+40)}{1 - e^{-\frac{V+40}{10}}}''')
+    with col2:
+        st.latex(r'''\beta_m(V) = 4e^{-\frac{V+65}{18}}''')
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.latex(r'''\alpha_h(V) = 0.07e^{-\frac{V+65}{20}}''')
+    with col2:
+        st.latex(r'''\beta_h(V) = \frac{1}{1 + e^{-\frac{V+35}{10}}}''')
+    
+    st.markdown("""Hodgkin and Huxley performed their experiments at around 6 - 7$^{o}C$. As mentioned in the section of temperature dependence, 
+                incorporation of biophysical details in the Hodgkin Huxley model allows us to explore the model dynamics at various temperatures 
+                and analyze how various aspects of action potential generation change upon temperature. One such aspect is the excitability and 
+                the action potential firing rate under the injection of a current pulse.  
+                Navigate to the Plots tab to explore these dynamics. 
+                First, change the injected current while keeping other parameters constant and observe how the neural response particularly the firing
+                rate differs in the control condition (6.3$^{o}$ C) and an altered condition corresponding to a different temperature. You can 
+                also modify other parameters like $Q_{10}$ values or temperature and then repeat the current change experiment to see the respective effects.""")
 
 def display_hvc_background():
     """
     Display the background behind the role of brain area HVC in birdsong.
     """ 
 
-    with st.expander("About HVC"):
-        st.markdown("HVC (used as a proper name) is a brain area in the brain of songbirds that has been hypothesized to encode for features of birdsong " \
-        "such as the duration of various song elements (syllables, silent gaps in between syllables), often referred to as song timing features. HVC is " \
-        "analogous to the premotor cortex in human brain (associated with motor planning and execution).")
+    st.markdown("HVC (used as a proper name) is a brain area in the brain of songbirds that has been hypothesized to encode for features of birdsong " \
+    "such as the duration of various song elements (syllables, silent gaps in between syllables), often referred to as song timing features. HVC is " \
+    "analogous to the premotor cortex in human brain (associated with motor planning and execution).")
 
-        descriptions = ["Zebra finches is a species of songbirds that is extensively studied to gain insights about the underlying neural circuitry and "
-        "mechanisms that control behavior that is composed of a sequence of actions. The motivation arises from the simplicity of the song (composed of "
-        "a fixed sequence of syllables) and the experimental tractability of probing the different brain regions.", 
-        "HVC forms a part of the premotor pathway, projecting connections to downstream region Robust nucleus of the Arcopallium (RA), which in turn "
-        "projects to the tracheosyringeal portion of the brainstem (nXIIts) that contains motoneurons controlling the vocal muscles. "]
-        
-        image_folder = os.path.join(image_dir, "zf")
-        image_files = sorted([f for f in os.listdir(image_folder) if f.endswith(('.png'))])
+    descriptions = ["Zebra finches is a species of songbirds that is extensively studied to gain insights about the underlying neural circuitry and "
+    "mechanisms that control behavior that is composed of a sequence of actions. The motivation arises from the simplicity of the song (composed of "
+    "a fixed sequence of syllables) and the experimental tractability of probing the different brain regions.", 
+    "HVC forms a part of the premotor pathway, projecting connections to downstream region Robust nucleus of the Arcopallium (RA), which in turn "
+    "projects to the tracheosyringeal portion of the brainstem (nXIIts) that contains motoneurons controlling the vocal muscles. "]
+    
+    image_folder = os.path.join(image_dir, "zf")
+    image_files = sorted([f for f in os.listdir(image_folder) if f.endswith(('.png'))])
 
-        max_index = len(image_files) - 1
-        min_index = 0
+    max_index = len(image_files) - 1
+    min_index = 0
 
-        if 'img_index_' not in st.session_state:
-            st.session_state.img_index_ = 0
+    if 'img_index_' not in st.session_state:
+        st.session_state.img_index_ = 0
 
-        col1, col2 = st.columns([1, 4])
-        with col1:
-            if st.session_state.img_index_ > min_index:
-                if st.button("Prev  "):
-                    st.session_state.img_index_ -= 1
-                    st.rerun()
-                    
-        with col2:
-            if st.session_state.img_index_ < max_index:
-                if st.button("Next  "):
-                    st.session_state.img_index_ += 1
-                    st.rerun()
-                    
-        current_index_ = st.session_state.img_index_
-        current_image_ = Image.open(os.path.join(image_folder, image_files[current_index_]))
+    col1, col2 = st.columns([1.2, 1])
+    with col1:
+        if st.session_state.img_index_ > min_index:
+            if st.button("Prev  "):
+                st.session_state.img_index_ -= 1
+                st.rerun()
+                
+    with col2:
+        if st.session_state.img_index_ < max_index:
+            if st.button("Next  "):
+                st.session_state.img_index_ += 1
+                st.rerun()
+                
+    current_index_ = st.session_state.img_index_
+    current_image_ = Image.open(os.path.join(image_folder, image_files[current_index_]))
 
-        st.image(current_image_, width=500)
-        st.markdown(f"{descriptions[current_index_]}")
+    st.image(current_image_, width=800)
+    st.markdown(f"{descriptions[current_index_]}")
 
 def display_hvcra_theory():
     """
     Display the theoretical background of the HVC(RA) model.
     """
-    with st.expander('About HVC(RA) model'):
-        st.markdown("""
-        ## About HVC(RA) model
+    st.markdown("""
+    ## About HVC(RA) model
 
-        This neuron model is a conductance-based compartment model, used to simulate the generation of a burst of action potentials
-        for an excitatory class of neurons in the premotor brain region HVC (used as proper name) in songbirds. These neurons communicate 
-        with neurons within the HVC, as well as send axonal projections to a downstream brain area called the Robust Nucleus of the 
-        Arcopallium (RA) involved in song production. This particular connectivity is why these neurons are named HVC(RA) neurons.
+    This neuron model is a conductance-based compartment model, used to simulate the generation of a burst of action potentials
+    for an excitatory class of neurons in the premotor brain region HVC (used as proper name) in songbirds. These neurons communicate 
+    with neurons within the HVC, as well as send axonal projections to a downstream brain area called the Robust Nucleus of the 
+    Arcopallium (RA) involved in song production. This particular connectivity is why these neurons are named HVC(RA) neurons.
 
-        These neurons exhibit precisely-timed bursting behavior, locked with song auditory features. Each HVC(RA) neuron bursts exactly once during a
-        rendition of the song motif. Furthermore, aligning these bursts with the song motif exhibits that the bursts occur in a sequence. It is this 
-        observation which motivates studying birdsong to gain insights about how neural circuits could govern behavior that involves a sequence of actions or
-        steps chunked together, like performing a dance move.  
-                    
-        To simulate the dynamics of these neurons, the model the Hodgkin-Huxley formalism seen in the previous section, but now with the incorporation 
-        of additional ion channels. Furthermore, the complex morphology of the HVC(RA) neurons is broken down into a dendritic 
-        and somatic compartment coupled via ohmic coupling, to obtain a simple model that is able to exhibit precise bursting behavior. 
-        The dendritic compartment contains a Calcium channel, and two Calcium concentration dependent Potassium ion channels. The dendritic compartment
-        integrates injected current inputs as well as any synaptic from other neurons, and elicits a wide calcium spike. This Calcium spike, in turn due to the
-        coupling between the two compartments, drives 4-5 tightly chunked sodium ion spikes in the somatic compartment. The model behavior is representative 
-        of the bursting behavior observed in HVC(RA) neurons. 
-                    """)
-        model_image = os.path.join(image_dir, "hvcra.png")
-        col1, col2 = st.columns([1, 2])
-        with col2:
-            st.image(model_image, width=400)
-        st.markdown("""
-                    
-        With this interactive tool, you get to explore two aspects of model behavior. The first aspect involves how the number of spikes generated in the 
-        somatic compartment is constant irrespective of the input strength. The incorporation of temperature dependence exhibits the same result as seen 
-        in Hodgkin Huxley model, corresponding to the higher excitability at lower temperatures, and decreased spike frequency. The second aspect involves
-        exploring the model behavior under the application of a single excitatory synaptic input. Through this, you can note how neural response changes 
-        as a function of input strength, as well as the temperature sensitivity of the response, given by the $Q_{10}$ for rise/response time. The model 
-        behavior to an excitatory synaptic input and its temperature dependence has important implications towards emphasizing the role of a neural cicruit 
-        localized within HVC towards governing the timing features of birdsong. For more details of the same, please refer to the research work done in the 
-        following computational [study](https://www.biorxiv.org/content/10.1101/2025.03.06.641874v1.full.pdf) """) 
-        
-        st.markdown("""            
-        To explore the model behavior, choose either the current input (for number of spikes) or synaptic input (for rise time $Q_{10}$), and then vary the 
-        respective input strength from the sidebar. You can also change the $Q_{10}$ values or the temperature and repeat the analysis for model behavior 
-        and its temperature dependence as input strength is varied. In both cases, input is made on the dendritic compartment, and the somatic membrane potential 
-        is tracked.
-        """)
+    These neurons exhibit precisely-timed bursting behavior, locked with song auditory features. Each HVC(RA) neuron bursts exactly once during a
+    rendition of the song motif. Furthermore, aligning these bursts with the song motif exhibits that the bursts occur in a sequence. It is this 
+    observation which motivates studying birdsong to gain insights about how neural circuits could govern behavior that involves a sequence of actions or
+    steps chunked together, like performing a dance move.  
+                
+    To simulate the dynamics of these neurons, the model the Hodgkin-Huxley formalism seen in the previous section, but now with the incorporation 
+    of additional ion channels. Furthermore, the complex morphology of the HVC(RA) neurons is broken down into a dendritic 
+    and somatic compartment coupled via ohmic coupling, to obtain a simple model that is able to exhibit precise bursting behavior. 
+    The dendritic compartment contains a Calcium channel, and two Calcium concentration dependent Potassium ion channels. The dendritic compartment
+    integrates injected current inputs as well as any synaptic from other neurons, and elicits a wide calcium spike. This Calcium spike, in turn due to the
+    coupling between the two compartments, drives 4-5 tightly chunked sodium ion spikes in the somatic compartment. The model behavior is representative 
+    of the bursting behavior observed in HVC(RA) neurons. 
+                """)
+    model_image = os.path.join(image_dir, "hvcra.png")
+    col1, col2 = st.columns([1, 2])
+    with col2:
+        st.image(model_image, width=400)
+    st.markdown("""
+                
+    With this interactive tool, you get to explore two aspects of model behavior. The first aspect involves how the number of spikes generated in the 
+    somatic compartment is constant irrespective of the input strength. The incorporation of temperature dependence exhibits the same result as seen 
+    in Hodgkin Huxley model, corresponding to the higher excitability at lower temperatures, and decreased spike frequency. The second aspect involves
+    exploring the model behavior under the application of a single excitatory synaptic input. Through this, you can note how neural response changes 
+    as a function of input strength, as well as the temperature sensitivity of the response, given by the $Q_{10}$ for rise/response time. The model 
+    behavior to an excitatory synaptic input and its temperature dependence has important implications towards emphasizing the role of a neural cicruit 
+    localized within HVC towards governing the timing features of birdsong. For more details of the same, please refer to the research work done in the 
+    following computational [study](https://www.biorxiv.org/content/10.1101/2025.03.06.641874v1.full.pdf) """) 
+    
+    st.markdown("""            
+    To explore the model behavior, choose either the current input (for number of spikes) or synaptic input (for rise time $Q_{10}$), and then vary the 
+    respective input strength from the sidebar. You can also change the $Q_{10}$ values or the temperature and repeat the analysis for model behavior 
+    and its temperature dependence as input strength is varied. In both cases, input is made on the dendritic compartment, and the somatic membrane potential 
+    is tracked.
+    """)
 
 def display_hvci_theory():
     """
     Display the theoretical background for HVC(I) model.
     """
 
-    with st.expander('About HVC(I)) model'):
-        st.markdown("""
-        ## About HVC(I) model
+    st.markdown("""
+    ## About HVC(I) model
 
-        This neuron model is a conductance-based single compartment model, used to simulate the generation of action potentials
-        for an inhibitory class of neurons in the premotor brain region HVC (used as proper name) in songbirds. These neurons exhibit 
-        a fast-spiking behavior, and are a major source of inhibition within HVC, which is hypothesised to regulate network activity. 
-        This model is a minimal model that breaks the morphology of the HVC(I) neurons into a single somatic compartment. This model 
-        is similar to the Hodgkin-Huxley model in terms of its ionic compositions, with the additional incorporation of a high-threshold 
-        potassium channel that imparts a fast-spiking behavior to these neurons, representative of the HVC(I) neurons in songbirds.
-        """)
+    This neuron model is a conductance-based single compartment model, used to simulate the generation of action potentials
+    for an inhibitory class of neurons in the premotor brain region HVC (used as proper name) in songbirds. These neurons exhibit 
+    a fast-spiking behavior, and are a major source of inhibition within HVC, which is hypothesised to regulate network activity. 
+    This model is a minimal model that breaks the morphology of the HVC(I) neurons into a single somatic compartment. This model 
+    is similar to the Hodgkin-Huxley model in terms of its ionic compositions, with the additional incorporation of a high-threshold 
+    potassium channel that imparts a fast-spiking behavior to these neurons, representative of the HVC(I) neurons in songbirds.
+    """)
 
-        model_image = os.path.join(image_dir, "hvci.png")
-        col1, col2 = st.columns([1, 2])
-        with col2:
-            st.image(model_image, width=400)
-        
-        st.markdown("""
-        With this interactive tool, you get to explore how the spike frequency generated in the somatic compartment changes as a function 
-        of the input strength. The incorporation of temperature dependence helps visualize how this feature changes at different temperatures, 
-        as well as how a particular input profile that is consistent with experiments shapes the firing rate statistics and its temperature dependence.
-        The model behavior explored here has important implications towards the role of HVC(I) neurons and their connectivity patterns with the HVC(RA)
-        neurons in imparting temperature robustness to the HVC(RA) burst propagation time. For more details, please refer to the 
-        computational [study](https://www.biorxiv.org/content/10.1101/2025.03.06.641874v1.full.pdf)
-                    
-        To explore the model behavior, choose either the current input or synaptic input, and then vary the respective input strength from the sidebar. 
-        You can also change the $Q_{10}$ values or the temperature and repeat the analysis for model behavior and its temperature dependence as input 
-        strength is varied. 
-        """)
+    model_image = os.path.join(image_dir, "hvci.png")
+    col1, col2 = st.columns([1, 2])
+    with col2:
+        st.image(model_image, width=400)
+    
+    st.markdown("""
+    With this interactive tool, you get to explore how the spike frequency generated in the somatic compartment changes as a function 
+    of the input strength. The incorporation of temperature dependence helps visualize how this feature changes at different temperatures, 
+    as well as how a particular input profile that is consistent with experiments shapes the firing rate statistics and its temperature dependence.
+    The model behavior explored here has important implications towards the role of HVC(I) neurons and their connectivity patterns with the HVC(RA)
+    neurons in imparting temperature robustness to the HVC(RA) burst propagation time. For more details, please refer to the 
+    computational [study](https://www.biorxiv.org/content/10.1101/2025.03.06.641874v1.full.pdf)
+                
+    To explore the model behavior, choose either the current input or synaptic input, and then vary the respective input strength from the sidebar. 
+    You can also change the $Q_{10}$ values or the temperature and repeat the analysis for model behavior and its temperature dependence as input 
+    strength is varied. 
+    """)
 
 def create_current_stimulus_array(time_array, i_amp, i_start, i_end):
     
@@ -780,13 +776,18 @@ def create_sidebar_controls_lif():
         st.session_state.lif_current_list = []
     if 'lif_last_current' not in st.session_state:
         st.session_state.lif_last_current = 0.0
-    
     if 'lif_frequency_list' not in st.session_state:
         st.session_state.lif_frequency_list = []
     if 'lif_reset_counter' not in st.session_state:
         st.session_state.lif_reset_counter = 0
-
+    
     lif_reset_key = st.session_state.lif_reset_counter
+
+    st.sidebar.header('Model Parameters')        
+    st.sidebar.subheader('Current stimulus settings')
+
+    i_amp = st.sidebar.slider('Current amplitude ($\\mu A/cm^2$)', -1.0, 3.0, 0.0, 0.25, key=f'i_amp_{lif_reset_key}')
+      
     lif_reset_pressed = st.sidebar.button("Reset")
 
     if lif_reset_pressed:
@@ -796,12 +797,7 @@ def create_sidebar_controls_lif():
         st.session_state.lif_reset_counter += 1 
 
         st.rerun()
-    
-    st.sidebar.header('Model Parameters')        
-    st.sidebar.subheader('Current stimulus settings')
 
-    i_amp = st.sidebar.slider('Current amplitude ($\\mu A/cm^2$)', -1.0, 3.0, 0.0, 0.25, key=f'i_amp_{lif_reset_key}')
-    
     return {
         'I_amp': i_amp,
         'Current_list': st.session_state.lif_current_list,
