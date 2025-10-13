@@ -31,7 +31,7 @@ def display_introduction():
     st.markdown('<p class="big-font"> In this interactive tool, you get to explore some computational models that are used for simulating the dynamics of a neuron cell. \
                  You will start by learning about the parts of a neuron, and the function they serve. You will also learn about the electrical properties and how Physics concepts can ' \
                  'be utilized along with biological details to mathematically model neural dynamics and simulate them on a computer. ' \
-                 'We will also discuss how the various processes behind neural function depend on temperature, and how that affects properties associated with ' \
+                 'You will also learn how the various processes behind neural function depend on temperature, and how that affects properties associated with ' \
                  'neural activity. </p>', unsafe_allow_html=True)
 
 def display_electrical_properties():
@@ -79,7 +79,14 @@ def display_electrical_properties():
     current_index = st.session_state.img_index
     current_image = Image.open(os.path.join(image_folder_0, image_files_0[current_index]))
     st.image(current_image, width=700)
-    st.markdown(f"{descriptions_0[current_index]}")
+    description_placeholder = st.empty()
+    with description_placeholder.container():
+        st.markdown(f"""
+            <div style="min-height: 100px; padding: 10px;">
+                {descriptions_0[current_index]}
+            </div>
+        """, unsafe_allow_html=True)
+    #st.markdown(f"{descriptions_0[current_index]}")
 
 ######################################################################################################
 
@@ -90,31 +97,35 @@ def display_electrical_properties():
     descriptions_1 = [
     "There exists a difference in the potential on either side of the cell membrane. This difference, typically denoted by V "
     "will be referred to as the membrane potential, or simply the voltage of the neuron. In the resting state, this voltage is typically "
-    "in the range of -65 to -80 mV.",
+    "in the range of -65 to -80 mV. We use a simple picture above for the neuron, showing how the cellular membrane separates the intracellular "
+    "and extracellular space.",
 
-    "This potential difference exists because of a concentration difference of ions on either side of the membrane, such that the inside "
-    "of the cell becomes negatively charged relative to the outside. Additionally, specific ions are higher in concentration on one side "
+    "This potential difference exists because of a concentration difference of ions on either side of the membrane, such that the intracellular "
+    "space is negatively charged relative to the extracellular. Additionally, specific ions are higher in concentration on one side "
     "of the membrane, as seen above for sodium and potassium. There are other ions as well, like Chloride and Calcium, which are not shown "
-    "for simplicity as well as the fact that later on we will discuss how the sodium and potassium ions in particular play a role in action "
-    "potential generation."
+    "for simplicity. Later we will learn how the sodium and potassium ions particularly play an important role in action "
+    "potential generation. "
     "The membrane is a lipid bilayer which is impermeable to the flow of ions. However, it contains various ion channels that selectively "
     "allow for the movement of specific ions. These ion channels can open and close through changes in the conformational states of the "
     "channel proteins. The opening and closing rates of these channels depend on the membrane potential, thus earning them the name "
     "voltage-gated ion channels. In the resting state, these voltage-gated channels are predominantly closed.",
     
-    "A brief, sufficiently strong excitatory input or injected current through an electrode can elevate the membrane potential from its "
+    "A brief, excitatory input or injected current through an electrode can elevate the membrane potential from its "
     "resting state. This process is called membrane depolarization. As the membrane depolarizes, ion channels permeable to sodium ions "
     "open, allowing an influx of sodium ions that further aids depolarization.",
     
-    "At a certain membrane potential called the threshold potential, a large positive feedback loop emerges, as sodium ions surge into the cell "
-    "resulting in rapid depolarization.",
+    "If the input were strong enough, the membrane potential can be depolarized enough to cross a value called the threshold potential, at which "
+    "a large positive feedback loop emerges, as sodium ions surge into the cell resulting in rapid depolarization.",
 
     "The rapid depolarization subsequently opens voltage-gated potassium channels, allowing "
     "potassium ions to move out of the cell, which repolarizes the membrane back toward its resting potential.",
 
     "The rapid depolarization followed by repolarization, which typically occurs within a millisecond in most neurons, is known as "
     "an action potential. It is this sharp pulse of electrical activity, generated at the axon hillock, that is carried along the "
-    "axon and triggers the release of neurotransmitters at the axon terminal."
+    "axon and triggers the release of neurotransmitters at the axon terminal. After an action potential, the concentrations of the Sodium and "
+    "Potassium ions on either side of the membrane are re-established by active proteins called ion pumps, which requires energy that is "
+    "achieved through the breakdown of ATP. The sodium-potassium pump moves 3 Sodium ions out of the cell for every 2 Potassium ions moved "
+    "into the cell." 
     ]
 
     max_index_dynamics = len(descriptions_1) - 1
@@ -157,10 +168,10 @@ def display_electrical_properties():
     st.markdown("" \
         "To simulate the dynamics of a neuron, we can model a small patch of the neuronal membrane as a capacitor due to the charge separation " \
         "across it. The key assumption is that this membrane patch is isopotential. This means that the voltage is uniform across the entire patch. " \
-        "The charge separation and resulting voltage vary as ions flow in and out of the neuron. Not all ion channel conductances are constant. Instead, " \
-        "as we will see later, channels open and close following first-order kinetics with voltage-dependent rates. In the resting state, when there are " \
-        "no external inputs the voltage remains constant because there is no net ion flow. This can be mathematically written as the membrane potential " \
-        "equation: "
+        "The charge separation and resulting voltage vary as ions flow in and out of the neuron. Not all ion channel conductances are constant (the arrow on " \
+        "the resistor denotes variability). Instead, as we will see later, channels open and close following first-order kinetics with " \
+        "voltage-dependent rates. In the resting state, when there are no external inputs the voltage remains constant because there is no net " \
+        "ion flow. This can be mathematically written as the membrane potential equation: "
         )
     
     st.latex(r''' C\frac{dV}{dt} + I_{ion} = 0''')
@@ -172,7 +183,7 @@ def display_electrical_properties():
     st.markdown("$p$ denotes the probability of activation for a subunit constituting an ion channel, and the exponent denotes how many " \
     "such subunits must be independently activated or deactivated. $\\overline{g}_{ion}$ denotes the maximum conductance for a given ion channel. " \
     "Hence the driving force for an ionic current depends both on the state of the channel denoted by $p$ and the difference " \
-    "$V - E_{rev, ion}$, not simply V. This additional term $E_{rev, ion}$, is the reversal potential." \
+    "$V - E_{rev, ion}$, not simply V. This additional term $E_{rev, ion}$, is the reversal potential. " \
     "It is the membrane potential value at which the direction of an ionic current reverses. " \
     "To understand this, consider the case when sodium ions flows into the cell. The influx depolarizes the cell, moving the potential towards " \
     "a positive value. At the same time due to the influx, the concentration of sodium ions increases in the intracellular space. " \
@@ -305,15 +316,19 @@ def display_lif_theory():
 
     st.markdown(f"""
 
-The Leaky Integrate and Fire (LIF) model is a simple mathematical model that effectively \
-explains the most basic neuron function, i.e., integrating inputs to produce an output \
-spike. 
+The Leaky Integrate and Fire (LIF) model is a simple mathematical model that effectively explains the most basic neuron 
+function, i.e., integration of inputs and production of an output spike, without incorporating the complex mechanisms involved in the ion
+channel dynamics we saw in the previous page. 
 
                 
 The Leaky in the LIF model corresponds to the incorporation of a leaky ion channel \
 in the model, that ensures that the membrane potential exponentially decays back to the \
 resting-state value in the absence of any inputs. This is the only ion channel incorporated \
-in the model. The membrane potential dynamics of the model are described by the equation """)
+in the model. The LIF model has an artificially defined threshold value. If a depolarizing input
+causes the membrane potential to reach this threshold, the membrane potential is adjusted back to a reset 
+value, and this is considered as a spike being generated by the model neuron. 
+
+The membrane potential dynamics of the model are described by the equation """)
     
     st.latex(r''' C\frac{dV}{dt} = - I_L + I_{inj} ''')
 
@@ -329,7 +344,7 @@ in the model. The membrane potential dynamics of the model are described by the 
                 This equation, holding for any value of the membrane potential below the threshold
                 value, can be used to obtain a response time for the LIF model. This response time, say
                 $t'$ corresponds to the time it takes for the neuron to fire an action potential from the
-                time at which the current pulse starts. Setting $V(0) = E_L$ and $V(t') = V_{{th}}$, the threshold
+                time at which the current pulse starts. Setting the initial condition, $V(0) = E_L$ and $V(t') = V_{{th}}$, the threshold
                 membrane potential, we get""")
     
     st.latex(r''' t' = \tau ln(\frac{I_{inj}R}{I_{inj}R + V(0) - V_{th}})''')
@@ -341,15 +356,31 @@ in the model. The membrane potential dynamics of the model are described by the 
     st.markdown(f"""and using the approximation that $ln(1+x) \\approx x$ we get""")
     st.latex(r''' t' \approx C\frac{V_{th} - V(0)}{I_{inj}}''')
 
-    st.markdown(f"""As can be seen, increasing the current would decrease the response time or increase the firing rate (inverse of the response time). Additionally, it should 
-                    be noted that the closer the initial value is to threshold membrane potential, faster the response.""")
+    st.markdown(f"""As can be seen, increasing the current would decrease the response time. If we choose a reset value to be equal to the 
+                initial condition $V(0)$, then as long as the current pulse is present, the membrane potential depolarize to the 
+                threshold in time t', followed by a reset and subsequent depolarization with the same time t', to the threshold. 
+                 Hence the inverse of the above equation gives us the firing rate of the LIF model. It should 
+                    be noted that the closer the initial value is to threshold membrane potential, faster the response. 
+                And larger the current pulse, faster the response, and higher the firing rate. """)
     
-    st.markdown(f""" Click on the Plots tab to explore how increasing the injected current increases the firing rate of the LIF neuron model.
+    st.markdown(f""" Click on the Plots tab to explore the effect of an increasing injected current on the firing rate of the LIF neuron model.
                 In this setup, we have defined the threshold to be -50 mV. Each time the membrane potential crosses the threshold, 
-                a spike is generated and the membrane potential is reset to a value same as the leak reversal potential (-65 mV). If the 
-                current pulse is present for sufficient time, the neuron would depolarize to the threshold and spike again.
+                a spike is generated and the membrane potential is reset to a value same as the leak reversal potential (-65 mV, which is also 
+                the initial condition). If the current pulse is present for sufficient time, the neuron would depolarize to the threshold and 
+                spike again.
                 """)
 
+def display_lif_summary():
+    """
+    Display concluding remarks for the LIF section.
+    """
+
+    with st.expander("Remarks"):
+        st.write("f-I curves like above provide crucial information related to processing of inputs by neurons, like the minimum " \
+        "current needed by a neuron to produce action potentials. While for the LIF model, it is evident that the firing rate keeps on " \
+        "increasing with the input current pulse, there are some classes of neurons that exhibit saturation, which would show up as minimal " \
+        "or no increase in firing rate after a certain current. Such aspects can be useful towards classifying neurons as well. ")
+    
 def display_hh_theory():
     """
     Display the theoretical background of the Hodgkin-Huxley model.
@@ -420,6 +451,21 @@ def display_hh_theory():
                 rate differs in the control condition (6.3$^{o}$ C) and an altered condition corresponding to a different temperature. You can 
                 also modify other parameters like $Q_{10}$ values or temperature and then repeat the current change experiment to see the respective effects.""")
 
+def display_hh_summary():
+    """
+    Display concluding remarks for the HH section.
+    """
+
+    with st.expander("Remarks"):
+        st.write(" HH model provides a biophysical description of action potential generation by incorporating phenomenolgical variables " \
+        "representing the opening and closing dynamcis of the sodium and potassium ion channels. Combined with the knowledge about how " \
+        "temperature affects various biological processes allows making predictions about change in neural dynamics with a change in temperature. " \
+        "With the above tool, you learned how a drop in temperature raises the resting membrane potential due to its dependence on " \
+        "the temperature dependent reversal potential of the leak channel. Furthermore a drop in temperature slows down the opening and closing " \
+        "dynamics of ion channels (governed by the $Q_{10}$ of conformational change dependent processes). These dynamics govern features " \
+        "characteristic features of spikes, such as spike widths, and interspike intervals. Hence under the injection of a strong current pulse "
+        "(fixed duration) at two different temperatures, the slowed dynamics reduce the action potential firing rate. ")
+    
 def display_hvc_background():
     """
     Display the background behind the role of brain area HVC in birdsong.
@@ -918,7 +964,7 @@ def create_sidebar_controls_hh():
     st.sidebar.subheader('Current stimulus settings')
     i_amp = st.sidebar.slider('Current amplitude ($\\mu A/cm^2$)', 0.0, 15.0, 0.0, 1.0, key=f'i_amp_{hh_reset_key}')
     
-    temperature = st.selectbox('Temperature in Celsius (control fixed at 6.3 Celsius)', [0.0, 10.0, -10.0], width=300, on_change=handle_reset) # control temperature = 6.3 celsius
+    temperature = st.sidebar.selectbox('Temperature in Celsius (control fixed at 6.3 Celsius)', [0.0, 10.0, -10.0], width=300, on_change=handle_reset) # control temperature = 6.3 celsius
 
     return {
         'temperature': temperature,
@@ -1034,9 +1080,8 @@ def create_sidebar_controls_hvcra():
     '''
 
     st.sidebar.header('Model Parameters')
-    st.sidebar.subheader('Temperature and $Q_{10}$ values')
 
-    input_type = st.selectbox('Input type', ['Current input', 'Synaptic input'], width=200)
+    input_type = st.sidebar.selectbox('Input type', ['Current input', 'Synaptic input'], width=200)
 
     if input_type == 'Current input':   
         
@@ -1059,8 +1104,9 @@ def create_sidebar_controls_hvcra():
             st.session_state.hvcra_reset_counter += 1
 
         hvcra_reset_key = st.session_state.hvcra_reset_counter
+        st.sidebar.subheader('Temperature and $Q_{10}$ values')
 
-        temperature = st.selectbox('Altered Temperature in $^o$C (control set to 40$^o$ C)', [30.0, 35.0], width=300, on_change=handle_reset) #  control temperature = 40.0 celsius
+        temperature = st.sidebar.selectbox('Altered Temperature in $^o$C (control set to 40$^o$ C)', [30.0, 35.0], width=300, on_change=handle_reset) #  control temperature = 40.0 celsius
         
         q_gate = st.sidebar.slider('$Q_{10}$ for conformation dependent processes', 2.0, 4.0, 3.0, 0.1, on_change=handle_reset)
         q_cond = st.sidebar.slider('$Q_{10}$ for diffusion dependent processes', 1.0, 2.0, 1.3, 0.1, on_change=handle_reset)
@@ -1102,8 +1148,8 @@ def create_sidebar_controls_hvcra():
             st.session_state.hvcra_reset_counter += 1
 
         hvcra_reset_key = st.session_state.hvcra_reset_counter
-
-        temperature = st.selectbox('Altered Temperature in $^o$C (control set to 40$^o$ C)', [30.0, 35.0], width=300, on_change=handle_reset) #  control temperature = 40.0 celsius
+        st.sidebar.subheader('Temperature and $Q_{10}$ values')
+        temperature = st.sidebar.selectbox('Altered Temperature in $^o$C (control set to 40$^o$ C)', [30.0, 35.0], width=300, on_change=handle_reset) #  control temperature = 40.0 celsius
         
         q_gate = st.sidebar.slider('$Q_{10}$ for conformation dependent processes', 2.0, 4.0, 3.0, 0.1, on_change=handle_reset)
         q_cond = st.sidebar.slider('$Q_{10}$ for diffusion dependent processes', 1.0, 2.0, 1.3, 0.1, on_change=handle_reset)
@@ -1221,10 +1267,7 @@ def create_sidebar_controls_hvci():
 
     st.sidebar.header('Model Parameters')
 
-    #input_type = st.selectbox('Input type', ['Current input', 'Noise input'])
-    input_type = st.selectbox('Input type', ['Single current pulse', 'Synaptic input in multiple intervals'])
-
-    st.sidebar.subheader('Temperature and $Q_{10}$ values')
+    input_type = st.sidebar.selectbox('Input type', ['Single current pulse', 'Synaptic input in multiple intervals'])
     
     if input_type == 'Single current pulse':
 
@@ -1248,8 +1291,10 @@ def create_sidebar_controls_hvci():
             st.session_state.hvci_frequency_alt_list = []
             st.session_state.hvci_last_current_input = 0.0
             st.session_state.hvci_reset_counter += 1 
-
-        temperature = st.selectbox('Temperature in Celsius', [30.0, 35.0], on_change=handle_reset) #  control temperature = 40.0 celsius
+        
+        st.sidebar.subheader('Temperature and $Q_{10}$ values')
+        
+        temperature = st.sidebar.selectbox('Temperature in Celsius', [30.0, 35.0], on_change=handle_reset) #  control temperature = 40.0 celsius
         q_gate = st.sidebar.slider('$Q_{10}$ for conformation dependent processes', 2.0, 4.0, 3.0, 0.1, on_change=handle_reset)
         q_cond = st.sidebar.slider('$Q_{10}$ for diffusion dependent processes', 1.0, 2.0, 1.3, 0.1, on_change=handle_reset)
 
@@ -1292,7 +1337,9 @@ def create_sidebar_controls_hvci():
             st.session_state.hvci_last_synaptic_input = 0.0
             st.session_state.hvci_reset_counter += 1 
 
-        temperature = st.selectbox('Temperature in Celsius', [30.0, 35.0], on_change=handle_reset) #  control temperature = 40.0 celsius
+        st.sidebar.subheader('Temperature and $Q_{10}$ values')
+
+        temperature = st.sidebar.selectbox('Temperature in Celsius', [30.0, 35.0], on_change=handle_reset) #  control temperature = 40.0 celsius
         q_gate = st.sidebar.slider('$Q_{10}$ for conformation dependent processes', 2.0, 4.0, 3.0, 0.1, on_change=handle_reset)
         q_cond = st.sidebar.slider('$Q_{10}$ for diffusion dependent processes', 1.0, 2.0, 1.3, 0.1, on_change=handle_reset)
 

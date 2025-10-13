@@ -3,9 +3,11 @@ import streamlit as st
 from utils import (display_introduction,
                    display_electrical_properties,
                    display_lif_theory,
+                   display_lif_summary,
                    prepare_lif_plots,
                    display_hh_theory,
                    prepare_hh_plots,
+                   display_hh_summary,
                    display_hvc_background,
                    display_hvcra_theory,
                    prepare_hvcra_plots,
@@ -76,6 +78,8 @@ if select_page == 'Integrate and Fire model':
         
         st.pyplot(fig_fi)
 
+        display_lif_summary()
+
 if select_page == 'Hodgkin Huxley':
 
     st.title('Hodgkin-Huxley (HH) model')
@@ -99,7 +103,9 @@ if select_page == 'Hodgkin Huxley':
                                             frequency_list_alt,
                                             last_current)
 
-        st.pyplot(fig_mp)    
+        st.pyplot(fig_mp)  
+
+        display_hh_summary()  
 
 if select_page == 'HVC neurons':
 
