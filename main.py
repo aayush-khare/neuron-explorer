@@ -235,5 +235,5 @@ if select_page == 'HVC neurons':
                 st.pyplot(fig_mp)
 
 if select_page == 'Coming up!':
-    st.markdown(""" Thank you for going over this interactive neuron model simulator! If you have any feedback to share, do reach out to me. 
-                And I will be continuing to work on more such interactive tools catering to computational neuroscience, so keep checking this streamlit page""")
+    st.markdown(""" Thank you for going over this interactive neuron model simulator! If you have any feedback to share, do reach out to me at amk7136@psu.edu. 
+                And there is more interactive tools catering to computational neuroscience coming up, so keep checking this streamlit page!""")

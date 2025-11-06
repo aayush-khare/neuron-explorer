@@ -458,7 +458,7 @@ def display_hh_summary():
 
     with st.expander("Remarks"):
         st.write(" HH model provides a biophysical description of action potential generation by incorporating phenomenolgical variables " \
-        "representing the opening and closing dynamcis of the sodium and potassium ion channels. Combined with the knowledge about how " \
+        "representing the opening and closing dynamics of the sodium and potassium ion channels. Combined with the knowledge about how " \
         "temperature affects various biological processes allows making predictions about change in neural dynamics with a change in temperature. " \
         "With the above tool, you learned how a drop in temperature raises the resting membrane potential due to its dependence on " \
         "the temperature dependent reversal potential of the leak channel. Furthermore a drop in temperature slows down the opening and closing " \
