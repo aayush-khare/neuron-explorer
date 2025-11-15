@@ -129,7 +129,7 @@ if select_page == 'HVC neurons':
                 input_type, q_cond, fluctuations, vs_control, vs_alt, vd_control, vd_alt, time, input_array, input_array_alt, temperature, input_list, control_data_list, alt_data_list, last_input = prepare_hvcra_plots()
 
                 if input_type == "Current input":
-                    tab1, tab2= st.tabs(['Soma membrane potential and spike frequency', 'Dendrite membrane potential'])
+                    tab1, tab2= st.tabs(['Soma membrane potential and spike counts', 'Dendrite membrane potential'])
 
                     with tab1:
                         
@@ -235,5 +235,6 @@ if select_page == 'HVC neurons':
                 st.pyplot(fig_mp)
 
 if select_page == 'Coming up!':
-    st.markdown(""" Thank you for going over this interactive neuron model simulator! If you have any feedback to share, do reach out to me at amk7136@psu.edu. 
-                And there is more interactive tools catering to computational neuroscience coming up, so keep checking this streamlit page!""")
+    st.markdown(""" Thank you for going over this interactive neuron model simulator! If you have any feedback to share, do reach out to me at aayushkhare@psu.edu 
+                or aayushkhare95@gmail.com. And there are more interactive tools catering to computational neuroscience coming up, so keep checking this 
+                streamlit page!""")

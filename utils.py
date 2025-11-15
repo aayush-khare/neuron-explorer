@@ -462,7 +462,7 @@ def display_hh_summary():
         "temperature affects various biological processes allows making predictions about change in neural dynamics with a change in temperature. " \
         "With the above tool, you learned how a drop in temperature raises the resting membrane potential due to its dependence on " \
         "the temperature dependent reversal potential of the leak channel. Furthermore a drop in temperature slows down the opening and closing " \
-        "dynamics of ion channels (governed by the $Q_{10}$ of conformational change dependent processes). These dynamics govern features " \
+        "dynamics of ion channels (governed by the $Q_{10}$ of conformational change dependent processes). These dynamics govern " \
         "characteristic features of spikes, such as spike widths, and interspike intervals. Hence under the injection of a strong current pulse "
         "(fixed duration) at two different temperatures, the slowed dynamics reduce the action potential firing rate. ")
     
@@ -1936,5 +1936,3 @@ def prepare_hvci_plots():
         st.session_state.hvci_last_synaptic_input = input_strength
         
         return input_type, v_control, v_alt, time, excitatory_synapse_stimulus_control, temperature, st.session_state.hvci_synaptic_input_list, st.session_state.hvci_frequency_control_list, st.session_state.hvci_frequency_alt_list, st.session_state.hvci_last_synaptic_input
-
-
