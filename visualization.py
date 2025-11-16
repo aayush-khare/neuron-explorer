@@ -524,6 +524,74 @@ def plot_hh_membrane_potential(time, v_control, v_alt, current, temperature, cur
     plt.tight_layout()
     return fig
 
+def plot_hh_membrane_potential_spike_properties(temperature, current_list, spike_width_list_control, spike_width_list_alt, isi_list_control, isi_list_alt, last_current):
+    """
+    """
+
+    fig = plt.figure(figsize=(12,6))
+    gs = gridspec.GridSpec(2, 1, height_ratios=[1, 1], figure=fig)
+    ax1 = fig.add_subplot(gs[0, 0])
+    ax2 = fig.add_subplot(gs[1, 0], sharex=ax1)
+    
+    if len(current_list) > 0:
+        sorted_pairs = sorted(zip(current_list, spike_width_list_control, spike_width_list_alt, isi_list_control, isi_list_alt))
+        sorted_current, sorted_spike_width_control, sorted_spike_width_alt, sorted_isi_control, sorted_isi_alt = zip(*sorted_pairs)
+        sorted_current = list(sorted_current)
+        sorted_spike_width_control = list(sorted_spike_width_control)
+        sorted_spike_width_alt = list(sorted_spike_width_alt)
+        sorted_isi_control = list(sorted_isi_control)
+        sorted_isi_alt = list(sorted_isi_alt)
+
+        
+        ax1.plot(sorted_current, sorted_spike_width_control,
+                'ro-', linewidth=1, markersize=4, alpha=0.7, label = '6.3$^o$ C')
+        ax1.plot(sorted_current, sorted_spike_width_alt,
+                 'bo-', linewidth=1, markersize=4, alpha=0.7, label = f'{temperature}$^o$ C')
+        ax2.plot(sorted_current, sorted_isi_control,
+                'ro-', linewidth=1, markersize=4, alpha=0.7)
+        ax2.plot(sorted_current, sorted_isi_alt,
+                 'bo-', linewidth=1, markersize=4, alpha=0.7)
+        
+        if last_current in [c for c in sorted_current if c == last_current]:
+            idx = next(i for i, c in enumerate(sorted_current) if c == last_current)
+            current_spike_width_control = sorted_spike_width_control[idx]
+            current_spike_width_alt = sorted_spike_width_alt[idx]
+            current_isi_control = sorted_isi_control[idx]
+            current_isi_alt = sorted_isi_alt[idx]
+
+            ax1.plot(last_current, current_spike_width_control, 'o', color='red', markersize=10,
+                    label=f'{last_current:.1f} $\\mu A/cm^{2}$, {current_spike_width_control:.2f} ms')
+            ax1.plot(last_current, current_spike_width_alt, 'o', color='blue', markersize=10,
+                    label=f'{last_current:.1f} $\\mu A/cm^{2}$, {current_spike_width_alt:.2f} ms')   
+            ax2.plot(last_current, current_isi_control, 'o', color='red', markersize=10,
+                    label=f'{last_current:.1f} $\\mu A/cm^{2}$, {current_isi_control:.2f} ms')
+            ax2.plot(last_current, current_isi_alt, 'o', color='blue', markersize=10,
+                    label=f'{last_current:.1f} $\\mu A/cm^{2}$, {current_isi_alt:.2f} ms')   
+        
+        ax1.set_ylabel('Mean spike width (ms)', fontsize=12)
+        ax2.set_ylabel('ISI (ms)', fontsize=12)
+        ax2.set_xlabel('Injected Current ($\\mu A/cm^{2}$)', fontsize=12)
+        ax1.set_title('Change in spike widths and Interspike intervals (ISIs) with temperature', fontsize=14)
+        ax1.grid(True, alpha=0.3)
+        ax1.legend()
+        ax2.grid(True, alpha=0.3)
+        ax2.legend()
+        
+      
+    else:
+        ax1.set_ylabel('Mean spike width (ms)', fontsize=12)
+        ax2.set_xlabel('Injected Current ($\\mu A/cm^{2}$)', fontsize=12)
+        ax2.set_ylabel('Interspike interval (ms)', fontsize=12)
+        ax1.set_title('Change in spike widths and Interspike intervals (ISIs) with temperature', fontsize=14)
+        ax1.grid(True, alpha=0.3)
+        ax2.grid(True, alpha=0.3)
+        ax1.text(0.5, 0.5, 'No data points yet\nAdjust current and observe', 
+                transform=ax1.transAxes, ha='center', va='center', fontsize=12)
+        ax2.text(0.5, 0.5, 'No data points yet\nAdjust current and observe', 
+                transform=ax2.transAxes, ha='center', va='center', fontsize=12)
+    plt.tight_layout()
+    return fig
+
 def plot_lif_membrane_potential(time, v, current, current_list, frequency_list, last_current):
     """
     Plot the membrane potential for the LIF neuron model.

@@ -17,6 +17,7 @@ from utils import (display_introduction,
 
 from visualization import (plot_lif_membrane_potential,
                            plot_hh_membrane_potential,
+                           plot_hh_membrane_potential_spike_properties,
                            plot_somatic_membrane_potential,
                            plot_dendritic_membrane_potential,
                            plot_somatic_membrane_potential_with_spike_counts,
@@ -89,21 +90,37 @@ if select_page == 'Hodgkin Huxley':
         display_hh_theory()
     
     else:
-        v_control, v_alt, time, current_stimulus, temperature, current_list, frequency_list_control, frequency_list_alt, last_current = prepare_hh_plots()
+        v_control, v_alt, time, current_stimulus, temperature, current_list, frequency_list_control, frequency_list_alt, spike_width_list_control, spike_width_list_alt, isi_list_control, isi_list_alt, last_current = prepare_hh_plots()
 
         st.markdown("## Hodgkin Huxley model: Membrane potential and F-I relationship")
 
-        fig_mp = plot_hh_membrane_potential(time,
-                                            v_control,
-                                            v_alt,
-                                            current_stimulus,
-                                            temperature,
-                                            current_list,
-                                            frequency_list_control,
-                                            frequency_list_alt,
-                                            last_current)
+        tab1, tab2 = st.tabs(['Membrane Potential', 'Spike properties'])
 
-        st.pyplot(fig_mp)  
+        with tab1:
+        
+            fig_mp = plot_hh_membrane_potential(time,
+                                                v_control,
+                                                v_alt,
+                                                current_stimulus,
+                                                temperature,
+                                                current_list,
+                                                frequency_list_control,
+                                                frequency_list_alt,
+                                                last_current)
+            
+            st.pyplot(fig_mp)
+        
+        with tab2:
+            
+            fig_mp = plot_hh_membrane_potential_spike_properties(temperature,
+                                                                 current_list,
+                                                                 spike_width_list_control,
+                                                                 spike_width_list_alt,
+                                                                 isi_list_control,
+                                                                 isi_list_alt,
+                                                                 last_current)
+            
+            st.pyplot(fig_mp)  
 
         display_hh_summary()  
 

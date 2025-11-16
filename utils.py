@@ -672,6 +672,42 @@ def generate_poisson_events(event_time, freq):
    
     return event_time
 
+def spike_widths(v, input_start_time, time_step):
+    """
+    """
+    input_time_step = int(input_start_time / time_step)
+
+    baseline = np.median(v[0:input_time_step])
+    peak_v = baseline
+    if v.max() > -20.0:
+        peak_v = v.max()
+        threshold = (baseline + peak_v) * 0.5
+        current_condition = v >= threshold
+        previous_condition_1 = np.concatenate([[False], v[:-1] < threshold])
+        previous_condition_2 = np.concatenate([v[1:] < threshold, [False]])
+
+        spike_upstroke = current_condition & previous_condition_1
+        spike_downstroke = current_condition & previous_condition_2
+
+        spike_upstroke_indices = np.where(spike_upstroke)[0]
+        spike_downstroke_indices = np.where(spike_downstroke)[0]
+
+        spike_width = (spike_downstroke_indices - spike_upstroke_indices) * time_step
+        return round(np.mean(spike_width), 3)
+
+def interspike_intervals(v, time_step):
+    """
+    """
+
+    threshold = -20
+    current_condition = v >= threshold
+    previous_condition_1 = np.concatenate([[False], v[:-1] < threshold])
+
+    spike_upstroke = current_condition & previous_condition_1
+    spike_upstroke_indices = np.where(spike_upstroke)[0]
+
+    return round(np.mean(np.diff(spike_upstroke_indices * time_step)), 3)
+
 def create_synapse_stimulus_over_intervals_array(time_array, temp, q_gate, g_max, freq, interval_size, step_size, simulation_time):
     """                                            
     Function for creating a synapse stimulus array where the synaptic input
@@ -944,6 +980,18 @@ def create_sidebar_controls_hh():
     if 'hh_frequency_list_alt' not in st.session_state:
         st.session_state.hh_frequency_list_alt = []
 
+    if 'hh_spike_width_list_control' not in st.session_state:
+        st.session_state.hh_spike_width_list_control = []
+    
+    if 'hh_spike_width_list_alt' not in st.session_state:
+        st.session_state.hh_spike_width_list_alt = []
+    
+    if 'hh_isi_list_control' not in st.session_state:
+        st.session_state.hh_isi_list_control = []
+    
+    if 'hh_isi_list_alt' not in st.session_state:
+        st.session_state.hh_isi_list_alt = []
+
     if 'hh_reset_counter' not in st.session_state:
         st.session_state.hh_reset_counter = 0
     
@@ -951,6 +999,10 @@ def create_sidebar_controls_hh():
         st.session_state.hh_current_list = []
         st.session_state.hh_frequency_list_control = []
         st.session_state.hh_frequency_list_alt = []
+        st.session_state.hh_spike_width_list_control = []
+        st.session_state.hh_spike_width_list_alt = []
+        st.session_state.hh_isi_list_control = []
+        st.session_state.hh_isi_list_alt = []
         st.session_state.hh_last_current = 0.0
         st.session_state.hh_reset_counter += 1
 
@@ -974,6 +1026,10 @@ def create_sidebar_controls_hh():
         'HH_Current_list': st.session_state.hh_current_list,
         'Frequency_list_control': st.session_state.hh_frequency_list_control,
         'Frequency_list_alt': st.session_state.hh_frequency_list_alt,
+        'Spike_width_list_control': st.session_state.hh_spike_width_list_control,
+        'Spike_width_list_alt': st.session_state.hh_spike_width_list_alt,
+        'ISI_list_control': st.session_state.hh_isi_list_control,
+        'ISI_list_alt': st.session_state.hh_isi_list_alt,
         'HH_Last_current': st.session_state.hh_last_current
     }
 
@@ -1008,9 +1064,8 @@ def prepare_hh_plots():
     
     solution_alt = neuron_alt.simulate(time, STEP_SIZE, current_stimulus_array=current_stimulus)
 
-    v_control= solution_control[:, 0]
-    v_alt= solution_alt[:, 0]
-
+    v_control = solution_control[:, 0]
+    v_alt = solution_alt[:, 0]
 
     hh_current_list = st.session_state.hh_current_list
     hh_last_current = st.session_state.hh_last_current
@@ -1028,7 +1083,7 @@ def prepare_hh_plots():
             solution_control = neuron_control.simulate(time, STEP_SIZE, current_stimulus_array=current_stimulus)
             solution_alt = neuron_alt.simulate(time, STEP_SIZE, current_stimulus_array=current_stimulus)
         
-            v_control= solution_control[:, 0]
+            v_control = solution_control[:, 0]
             v_alt= solution_alt[:, 0]
             st.session_state.hh_current_list.append(i_amp)
 
@@ -1041,24 +1096,53 @@ def prepare_hh_plots():
             if len(spike_indices) > 0:
                 duration = i_end - i_start
                 frequency_control = 1000 * len(spike_indices) / duration
+                spike_width_control = spike_widths(v_control, i_start, STEP_SIZE)
+                if len(spike_indices) > 1:
+                    isi_control = interspike_intervals(v_control, STEP_SIZE)
+                else:
+                    isi_control = 0
             else:
                 frequency_control = 0
+                spike_width_control = 0
+                isi_control = 0
 
             if len(spike_indices_) > 0:
                 duration_ = i_end - i_start
                 frequency_alt = 1000 * len(spike_indices_) / duration_
+                spike_width_alt = spike_widths(v_alt, i_start, STEP_SIZE)
+                if len(spike_indices_) > 1:
+                    isi_alt = interspike_intervals(v_alt, STEP_SIZE)
+                else:
+                    isi_alt = 0
             else:
                 frequency_alt = 0
-
+                spike_width_alt = 0
+                isi_alt = 0
             
             st.session_state.hh_frequency_list_control.append(frequency_control)
+            st.session_state.hh_spike_width_list_control.append(spike_width_control)
+            st.session_state.hh_isi_list_control.append(isi_control)
             st.session_state.hh_frequency_list_alt.append(frequency_alt)
+            st.session_state.hh_spike_width_list_alt.append(spike_width_alt)
+            st.session_state.hh_isi_list_alt.append(isi_alt)
 
-            sorted_pairs = sorted(zip(st.session_state.hh_current_list, st.session_state.hh_frequency_list_control, st.session_state.hh_frequency_list_alt))
-            st.session_state.hh_current_list, st.session_state.hh_frequency_list_control, st.session_state.hh_frequency_list_alt = zip(*sorted_pairs)
+            sorted_pairs = sorted(zip(st.session_state.hh_current_list, 
+                                      st.session_state.hh_frequency_list_control, 
+                                      st.session_state.hh_frequency_list_alt,
+                                      st.session_state.hh_spike_width_list_control,
+                                      st.session_state.hh_spike_width_list_alt,
+                                      st.session_state.hh_isi_list_control,
+                                      st.session_state.hh_isi_list_alt))
+            
+            st.session_state.hh_current_list, st.session_state.hh_frequency_list_control, st.session_state.hh_frequency_list_alt, st.session_state.hh_spike_width_list_control, st.session_state.hh_spike_width_list_alt, st.session_state.hh_isi_list_control, st.session_state.hh_isi_list_alt = zip(*sorted_pairs)
+
             st.session_state.hh_current_list = list(st.session_state.hh_current_list)
             st.session_state.hh_frequency_list_control = list(st.session_state.hh_frequency_list_control)
             st.session_state.hh_frequency_list_alt = list(st.session_state.hh_frequency_list_alt)
+            st.session_state.hh_spike_width_list_control = list(st.session_state.hh_spike_width_list_control)
+            st.session_state.hh_spike_width_list_alt = list(st.session_state.hh_spike_width_list_alt)
+            st.session_state.hh_isi_list_control = list(st.session_state.hh_isi_list_control)
+            st.session_state.hh_isi_list_alt = list(st.session_state.hh_isi_list_alt)
             
             st.success(f"Added: {i_amp:.1f} $\\mu A/cm^{2}$")
     
@@ -1067,7 +1151,7 @@ def prepare_hh_plots():
 
     st.session_state.hh_last_current = i_amp    
 
-    return v_control, v_alt, time, current_stimulus, temperature, st.session_state.hh_current_list, st.session_state.hh_frequency_list_control, st.session_state.hh_frequency_list_alt, st.session_state.hh_last_current
+    return v_control, v_alt, time, current_stimulus, temperature, st.session_state.hh_current_list, st.session_state.hh_frequency_list_control, st.session_state.hh_frequency_list_alt, st.session_state.hh_spike_width_list_control, st.session_state.hh_spike_width_list_alt, st.session_state.hh_isi_list_control, st.session_state.hh_isi_list_alt, st.session_state.hh_last_current
 
 def create_sidebar_controls_hvcra():
     '''
