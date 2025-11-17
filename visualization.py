@@ -297,7 +297,7 @@ def plot_dendritic_membrane_potential(time, vd_control, vd_alt, temperature):
     plt.tight_layout()
     return fig
 
-def plot_hvci_membrane_potential(time, v_control, v_alt, input_profile, temperature, input_strength_list, frequency_list_control, frequency_list_alt, last_input_strength, input_type):
+def plot_hvci_membrane_potential(time, v_control, v_alt, input_profile_control, input_profile_alt, q_cond, temperature, input_strength_list, frequency_list_control, frequency_list_alt, last_input_strength, input_type):
 
     """
     Plot the membrane potential for the HVC(I) neuron under a control 
@@ -311,8 +311,12 @@ def plot_hvci_membrane_potential(time, v_control, v_alt, input_profile, temperat
         Membrane potential values for the control condition.
     v_alt : array_like
         Membrane potential values for the alternative condition.
-    input_profile : array_like
-        Vector containing values of the input made over the simulation time (either current or synaptic depending on the input type)
+    input_profile_control : array_like
+        Vector containing values of the input made over the simulation time (either current or synaptic depending on the input type), for control condition
+    input_profile_alt : array_like
+        Vector containing values of the input made over the simulation time (either current or synaptic depending on the input type), for alternative condition
+    q_cond : float
+        Q10 value set for diffusion dependent processes
     temperature : float
         Temperature (in °C) used for the alternative experimental condition.
     input_strength_list : array_like
@@ -345,6 +349,7 @@ def plot_hvci_membrane_potential(time, v_control, v_alt, input_profile, temperat
         linestyle = '--'
     
     elif input_type == 'Synaptic input in multiple intervals':
+        input_profile_alt = [g / q_cond for g in input_profile_alt]
         x_label = 'max synaptic kick($mS/cm^{2}$)'
         y_label = f'synapse stimulus ($mS/cm^{2}$)'        
         plot_title = 'Membrane Potential'
@@ -380,9 +385,15 @@ def plot_hvci_membrane_potential(time, v_control, v_alt, input_profile, temperat
     ax3.grid(True, alpha=0.3)
     ax3.set_title(plot_title + f' ({temperature}$^o$ C)')    
 
-    ax4.plot(time, input_profile, 'tab:green', linestyle=linestyle)
-    ax4.set_ylabel(y_label, color='tab:green', fontsize=12)
-    ax4.tick_params(axis='y', labelcolor='tab:green')
+    if input_type == 'Single current pulse':
+        ax4.plot(time, input_profile_control, 'tab:green', linestyle=linestyle)
+        ax4.set_ylabel(y_label, color='tab:green', fontsize=12)
+        ax4.tick_params(axis='y', labelcolor='tab:green')
+    else:
+        ax4.plot(time, input_profile_control, 'red', linestyle=linestyle)
+        ax4.plot(time, input_profile_alt, color='blue', linestyle=linestyle)
+        ax4.set_ylabel(y_label, color='black', fontsize=12) 
+        ax4.tick_params(axis='y', labelcolor='black')
     ax4.set_ylim(ymin, ymax)
     ax4.set_xlim(xmin, xmax)
     ax4.set_xlabel('Time (ms)', fontsize=12)
@@ -524,7 +535,183 @@ def plot_hh_membrane_potential(time, v_control, v_alt, current, temperature, cur
     plt.tight_layout()
     return fig
 
-def plot_hh_membrane_potential_spike_properties(temperature, current_list, spike_width_list_control, spike_width_list_alt, isi_list_control, isi_list_alt, last_current):
+def plot_hvcra_somatic_spike_characteristics(temperature, input_list, spike_width_list_control, spike_width_list_alt, isi_list_control, isi_list_alt, last_input):
+    """
+    """
+
+    fig = plt.figure(figsize=(12,6))
+    gs = gridspec.GridSpec(2, 1, height_ratios=[1, 1], figure=fig)
+    ax1 = fig.add_subplot(gs[0, 0])
+    ax2 = fig.add_subplot(gs[1, 0], sharex=ax1)
+    
+    if len(input_list) > 0:
+        sorted_pairs = sorted(zip(input_list, spike_width_list_control, spike_width_list_alt, isi_list_control, isi_list_alt))
+        sorted_current, sorted_spike_width_control, sorted_spike_width_alt, sorted_isi_control, sorted_isi_alt = zip(*sorted_pairs)
+        sorted_current = list(sorted_current)
+        sorted_spike_width_control = list(sorted_spike_width_control)
+        sorted_spike_width_alt = list(sorted_spike_width_alt)
+        sorted_isi_control = list(sorted_isi_control)
+        sorted_isi_alt = list(sorted_isi_alt)
+
+        mask = np.array(sorted_spike_width_control) != 0 
+        filtered_current = np.array(sorted_current)[mask]
+        filtered_width_control = np.array(sorted_spike_width_control)[mask]
+        ax1.plot(filtered_current, filtered_width_control,
+                'ro-', linewidth=1, markersize=4, alpha=0.7, label = '40.0$^o$ C')
+        
+        mask = np.array(sorted_spike_width_alt) != 0 
+        filtered_current = np.array(sorted_current)[mask]
+        filtered_width_alt = np.array(sorted_spike_width_alt)[mask]
+        ax1.plot(filtered_current, filtered_width_alt,
+                'bo-', linewidth=1, markersize=4, alpha=0.7, label = f'{temperature}$^o$ C')
+        ax1.set_ylim(0, 1.0)
+
+        mask = np.array(sorted_isi_control) != 0 
+        filtered_current = np.array(sorted_current)[mask]
+        filtered_isi_control = np.array(sorted_isi_control)[mask]
+        ax2.plot(filtered_current, filtered_isi_control,
+                'ro-', linewidth=1, markersize=4, alpha=0.7)
+        
+        mask = np.array(sorted_isi_alt) != 0 
+        filtered_current = np.array(sorted_current)[mask]
+        filtered_isi_alt = np.array(sorted_isi_alt)[mask]
+        ax2.plot(filtered_current, filtered_isi_alt,
+                'bo-', linewidth=1, markersize=4, alpha=0.7)
+        ax2.set_ylim(0, 10.0)
+        
+        if last_input in [c for c in sorted_current if c == last_input]:
+            idx = next(i for i, c in enumerate(sorted_current) if c == last_input)
+            current_spike_width_control = sorted_spike_width_control[idx]
+            current_spike_width_alt = sorted_spike_width_alt[idx]
+            current_isi_control = sorted_isi_control[idx]
+            current_isi_alt = sorted_isi_alt[idx]
+
+            if current_spike_width_control != 0:
+                ax1.plot(last_input, current_spike_width_control, 'o', color='red', markersize=10,
+                        label=f'{last_input:.1f} $\\mu A/cm^{2}$, {current_spike_width_control:.2f} ms')
+            if current_spike_width_alt != 0:
+                ax1.plot(last_input, current_spike_width_alt, 'o', color='blue', markersize=10,
+                        label=f'{last_input:.1f} $\\mu A/cm^{2}$, {current_spike_width_alt:.2f} ms')   
+            if current_isi_control != 0:
+                ax2.plot(last_input, current_isi_control, 'o', color='red', markersize=10,
+                        label=f'{last_input:.1f} $\\mu A/cm^{2}$, {current_isi_control:.2f} ms')
+            if current_isi_alt != 0:
+                ax2.plot(last_input, current_isi_alt, 'o', color='blue', markersize=10,
+                        label=f'{last_input:.1f} $\\mu A/cm^{2}$, {current_isi_alt:.2f} ms')   
+        
+        ax1.set_ylabel('Mean spike width (ms)', fontsize=12)
+        ax2.set_ylabel('ISI (ms)', fontsize=12)
+        ax2.set_xlabel('Injected Current ($\\mu A/cm^{2}$)', fontsize=12)
+        ax1.set_title('Change in spike widths and Interspike intervals (ISIs) with temperature', fontsize=14)
+        ax1.grid(True, alpha=0.3)
+        ax1.legend()
+        ax2.grid(True, alpha=0.3)
+        if current_isi_alt != 0 or current_isi_control != 0:
+            ax2.legend()        
+      
+    else:
+        ax1.set_ylabel('Mean spike width (ms)', fontsize=12)
+        ax2.set_xlabel('Injected Current ($\\mu A/cm^{2}$)', fontsize=12)
+        ax2.set_ylabel('Interspike interval (ms)', fontsize=12)
+        ax1.set_title('Change in spike widths and Interspike intervals (ISIs) with temperature', fontsize=14)
+        ax1.grid(True, alpha=0.3)
+        ax2.grid(True, alpha=0.3)
+        ax1.text(0.5, 0.5, 'No data points yet\nAdjust current and observe', 
+                transform=ax1.transAxes, ha='center', va='center', fontsize=12)
+        ax2.text(0.5, 0.5, 'No data points yet\nAdjust current and observe', 
+                transform=ax2.transAxes, ha='center', va='center', fontsize=12)
+    plt.tight_layout()
+    return fig
+
+def plot_hvci_spike_characteristics(temperature, input_strength_list, spike_width_list_control, spike_width_list_alt, isi_list_control, isi_list_alt, last_input_strength):
+    """
+    """
+    fig = plt.figure(figsize=(12,6))
+    gs = gridspec.GridSpec(2, 1, height_ratios=[1, 1], figure=fig)
+    ax1 = fig.add_subplot(gs[0, 0])
+    ax2 = fig.add_subplot(gs[1, 0], sharex=ax1)
+    
+    if len(input_strength_list) > 0:
+        sorted_pairs = sorted(zip(input_strength_list, spike_width_list_control, spike_width_list_alt, isi_list_control, isi_list_alt))
+        sorted_current, sorted_spike_width_control, sorted_spike_width_alt, sorted_isi_control, sorted_isi_alt = zip(*sorted_pairs)
+        sorted_current = list(sorted_current)
+        sorted_spike_width_control = list(sorted_spike_width_control)
+        sorted_spike_width_alt = list(sorted_spike_width_alt)
+        sorted_isi_control = list(sorted_isi_control)
+        sorted_isi_alt = list(sorted_isi_alt)
+
+        mask = np.array(sorted_spike_width_control) != 0 
+        filtered_current = np.array(sorted_current)[mask]
+        filtered_width_control = np.array(sorted_spike_width_control)[mask]
+        ax1.plot(filtered_current, filtered_width_control,
+                'ro-', linewidth=1, markersize=4, alpha=0.7, label = '40.0$^o$ C')
+        
+        mask = np.array(sorted_spike_width_alt) != 0 
+        filtered_current = np.array(sorted_current)[mask]
+        filtered_width_alt = np.array(sorted_spike_width_alt)[mask]
+        ax1.plot(filtered_current, filtered_width_alt,
+                'bo-', linewidth=1, markersize=4, alpha=0.7, label = f'{temperature}$^o$ C')
+        ax1.set_ylim(0, 1.0)
+
+        mask = np.array(sorted_isi_control) != 0 
+        filtered_current = np.array(sorted_current)[mask]
+        filtered_isi_control = np.array(sorted_isi_control)[mask]
+        ax2.plot(filtered_current, filtered_isi_control,
+                'ro-', linewidth=1, markersize=4, alpha=0.7)
+        
+        mask = np.array(sorted_isi_alt) != 0 
+        filtered_current = np.array(sorted_current)[mask]
+        filtered_isi_alt = np.array(sorted_isi_alt)[mask]
+        ax2.plot(filtered_current, filtered_isi_alt,
+                'bo-', linewidth=1, markersize=4, alpha=0.7)
+        ax2.set_ylim(0, 30.0)
+        
+        if last_input_strength in [c for c in sorted_current if c == last_input_strength]:
+            idx = next(i for i, c in enumerate(sorted_current) if c == last_input_strength)
+            current_spike_width_control = sorted_spike_width_control[idx]
+            current_spike_width_alt = sorted_spike_width_alt[idx]
+            current_isi_control = sorted_isi_control[idx]
+            current_isi_alt = sorted_isi_alt[idx]
+
+            if current_spike_width_control != 0:
+                ax1.plot(last_input_strength, current_spike_width_control, 'o', color='red', markersize=10,
+                        label=f'{last_input_strength:.1f} $\\mu A/cm^{2}$, {current_spike_width_control:.2f} ms')
+            if current_spike_width_alt != 0:
+                ax1.plot(last_input_strength, current_spike_width_alt, 'o', color='blue', markersize=10,
+                        label=f'{last_input_strength:.1f} $\\mu A/cm^{2}$, {current_spike_width_alt:.2f} ms')   
+            if current_isi_control != 0:
+                ax2.plot(last_input_strength, current_isi_control, 'o', color='red', markersize=10,
+                        label=f'{last_input_strength:.1f} $\\mu A/cm^{2}$, {current_isi_control:.2f} ms')
+            if current_isi_alt != 0:
+                ax2.plot(last_input_strength, current_isi_alt, 'o', color='blue', markersize=10,
+                        label=f'{last_input_strength:.1f} $\\mu A/cm^{2}$, {current_isi_alt:.2f} ms')   
+        
+        ax1.set_ylabel('Mean spike width (ms)', fontsize=12)
+        ax2.set_ylabel('ISI (ms)', fontsize=12)
+        ax2.set_xlabel('Injected Current ($\\mu A/cm^{2}$)', fontsize=12)
+        ax1.set_title('Change in spike widths and Interspike intervals (ISIs) with temperature', fontsize=14)
+        ax1.grid(True, alpha=0.3)
+        ax1.legend()
+        ax2.grid(True, alpha=0.3)
+        
+        if current_isi_alt != 0 or current_isi_control != 0:
+            ax2.legend()        
+      
+    else:
+        ax1.set_ylabel('Mean spike width (ms)', fontsize=12)
+        ax2.set_xlabel('Injected Current ($\\mu A/cm^{2}$)', fontsize=12)
+        ax2.set_ylabel('Interspike interval (ms)', fontsize=12)
+        ax1.set_title('Change in spike widths and Interspike intervals (ISIs) with temperature', fontsize=14)
+        ax1.grid(True, alpha=0.3)
+        ax2.grid(True, alpha=0.3)
+        ax1.text(0.5, 0.5, 'No data points yet\nAdjust current and observe', 
+                transform=ax1.transAxes, ha='center', va='center', fontsize=12)
+        ax2.text(0.5, 0.5, 'No data points yet\nAdjust current and observe', 
+                transform=ax2.transAxes, ha='center', va='center', fontsize=12)
+    plt.tight_layout()
+    return fig
+
+def plot_hh_membrane_potential_spike_characteristics(temperature, current_list, spike_width_list_control, spike_width_list_alt, isi_list_control, isi_list_alt, last_current):
     """
     """
 
@@ -542,16 +729,32 @@ def plot_hh_membrane_potential_spike_properties(temperature, current_list, spike
         sorted_isi_control = list(sorted_isi_control)
         sorted_isi_alt = list(sorted_isi_alt)
 
-        
-        ax1.plot(sorted_current, sorted_spike_width_control,
+        mask = np.array(sorted_spike_width_control) != 0 
+        filtered_current = np.array(sorted_current)[mask]
+        filtered_width_control = np.array(sorted_spike_width_control)[mask]
+        ax1.plot(filtered_current, filtered_width_control,
                 'ro-', linewidth=1, markersize=4, alpha=0.7, label = '6.3$^o$ C')
-        ax1.plot(sorted_current, sorted_spike_width_alt,
-                 'bo-', linewidth=1, markersize=4, alpha=0.7, label = f'{temperature}$^o$ C')
-        ax2.plot(sorted_current, sorted_isi_control,
-                'ro-', linewidth=1, markersize=4, alpha=0.7)
-        ax2.plot(sorted_current, sorted_isi_alt,
-                 'bo-', linewidth=1, markersize=4, alpha=0.7)
         
+        mask = np.array(sorted_spike_width_alt) != 0 
+        filtered_current = np.array(sorted_current)[mask]
+        filtered_width_alt = np.array(sorted_spike_width_alt)[mask]
+        ax1.plot(filtered_current, filtered_width_alt,
+                'bo-', linewidth=1, markersize=4, alpha=0.7, label = f'{temperature}$^o$ C')
+        ax1.set_ylim(0, 5.0)
+
+        mask = np.array(sorted_isi_control) != 0 
+        filtered_current = np.array(sorted_current)[mask]
+        filtered_isi_control = np.array(sorted_isi_control)[mask]
+        ax2.plot(filtered_current, filtered_isi_control,
+                'ro-', linewidth=1, markersize=4, alpha=0.7)
+        
+        mask = np.array(sorted_isi_alt) != 0 
+        filtered_current = np.array(sorted_current)[mask]
+        filtered_isi_alt = np.array(sorted_isi_alt)[mask]
+        ax2.plot(filtered_current, filtered_isi_alt,
+                'bo-', linewidth=1, markersize=4, alpha=0.7)
+        ax2.set_ylim(0, 40.0)
+
         if last_current in [c for c in sorted_current if c == last_current]:
             idx = next(i for i, c in enumerate(sorted_current) if c == last_current)
             current_spike_width_control = sorted_spike_width_control[idx]
@@ -559,14 +762,18 @@ def plot_hh_membrane_potential_spike_properties(temperature, current_list, spike
             current_isi_control = sorted_isi_control[idx]
             current_isi_alt = sorted_isi_alt[idx]
 
-            ax1.plot(last_current, current_spike_width_control, 'o', color='red', markersize=10,
-                    label=f'{last_current:.1f} $\\mu A/cm^{2}$, {current_spike_width_control:.2f} ms')
-            ax1.plot(last_current, current_spike_width_alt, 'o', color='blue', markersize=10,
-                    label=f'{last_current:.1f} $\\mu A/cm^{2}$, {current_spike_width_alt:.2f} ms')   
-            ax2.plot(last_current, current_isi_control, 'o', color='red', markersize=10,
-                    label=f'{last_current:.1f} $\\mu A/cm^{2}$, {current_isi_control:.2f} ms')
-            ax2.plot(last_current, current_isi_alt, 'o', color='blue', markersize=10,
-                    label=f'{last_current:.1f} $\\mu A/cm^{2}$, {current_isi_alt:.2f} ms')   
+            if current_spike_width_control != 0:
+                ax1.plot(last_current, current_spike_width_control, 'o', color='red', markersize=10,
+                        label=f'{last_current:.1f} $\\mu A/cm^{2}$, {current_spike_width_control:.2f} ms')
+            if current_spike_width_alt != 0:
+                ax1.plot(last_current, current_spike_width_alt, 'o', color='blue', markersize=10,
+                        label=f'{last_current:.1f} $\\mu A/cm^{2}$, {current_spike_width_alt:.2f} ms')   
+            if current_isi_control != 0:    
+                ax2.plot(last_current, current_isi_control, 'o', color='red', markersize=10,
+                        label=f'{last_current:.1f} $\\mu A/cm^{2}$, {current_isi_control:.2f} ms')
+            if current_isi_alt != 0:    
+                ax2.plot(last_current, current_isi_alt, 'o', color='blue', markersize=10,
+                        label=f'{last_current:.1f} $\\mu A/cm^{2}$, {current_isi_alt:.2f} ms')   
         
         ax1.set_ylabel('Mean spike width (ms)', fontsize=12)
         ax2.set_ylabel('ISI (ms)', fontsize=12)
@@ -575,7 +782,8 @@ def plot_hh_membrane_potential_spike_properties(temperature, current_list, spike
         ax1.grid(True, alpha=0.3)
         ax1.legend()
         ax2.grid(True, alpha=0.3)
-        ax2.legend()
+        if current_isi_alt != 0 or current_isi_control != 0:
+            ax2.legend()
         
       
     else:

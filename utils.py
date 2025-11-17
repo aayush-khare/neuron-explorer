@@ -1175,6 +1175,14 @@ def create_sidebar_controls_hvcra():
             st.session_state.hvcra_frequency_control_list = []
         if 'hvcra_frequency_alt_list' not in st.session_state:
             st.session_state.hvcra_frequency_alt_list = []
+        if 'hvcra_spike_width_list_control' not in st.session_state:
+            st.session_state.hvcra_spike_width_list_control = []       
+        if 'hvcra_spike_width_list_alt' not in st.session_state:
+            st.session_state.hvcra_spike_width_list_alt = []
+        if 'hvcra_isi_list_control' not in st.session_state:
+            st.session_state.hvcra_isi_list_control = []
+        if 'hvcra_isi_list_alt' not in st.session_state:
+            st.session_state.hvcra_isi_list_alt = []
         if 'hvcra_last_current_input' not in st.session_state:
             st.session_state.hvcra_last_current_input = 0.0      
         if 'hvcra_reset_counter' not in st.session_state:
@@ -1184,6 +1192,10 @@ def create_sidebar_controls_hvcra():
             st.session_state.hvcra_current_input_list = []
             st.session_state.hvcra_frequency_control_list = []
             st.session_state.hvcra_frequency_alt_list = []
+            st.session_state.hvcra_spike_width_list_control = []
+            st.session_state.hvcra_spike_width_list_alt = []
+            st.session_state.hvcra_isi_list_control = []
+            st.session_state.hvcra_isi_list_alt = []
             st.session_state.hvcra_last_current_input = 0.0
             st.session_state.hvcra_reset_counter += 1
 
@@ -1208,6 +1220,10 @@ def create_sidebar_controls_hvcra():
             'Current_input_list': st.session_state.hvcra_current_input_list,
             'Frequency_control_list': st.session_state.hvcra_frequency_control_list,
             'Frequency_alt_list': st.session_state.hvcra_frequency_alt_list,
+            'Spike_width_control_list': st.session_state.hvcra_spike_width_list_control,
+            'Spike_width_alt_list': st.session_state.hvcra_spike_width_list_alt,
+            'ISI_list_control': st.session_state.hvcra_isi_list_control,
+            'ISI_list_alt': st.session_state.hvcra_isi_list_alt,
             'Last_current': st.session_state.hvcra_last_current_input
             }
     
@@ -1219,6 +1235,14 @@ def create_sidebar_controls_hvcra():
             st.session_state.response_time_control_list = []
         if 'response_time_alt_list' not in st.session_state:
             st.session_state.response_time_alt_list = []
+        if 'hvcra_spike_width_list_control' not in st.session_state:
+            st.session_state.hvcra_spike_width_list_control = []       
+        if 'hvcra_spike_width_list_alt' not in st.session_state:
+            st.session_state.hvcra_spike_width_list_alt = []
+        if 'hvcra_isi_list_control' not in st.session_state:
+            st.session_state.hvcra_isi_list_control = []
+        if 'hvcra_isi_list_alt' not in st.session_state:
+            st.session_state.hvcra_isi_list_alt = []
         if 'hvcra_last_synaptic_input' not in st.session_state:
             st.session_state.hvcra_last_synaptic_input = 0.0
         if 'hvcra_reset_counter' not in st.session_state:
@@ -1228,6 +1252,10 @@ def create_sidebar_controls_hvcra():
             st.session_state.hvcra_synaptic_input_list = []
             st.session_state.response_time_control_list = []
             st.session_state.response_time_alt_list = []
+            st.session_state.hvcra_spike_width_list_control = []
+            st.session_state.hvcra_spike_width_list_alt = []
+            st.session_state.hvcra_isi_list_control = []
+            st.session_state.hvcra_isi_list_alt = []
             st.session_state.hvcra_last_synaptic_input = 0.0
             st.session_state.hvcra_reset_counter += 1
 
@@ -1335,7 +1363,11 @@ def create_sidebar_controls_hvcra():
                 'Noise_input': noise_input,
                 'Synaptic_input_list': st.session_state.hvcra_synaptic_input_list,
                 'Response_time_control_list': st.session_state.response_time_control_list,
-                'Response_time_alt_list': st.session_state.response_time_alt_list,                
+                'Response_time_alt_list': st.session_state.response_time_alt_list,
+                'Spike_width_control_list': st.session_state.hvcra_spike_width_list_control,
+                'Spike_width_alt_list': st.session_state.hvcra_spike_width_list_alt,
+                'ISI_list_control': st.session_state.hvcra_isi_list_control,
+                'ISI_list_alt': st.session_state.hvcra_isi_list_alt,                
                 'Last_synaptic_input': st.session_state.hvcra_last_synaptic_input
             }
 
@@ -1361,9 +1393,16 @@ def create_sidebar_controls_hvci():
             st.session_state.hvci_frequency_control_list = []
         if 'hvci_frequency_alt_list' not in st.session_state:
             st.session_state.hvci_frequency_alt_list = []
+        if 'hvci_spike_width_list_control' not in st.session_state:
+            st.session_state.hvci_spike_width_list_control = []       
+        if 'hvci_spike_width_list_alt' not in st.session_state:
+            st.session_state.hvci_spike_width_list_alt = []
+        if 'hvci_isi_list_control' not in st.session_state:
+            st.session_state.hvci_isi_list_control = []
+        if 'hvci_isi_list_alt' not in st.session_state:
+            st.session_state.hvci_isi_list_alt = []
         if 'hvci_last_current_input' not in st.session_state:
-            st.session_state.hvci_last_current_input = 0.0
-        
+            st.session_state.hvci_last_current_input = 0.0        
         if 'hvci_reset_counter' not in st.session_state:
             st.session_state.hvci_reset_counter = 0
         
@@ -1373,6 +1412,10 @@ def create_sidebar_controls_hvci():
             st.session_state.hvci_current_input_list = []
             st.session_state.hvci_frequency_control_list = []
             st.session_state.hvci_frequency_alt_list = []
+            st.session_state.hvci_spike_width_list_control = []
+            st.session_state.hvci_spike_width_list_alt = []
+            st.session_state.hvci_isi_list_control = []
+            st.session_state.hvci_isi_list_alt = []
             st.session_state.hvci_last_current_input = 0.0
             st.session_state.hvci_reset_counter += 1 
         
@@ -1395,6 +1438,10 @@ def create_sidebar_controls_hvci():
             'Current_input_list': st.session_state.hvci_current_input_list,
             'Frequency_control_list': st.session_state.hvci_frequency_control_list,
             'Frequency_alt_list': st.session_state.hvci_frequency_alt_list,
+            'Spike_width_control_list': st.session_state.hvci_spike_width_list_control,
+            'Spike_width_alt_list': st.session_state.hvci_spike_width_list_alt,
+            'ISI_list_control': st.session_state.hvci_isi_list_control,
+            'ISI_list_alt': st.session_state.hvci_isi_list_alt,                
             'Last_current': st.session_state.hvci_last_current_input
         }
     
@@ -1406,9 +1453,16 @@ def create_sidebar_controls_hvci():
             st.session_state.hvci_frequency_control_list = []
         if 'hvci_frequency_alt_list' not in st.session_state:
             st.session_state.hvci_frequency_alt_list = []
+        if 'hvci_spike_width_list_control' not in st.session_state:
+            st.session_state.hvci_spike_width_list_control = []       
+        if 'hvci_spike_width_list_alt' not in st.session_state:
+            st.session_state.hvci_spike_width_list_alt = []
+        if 'hvci_isi_list_control' not in st.session_state:
+            st.session_state.hvci_isi_list_control = []
+        if 'hvci_isi_list_alt' not in st.session_state:
+            st.session_state.hvci_isi_list_alt = []
         if 'hvci_last_synaptic_input' not in st.session_state:
             st.session_state.hvci_last_synaptic_input = 0.0
-        
         if 'hvci_reset_counter' not in st.session_state:
             st.session_state.hvci_reset_counter = 0
         
@@ -1418,6 +1472,10 @@ def create_sidebar_controls_hvci():
             st.session_state.hvci_synaptic_input_list = []
             st.session_state.hvci_frequency_control_list = []
             st.session_state.hvci_frequency_alt_list = []
+            st.session_state.hvci_spike_width_list_control = []
+            st.session_state.hvci_spike_width_list_alt = []
+            st.session_state.hvci_isi_list_control = []
+            st.session_state.hvci_isi_list_alt = []
             st.session_state.hvci_last_synaptic_input = 0.0
             st.session_state.hvci_reset_counter += 1 
 
@@ -1441,6 +1499,10 @@ def create_sidebar_controls_hvci():
             'synaptic_input_list': st.session_state.hvci_synaptic_input_list,
             'Frequency_control_list': st.session_state.hvci_frequency_control_list,
             'Frequency_alt_list': st.session_state.hvci_frequency_alt_list,
+            'Spike_width_control_list': st.session_state.hvci_spike_width_list_control,
+            'Spike_width_alt_list': st.session_state.hvci_spike_width_list_alt,
+            'ISI_list_control': st.session_state.hvci_isi_list_control,
+            'ISI_list_alt': st.session_state.hvci_isi_list_alt,
             'last_input': st.session_state.hvci_last_synaptic_input,
             'freq_input': freq_input,
             'input_kick': g_max,
@@ -1547,23 +1609,61 @@ def prepare_hvcra_plots():
                 frequency_control = spike_count_control
                 frequency_alt = spike_count_alt
 
+                if spike_count_control > 0:
+                    
+                    spike_width_control = spike_widths(vs_control, i_start, STEP_SIZE)
+                    if spike_count_control > 1:
+                        isi_control = interspike_intervals(vs_control, STEP_SIZE)
+                    else:
+                        isi_control = 0
+                else:
+                    spike_width_control = 0
+                    isi_control = 0
+
+                if spike_count_alt > 0:
+                    
+                    spike_width_alt = spike_widths(vs_alt, i_start, STEP_SIZE)
+                    if spike_count_alt > 1:
+                        isi_alt = interspike_intervals(vs_alt, STEP_SIZE)
+                    else:
+                        isi_alt = 0
+                else:
+                    spike_width_alt = 0
+                    isi_alt = 0
+
                 st.session_state.hvcra_current_input_list.append(i_amp)
                 st.session_state.hvcra_frequency_control_list.append(frequency_control)
                 st.session_state.hvcra_frequency_alt_list.append(frequency_alt)
+                st.session_state.hvcra_spike_width_list_control.append(spike_width_control)
+                st.session_state.hvcra_spike_width_list_alt.append(spike_width_alt)
+                st.session_state.hvcra_isi_list_control.append(isi_control)
+                st.session_state.hvcra_isi_list_alt.append(isi_alt)
                 st.session_state.hvcra_last_current_input = i_amp
 
-                sorted_pairs = sorted(zip(st.session_state.hvcra_current_input_list, st.session_state.hvcra_frequency_control_list, st.session_state.hvcra_frequency_alt_list))
-                st.session_state.hvcra_current_input_list, st.session_state.hvcra_frequency_control_list, st.session_state.hvcra_frequency_alt_list = zip(*sorted_pairs)
+                sorted_pairs = sorted(zip(st.session_state.hvcra_current_input_list, 
+                                          st.session_state.hvcra_frequency_control_list, 
+                                          st.session_state.hvcra_frequency_alt_list,
+                                          st.session_state.hvcra_spike_width_list_control,
+                                          st.session_state.hvcra_spike_width_list_alt,
+                                          st.session_state.hvcra_isi_list_control,
+                                          st.session_state.hvcra_isi_list_alt))
+                
+                st.session_state.hvcra_current_input_list, st.session_state.hvcra_frequency_control_list, st.session_state.hvcra_frequency_alt_list, st.session_state.hvcra_spike_width_list_control, st.session_state.hvcra_spike_width_list_alt, st.session_state.hvcra_isi_list_control, st.session_state.hvcra_isi_list_alt = zip(*sorted_pairs)
+                
                 st.session_state.hvcra_current_input_list = list(st.session_state.hvcra_current_input_list)
                 st.session_state.hvcra_frequency_control_list = list(st.session_state.hvcra_frequency_control_list)
                 st.session_state.hvcra_frequency_alt_list = list(st.session_state.hvcra_frequency_alt_list)
+                st.session_state.hvcra_spike_width_list_control = list(st.session_state.hvcra_spike_width_list_control)
+                st.session_state.hvcra_spike_width_list_alt = list(st.session_state.hvcra_spike_width_list_alt)
+                st.session_state.hvcra_isi_list_control = list(st.session_state.hvcra_isi_list_control)
+                st.session_state.hvcra_isi_list_alt = list(st.session_state.hvcra_isi_list_alt)
         
         elif current_exists and current_changed:
             st.info(f"Current input {i_amp:.2f} $\\mu A/cm^{2}$already tested")
         
         st.session_state.hvcra_last_current_input = i_amp
 
-        return input_type, q_cond, fluctuations, vs_control, vs_alt, vd_control, vd_alt, time, current_stimulus, current_stimulus, temperature, st.session_state.hvcra_current_input_list, st.session_state.hvcra_frequency_control_list, st.session_state.hvcra_frequency_alt_list, st.session_state.hvcra_last_current_input
+        return input_type, q_cond, fluctuations, vs_control, vs_alt, vd_control, vd_alt, time, current_stimulus, current_stimulus, temperature, st.session_state.hvcra_current_input_list, st.session_state.hvcra_frequency_control_list, st.session_state.hvcra_frequency_alt_list, st.session_state.hvcra_spike_width_list_control, st.session_state.hvcra_spike_width_list_alt, st.session_state.hvcra_isi_list_control, st.session_state.hvcra_isi_list_alt, st.session_state.hvcra_last_current_input
  
     if input_type == 'Synaptic input':
 
@@ -1597,20 +1697,20 @@ def prepare_hvcra_plots():
             noise_strength = params['noise_strength']
 
         excitatory_synapse_stimulus_control = create_synapse_stimulus_array(time,
-                                                40.0,
-                                                q_gate,
-                                                ge_max,
-                                                ge_start,
-                                                STEP_SIZE
-                                                )
+                                                                            40.0,
+                                                                            q_gate,
+                                                                            ge_max,
+                                                                            ge_start,
+                                                                            STEP_SIZE
+                                                                            )
         
         excitatory_synapse_stimulus_alt = create_synapse_stimulus_array(time,
-                                                temperature,
-                                                q_gate,
-                                                ge_max,
-                                                ge_start,
-                                                STEP_SIZE
-                                                )
+                                                                        temperature,
+                                                                        q_gate,
+                                                                        ge_max,
+                                                                        ge_start,
+                                                                        STEP_SIZE
+                                                                        )
 
         inhibitory_synapse_stimulus_control = create_synapse_stimulus_array(time,
                                                 40.0,
@@ -1718,29 +1818,76 @@ def prepare_hvcra_plots():
                 vs_alt = solution_alt[:, 1]
                 vd_alt = solution_alt[:, 0]
 
-                response_time_control = response_time(time, 
-                                                        vd_control, 
-                                                        vs_control, 
-                                                        excitatory_input_start_time=ge_start, 
-                                                        excitatory_input_strength=ge_max)
+                response_time_control = response_time(time,
+                                                      vd_control,
+                                                      vs_control,
+                                                      excitatory_input_start_time=ge_start,
+                                                      excitatory_input_strength=ge_max)
                 
-                response_time_alt = response_time(time, 
-                                                        vd_alt, 
-                                                        vs_alt, 
-                                                        excitatory_input_start_time=ge_start, 
-                                                        excitatory_input_strength=ge_max)
+                response_time_alt = response_time(time,
+                                                  vd_alt,
+                                                  vs_alt,
+                                                  excitatory_input_start_time=ge_start,
+                                                  excitatory_input_strength=ge_max)
                 
+                spike_count_control = 0
+                spike_count_alt = 0
+                threshold = -20           
+        
+                for i in range(1, len(vs_control)):
+                    if vs_control[i-1] < threshold and vs_control[i] >= threshold:
+                        spike_count_control += 1
+                    if vs_alt[i-1] < threshold and vs_alt[i] >= threshold:
+                        spike_count_alt += 1
+
+                if spike_count_control > 0:
+                    
+                    spike_width_control = spike_widths(vs_control, ge_start, STEP_SIZE)
+                    if spike_count_control > 1:
+                        isi_control = interspike_intervals(vs_control, STEP_SIZE)
+                    else:
+                        isi_control = 0
+                else:
+                    spike_width_control = 0
+                    isi_control = 0
+
+                if spike_count_alt > 0:
+                    
+                    spike_width_alt = spike_widths(vs_alt, ge_start, STEP_SIZE)
+                    if spike_count_alt > 1:
+                        isi_alt = interspike_intervals(vs_alt, STEP_SIZE)
+                    else:
+                        isi_alt = 0
+                else:
+                    spike_width_alt = 0
+                    isi_alt = 0
+
                 st.session_state.hvcra_synaptic_input_list.append(ge_max)
                 st.session_state.response_time_control_list.append(response_time_control)
                 st.session_state.response_time_alt_list.append(response_time_alt)
+                st.session_state.hvcra_spike_width_list_control.append(spike_width_control)
+                st.session_state.hvcra_spike_width_list_alt.append(spike_width_alt)
+                st.session_state.hvcra_isi_list_control.append(isi_control)
+                st.session_state.hvcra_isi_list_alt.append(isi_alt)
                 st.session_state.hvcra_last_synaptic_input = ge_max
 
-                sorted_pairs = sorted(zip(st.session_state.hvcra_synaptic_input_list, st.session_state.response_time_control_list, st.session_state.response_time_alt_list))
-                st.session_state.hvcra_synaptic_input_list, st.session_state.response_time_control_list, st.session_state.response_time_alt_list = zip(*sorted_pairs)
+                sorted_pairs = sorted(zip(st.session_state.hvcra_synaptic_input_list, 
+                                          st.session_state.response_time_control_list, 
+                                          st.session_state.response_time_alt_list,
+                                          st.session_state.hvcra_spike_width_list_control,
+                                          st.session_state.hvcra_spike_width_list_alt,
+                                          st.session_state.hvcra_isi_list_control,
+                                          st.session_state.hvcra_isi_list_alt))
+                
+                st.session_state.hvcra_synaptic_input_list, st.session_state.response_time_control_list, st.session_state.response_time_alt_list, st.session_state.hvcra_spike_width_list_control, st.session_state.hvcra_spike_width_list_alt, st.session_state.hvcra_isi_list_control, st.session_state.hvcra_isi_list_alt = zip(*sorted_pairs)
+                
                 st.session_state.hvcra_synaptic_input_list = list(st.session_state.hvcra_synaptic_input_list)
                 st.session_state.response_time_control_list = list(st.session_state.response_time_control_list)
                 st.session_state.response_time_alt_list = list(st.session_state.response_time_alt_list)
-
+                st.session_state.hvcra_spike_width_list_control = list(st.session_state.hvcra_spike_width_list_control)
+                st.session_state.hvcra_spike_width_list_alt = list(st.session_state.hvcra_spike_width_list_alt)
+                st.session_state.hvcra_isi_list_control = list(st.session_state.hvcra_isi_list_control)
+                st.session_state.hvcra_isi_list_alt = list(st.session_state.hvcra_isi_list_alt)
 
                 st.success(f"finished running for synaptic input {ge_max:.2f} $mS/cm^{2}$!")
             
@@ -1748,7 +1895,7 @@ def prepare_hvcra_plots():
             st.info(f"Synaptic input {ge_max:.2f} $mS/cm^{2}$ already tested")
             st.session_state.hvcra_last_synaptic_input = ge_max
             
-        return input_type, q_cond, fluctuations, vs_control, vs_alt, vd_control, vd_alt, time, excitatory_synapse_stimulus_control, excitatory_synapse_stimulus_alt, temperature, st.session_state.hvcra_synaptic_input_list, st.session_state.response_time_control_list, st.session_state.response_time_alt_list, st.session_state.hvcra_last_synaptic_input
+        return input_type, q_cond, fluctuations, vs_control, vs_alt, vd_control, vd_alt, time, excitatory_synapse_stimulus_control, excitatory_synapse_stimulus_alt, temperature, st.session_state.hvcra_synaptic_input_list, st.session_state.response_time_control_list, st.session_state.response_time_alt_list, st.session_state.hvcra_spike_width_list_control, st.session_state.hvcra_spike_width_list_alt, st.session_state.hvcra_isi_list_control, st.session_state.hvcra_isi_list_alt, st.session_state.hvcra_last_synaptic_input
 
 def prepare_hvci_plots():
     """
@@ -1850,23 +1997,61 @@ def prepare_hvci_plots():
                 frequency_control = spike_count_control * 1000 / (i_end - i_start)
                 frequency_alt = spike_count_alt * 1000 / (i_end - i_start)
 
+                if spike_count_control > 0:
+                    
+                    spike_width_control = spike_widths(v_control, i_start, STEP_SIZE)
+                    if spike_count_control > 1:
+                        isi_control = interspike_intervals(v_control, STEP_SIZE)
+                    else:
+                        isi_control = 0
+                else:
+                    spike_width_control = 0
+                    isi_control = 0
+
+                if spike_count_alt > 0:
+                    
+                    spike_width_alt = spike_widths(v_alt, i_start, STEP_SIZE)
+                    if spike_count_alt > 1:
+                        isi_alt = interspike_intervals(v_alt, STEP_SIZE)
+                    else:
+                        isi_alt = 0
+                else:
+                    spike_width_alt = 0
+                    isi_alt = 0
+
                 st.session_state.hvci_current_input_list.append(i_amp)
                 st.session_state.hvci_frequency_control_list.append(frequency_control)
                 st.session_state.hvci_frequency_alt_list.append(frequency_alt)
+                st.session_state.hvci_spike_width_list_control.append(spike_width_control)
+                st.session_state.hvci_spike_width_list_alt.append(spike_width_alt)
+                st.session_state.hvci_isi_list_control.append(isi_control)
+                st.session_state.hvci_isi_list_alt.append(isi_alt)
                 st.session_state.hvci_last_current_input = i_amp
 
-                sorted_pairs = sorted(zip(st.session_state.hvci_current_input_list, st.session_state.hvci_frequency_control_list, st.session_state.hvci_frequency_alt_list))
-                st.session_state.hvci_current_input_list, st.session_state.hvci_frequency_control_list, st.session_state.hvci_frequency_alt_list = zip(*sorted_pairs)
+                sorted_pairs = sorted(zip(st.session_state.hvci_current_input_list, 
+                                          st.session_state.hvci_frequency_control_list, 
+                                          st.session_state.hvci_frequency_alt_list,
+                                          st.session_state.hvci_spike_width_list_control,
+                                          st.session_state.hvci_spike_width_list_alt,
+                                          st.session_state.hvci_isi_list_control,
+                                          st.session_state.hvci_isi_list_alt))
+                
+                st.session_state.hvci_current_input_list, st.session_state.hvci_frequency_control_list, st.session_state.hvci_frequency_alt_list, st.session_state.hvci_spike_width_list_control, st.session_state.hvci_spike_width_list_alt, st.session_state.hvci_isi_list_control, st.session_state.hvci_isi_list_alt = zip(*sorted_pairs)
+                
                 st.session_state.hvci_current_input_list = list(st.session_state.hvci_current_input_list)
                 st.session_state.hvci_frequency_control_list = list(st.session_state.hvci_frequency_control_list)
                 st.session_state.hvci_frequency_alt_list = list(st.session_state.hvci_frequency_alt_list)
-            
+                st.session_state.hvci_spike_width_list_control = list(st.session_state.hvci_spike_width_list_control)
+                st.session_state.hvci_spike_width_list_alt = list(st.session_state.hvci_spike_width_list_alt)
+                st.session_state.hvci_isi_list_control = list(st.session_state.hvci_isi_list_control)
+                st.session_state.hvci_isi_list_alt = list(st.session_state.hvci_isi_list_alt)
+
         elif current_exists and current_changed:
             st.info(f"Current input {i_amp:.2f} $\\mu A/cm^{2}$ already tested")
         
         st.session_state.hvci_last_current_input = i_amp
         
-        return input_type, v_control, v_alt, time, current_stimulus, temperature, st.session_state.hvci_current_input_list, st.session_state.hvci_frequency_control_list, st.session_state.hvci_frequency_alt_list, st.session_state.hvci_last_current_input
+        return input_type, q_cond, v_control, v_alt, time, current_stimulus, current_stimulus, temperature, st.session_state.hvci_current_input_list, st.session_state.hvci_frequency_control_list, st.session_state.hvci_frequency_alt_list, st.session_state.hvci_spike_width_list_control, st.session_state.hvci_spike_width_list_alt, st.session_state.hvci_isi_list_control, st.session_state.hvci_isi_list_alt, st.session_state.hvci_last_current_input
 
     if input_type == 'Synaptic input in multiple intervals':
         
@@ -1999,7 +2184,8 @@ def prepare_hvci_plots():
                         spike_count_control += 1
                     if v_alt[i-1] < threshold and v_alt[i] >= threshold:
                         spike_count_alt += 1
-                    
+                
+                print(spike_count_control, spike_count_alt)
                 frequency_control = spike_count_control #* 1000 / simulation_time
                 frequency_alt = spike_count_alt #* 1000 / simulation_time
 
@@ -2019,4 +2205,4 @@ def prepare_hvci_plots():
         
         st.session_state.hvci_last_synaptic_input = input_strength
         
-        return input_type, v_control, v_alt, time, excitatory_synapse_stimulus_control, temperature, st.session_state.hvci_synaptic_input_list, st.session_state.hvci_frequency_control_list, st.session_state.hvci_frequency_alt_list, st.session_state.hvci_last_synaptic_input
+        return input_type, q_cond, v_control, v_alt, time, excitatory_synapse_stimulus_control, excitatory_synapse_stimulus_alt, temperature, st.session_state.hvci_synaptic_input_list, st.session_state.hvci_frequency_control_list, st.session_state.hvci_frequency_alt_list, st.session_state.hvci_spike_width_list_control, st.session_state.hvci_spike_width_list_alt, st.session_state.hvci_isi_list_control, st.session_state.hvci_isi_list_alt, st.session_state.hvci_last_synaptic_input

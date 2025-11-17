@@ -17,7 +17,9 @@ from utils import (display_introduction,
 
 from visualization import (plot_lif_membrane_potential,
                            plot_hh_membrane_potential,
-                           plot_hh_membrane_potential_spike_properties,
+                           plot_hh_membrane_potential_spike_characteristics,
+                           plot_hvcra_somatic_spike_characteristics,
+                           plot_hvci_spike_characteristics,
                            plot_somatic_membrane_potential,
                            plot_dendritic_membrane_potential,
                            plot_somatic_membrane_potential_with_spike_counts,
@@ -94,7 +96,7 @@ if select_page == 'Hodgkin Huxley':
 
         st.markdown("## Hodgkin Huxley model: Membrane potential and F-I relationship")
 
-        tab1, tab2 = st.tabs(['Membrane Potential', 'Spike properties'])
+        tab1, tab2 = st.tabs(['Membrane Potential', 'Spike characteristics'])
 
         with tab1:
         
@@ -112,7 +114,7 @@ if select_page == 'Hodgkin Huxley':
         
         with tab2:
             
-            fig_mp = plot_hh_membrane_potential_spike_properties(temperature,
+            fig_mp = plot_hh_membrane_potential_spike_characteristics(temperature,
                                                                  current_list,
                                                                  spike_width_list_control,
                                                                  spike_width_list_alt,
@@ -143,10 +145,10 @@ if select_page == 'HVC neurons':
                 display_hvcra_theory()
             
             else:
-                input_type, q_cond, fluctuations, vs_control, vs_alt, vd_control, vd_alt, time, input_array, input_array_alt, temperature, input_list, control_data_list, alt_data_list, last_input = prepare_hvcra_plots()
+                input_type, q_cond, fluctuations, vs_control, vs_alt, vd_control, vd_alt, time, input_array, input_array_alt, temperature, input_list, control_data_list, alt_data_list, control_spike_width, alt_spike_width, control_isi, alt_isi, last_input = prepare_hvcra_plots()
 
                 if input_type == "Current input":
-                    tab1, tab2= st.tabs(['Soma membrane potential and spike counts', 'Dendrite membrane potential'])
+                    tab1, tab2, tab3 = st.tabs(['Soma membrane potential and spike counts', 'Somatic spike characteristics', 'Dendrite membrane potential'])
 
                     with tab1:
                         
@@ -164,6 +166,18 @@ if select_page == 'HVC neurons':
 
                     with tab2:
 
+                        fig_mp = plot_hvcra_somatic_spike_characteristics(temperature,
+                                                                          input_list,
+                                                                          control_spike_width,
+                                                                          alt_spike_width,
+                                                                          control_isi,
+                                                                          alt_isi,
+                                                                          last_input)
+
+                        st.pyplot(fig_mp)
+
+                    with tab3:
+
                         fig_mp = plot_dendritic_membrane_potential(time,
                                                                 vd_control,
                                                                 vd_alt,
@@ -174,7 +188,7 @@ if select_page == 'HVC neurons':
 
                 elif input_type == "Synaptic input":
                     if fluctuations == 'off':
-                        tab1, tab2 = st.tabs(['Soma membrane potential and response time Q10', 'Dendrite membrane potential'])
+                        tab1, tab2, tab3 = st.tabs(['Soma membrane potential and response time Q10', 'Somatic spike characteristics', 'Dendrite membrane potential'])
 
                         with tab1:
 
@@ -194,6 +208,18 @@ if select_page == 'HVC neurons':
                             st.pyplot(fig_a)
 
                         with tab2:
+
+                            fig_mp = plot_hvcra_somatic_spike_characteristics(temperature,
+                                                                            input_list,
+                                                                            control_spike_width,
+                                                                            alt_spike_width,
+                                                                            control_isi,
+                                                                            alt_isi,
+                                                                            last_input)
+
+                            st.pyplot(fig_mp)
+
+                        with tab3:
 
                             fig_mp = plot_dendritic_membrane_potential(time,
                                                                     vd_control,
@@ -234,22 +260,56 @@ if select_page == 'HVC neurons':
                 display_hvci_theory()
 
             else:
-                input_type, v_control, v_alt, time, input_profile, temperature, input_strength_list, frequency_list_control, frequency_list_alt, last_input_strength = prepare_hvci_plots()
+                input_type, q_cond, v_control, v_alt, time, input_profile_control, input_profile_alt, temperature, input_strength_list, frequency_list_control, frequency_list_alt, control_spike_width, alt_spike_width, control_isi, alt_isi, last_input_strength = prepare_hvci_plots()
                 
+                if input_type == 'Single current pulse':
+                
+                    tab1, tab2 = st.tabs(['Membrane potential', 'Spike characteristics'])
 
-                fig_mp = plot_hvci_membrane_potential(time,
-                                                    v_control,
-                                                    v_alt,
-                                                    input_profile,
-                                                    temperature,
-                                                    input_strength_list, 
-                                                    frequency_list_control,
-                                                    frequency_list_alt,
-                                                    last_input_strength,
-                                                    input_type
-                                                    )
+                    with tab1:
+                        fig_mp = plot_hvci_membrane_potential(time,
+                                                            v_control,
+                                                            v_alt,
+                                                            input_profile_control,
+                                                            input_profile_alt,
+                                                            q_cond,
+                                                            temperature,
+                                                            input_strength_list, 
+                                                            frequency_list_control,
+                                                            frequency_list_alt,
+                                                            last_input_strength,
+                                                            input_type
+                                                            )
+                        
+                        st.pyplot(fig_mp)
+                    
+                    with tab2:
+                        fig_mp = plot_hvci_spike_characteristics(temperature,
+                                                                input_strength_list,
+                                                                control_spike_width,
+                                                                alt_spike_width,
+                                                                control_isi,
+                                                                alt_isi,
+                                                                last_input_strength)
+
+                        st.pyplot(fig_mp)
                 
-                st.pyplot(fig_mp)
+                else:
+                    fig_mp = plot_hvci_membrane_potential(time,
+                                                          v_control,
+                                                          v_alt,
+                                                          input_profile_control,
+                                                          input_profile_alt,
+                                                          q_cond,
+                                                          temperature,
+                                                          input_strength_list, 
+                                                          frequency_list_control,
+                                                          frequency_list_alt,
+                                                          last_input_strength,
+                                                          input_type
+                                                          )
+                    
+                    st.pyplot(fig_mp)
 
 if select_page == 'Coming up!':
     st.markdown(""" Thank you for going over this interactive neuron model simulator! If you have any feedback to share, do reach out to me at aayushkhare@psu.edu 
