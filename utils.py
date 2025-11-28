@@ -86,7 +86,6 @@ def display_electrical_properties():
                 {descriptions_0[current_index]}
             </div>
         """, unsafe_allow_html=True)
-    #st.markdown(f"{descriptions_0[current_index]}")
 
 ######################################################################################################
 
@@ -376,10 +375,12 @@ def display_lif_summary():
     """
 
     with st.expander("Remarks"):
-        st.write("f-I curves like above provide crucial information related to processing of inputs by neurons, like the minimum " \
-        "current needed by a neuron to produce action potentials. While for the LIF model, it is evident that the firing rate keeps on " \
-        "increasing with the input current pulse, there are some classes of neurons that exhibit saturation, which would show up as minimal " \
-        "or no increase in firing rate after a certain current. Such aspects can be useful towards classifying neurons as well. ")
+        st.write("f-I curves provide crucial information related to processing of inputs by neurons, such as the minimum " \
+        "current required to produce action potentials. Furthermore, the slope of an f-I curve can be used " \
+        "to determine the sensitivity of neural response to change in input current. While in the LIF model, " \
+        "the firing rate keeps increasing with the input current pulse, there exist neuron classes that exhibit " \
+        "saturation, indicating minimal or no increase in firing rate after a certain current input. " \
+        "Thus f-I curves can be utilized for neuron classification. ")
     
 def display_hh_theory():
     """
@@ -389,11 +390,11 @@ def display_hh_theory():
     st.markdown("""
     
     Hodgkin Huxley model is a mathematical model that approximates the biophysical mechanisms involved in action potential generation. \
-    Developed in 1952 by Alan Hodgkin and Andrew Huxley by studying the ionic mechanisms behind axon potential generation and propagation \
+    Developed in 1952 by Alan Hodgkin and Andrew Huxley by studying the ionic mechanisms behind action potential generation and propagation \
     in the squid giant axon, this model forms a basis for biophysical models describing neural dynamics for different classes of neurons, 
     and earned them the Nobel Prize in Physiology or Medicince.
-    The HH model treats the cell membrane as a Capacitor, and voltage-dependent ion channels as variable resistors (variable as the resistance 
-    or conductance at any instance depends on the membrane potential at that instant), that impart non-linearity to the model dynamics. \
+    The HH model treats the cell membrane as a Capacitor, and voltage-dependent ion channels as variable resistors (voltage-dependent variability implies 
+    that the resistance or conductance at any instance depends on the membrane potential at that instant), that impart non-linearity to the model dynamics. \
     The mathematical form for the current flowing through the membrane is described as """)
 
     st.latex(r''' C\frac{dV}{dt} = - I_{Na} - I_{K} - I_L + I_{inj} ''')
@@ -418,9 +419,9 @@ def display_hh_theory():
 
     st.markdown(r"""Here $x = n, m, h$ and $\alpha$ and $\beta$ are the opening and closing rates for the voltage dependent ion channel.""")
 
-    st.markdown(""" The mathematical form for the voltage-dependent opening and closing rates of ion channels was determined using the voltage-clamp technique. This method 
-                holds the membrane potential constant at a specific value while measuring the resulting ionic current. By repeating this process across different membrane 
-                potentials and analyzing the resulting current curves, Hodgkin and Huxley could determine the voltage-dependent kinetics of channel opening ($\\alpha$)and closing ($\\beta$).
+    st.markdown(""" The mathematical form for the voltage-dependent opening and closing rates of ion channels was determined using the voltage-clamp technique. In this technique, 
+                the membrane potential is held at a constant value by injecting an external current while measuring the resulting ionic current. By repeating this process across different membrane 
+                potentials and analyzing the resulting current-voltage curves, Hodgkin and Huxley could determine the voltage-dependent kinetics of channel opening ($\\alpha$)and closing ($\\beta$).
                 The mathematical form for these kinetics typically is an exponential function or some combination of a linear and exponential function of the membrane potential. For the Hodgkin-Huxley
                 model, these rates are as follows""")
 
@@ -445,7 +446,9 @@ def display_hh_theory():
     st.markdown("""Hodgkin and Huxley performed their experiments at around 6 - 7$^{o}C$. As mentioned in the section of temperature dependence, 
                 incorporation of biophysical details in the Hodgkin Huxley model allows us to explore the model dynamics at various temperatures 
                 and analyze how various aspects of action potential generation change upon temperature. One such aspect is the excitability and 
-                the action potential firing rate under the injection of a current pulse.  
+                the action potential firing rate under the injection of a current pulse, which depends on the resting value of the membrane potential and is
+                governed by the leak conductance's reversal value.  Furthermore, the temperature dependence of the opening and closing dynamics of the ion channels 
+                have significant effects on the action potential widths and interspike intervals (time interval between successive spikes).  
                 Navigate to the Plots tab to explore these dynamics. 
                 First, change the injected current while keeping other parameters constant and observe how the neural response particularly the firing
                 rate differs in the control condition (6.3$^{o}$ C) and an altered condition corresponding to a different temperature. You can 
@@ -464,22 +467,27 @@ def display_hh_summary():
         "the temperature dependent reversal potential of the leak channel. Furthermore a drop in temperature slows down the opening and closing " \
         "dynamics of ion channels (governed by the $Q_{10}$ of conformational change dependent processes). These dynamics govern " \
         "characteristic features of spikes, such as spike widths, and interspike intervals. Hence under the injection of a strong current pulse "
-        "(fixed duration) at two different temperatures, the slowed dynamics reduce the action potential firing rate. ")
+        "(fixed duration) at two different temperatures, the slowed dynamics reduce the action potential firing rate. You can further explore alternative " \
+        "temperatures (as well as warming) to assess the effect of temperature on various features of the HH model dynamics.")
     
 def display_hvc_background():
     """
     Display the background behind the role of brain area HVC in birdsong.
     """ 
 
-    st.markdown("HVC (used as a proper name) is a brain area in the brain of songbirds that has been hypothesized to encode for features of birdsong " \
+    st.markdown("HVC (used as a proper name) is a brain area in the brain of songbirds hypothesized to encode features of birdsong " \
     "such as the duration of various song elements (syllables, silent gaps in between syllables), often referred to as song timing features. HVC is " \
     "analogous to the premotor cortex in human brain (associated with motor planning and execution).")
 
     descriptions = ["Zebra finches is a species of songbirds that is extensively studied to gain insights about the underlying neural circuitry and "
     "mechanisms that control behavior that is composed of a sequence of actions. The motivation arises from the simplicity of the song (composed of "
     "a fixed sequence of syllables) and the experimental tractability of probing the different brain regions.", 
-    "HVC forms a part of the premotor pathway, projecting connections to downstream region Robust nucleus of the Arcopallium (RA), which in turn "
-    "projects to the tracheosyringeal portion of the brainstem (nXIIts) that contains motoneurons controlling the vocal muscles. "]
+    "HVC is a part of the premotor pathway, projecting axonal connections to downstream region Robust nucleus of the Arcopallium (RA), which in turn "
+    "projects to the tracheosyringeal portion of the brainstem (nXIIts) that contains motoneurons controlling the vocal muscles. Experimental studies "
+    "have identified that neural activity in both HVC and RA exhibits precise temporal alignment with the song. What this means is that when a neuron "
+    "belonging to a specific class in either HVC or RA was tracked for its electrical activity, it was observed that the neuron generates action potentials "
+    "at precise time points during the song. Depending on the neuron class and the region examined, this precise neural activity was found to be temporally "
+    "aligned with exactly one time point in the song, or multiple time points. "]
     
     image_folder = os.path.join(image_dir, "zf")
     image_files = sorted([f for f in os.listdir(image_folder) if f.endswith(('.png'))])
@@ -620,7 +628,7 @@ def create_current_stimulus_array(time_array, i_amp, i_start, i_end):
 
 def create_synapse_stimulus_array(time_array, temp, q_gate, g_max, g_start, step_size):
     """                                            
-    Function for creating a synapse stimulus array 
+    Function for creating a synapse stimulus array corresponding to a single synaptic input
     
     Parameters
     ----------
@@ -674,6 +682,21 @@ def generate_poisson_events(event_time, freq):
 
 def spike_widths(v, input_start_time, time_step):
     """
+    Function to calculate the mean spike width for the action potentials generated by a neuron model
+
+    Parameters
+    ----------
+    v : array_like
+        Membrane potential (mV)
+    input_start_time : float
+        Time of stimulus onset (ms)
+    time_step : float
+        Time step used in simulations for the neuron model's dynamics
+
+    Returns
+    -------
+    float
+        The mean spike width, calculated over all the action potentials generated by the neuron model
     """
     input_time_step = int(input_start_time / time_step)
 
@@ -697,6 +720,19 @@ def spike_widths(v, input_start_time, time_step):
 
 def interspike_intervals(v, time_step):
     """
+    Function to calculate the interspike interval (ISI) between successive action potentials generated by a neuron model
+
+    Parameters
+    ----------
+    v : array_like
+        Membrane potential (mV)
+    time_step : float
+        Time step used in simulations for the neuron model's dynamics
+
+    Returns
+    -------
+    float
+        The mean ISI, calculated over all the action potentials generated by the neuron model
     """
 
     threshold = -20
@@ -868,7 +904,7 @@ def create_sidebar_controls_lif():
     st.sidebar.header('Model Parameters')        
     st.sidebar.subheader('Current stimulus settings')
 
-    i_amp = st.sidebar.slider('Current amplitude ($\\mu A/cm^2$)', -1.0, 3.0, 0.0, 0.25, key=f'i_amp_{lif_reset_key}')
+    i_amp = st.sidebar.slider('Current amplitude ($\\mu A/cm^2$)', -1.0, 2.0, 0.0, 0.04, key=f'i_amp_{lif_reset_key}')
       
     lif_reset_pressed = st.sidebar.button("Reset")
 
@@ -906,8 +942,8 @@ def prepare_lif_plots():
     lif_current_list = st.session_state.lif_current_list
     lif_last_current = st.session_state.lif_last_current
 
-    current_changed = abs(i_amp - lif_last_current) > 0.05
-    current_exists = any(abs(c - i_amp) <= 0.05 for c in lif_current_list)
+    current_changed = abs(i_amp - lif_last_current) > 0.005
+    current_exists = any(abs(c - i_amp) <= 0.005 for c in lif_current_list)
     
     current_stimulus = create_current_stimulus_array(time,
                                                     i_amp,
@@ -933,7 +969,7 @@ def prepare_lif_plots():
                 if v[i-1] < threshold and v[i] >= threshold:
                     spike_indices.append(i)
             
-            if(len(spike_indices) > 1):
+            if(len(spike_indices) >= 1):
                 duration = i_end - i_start
                 frequency = 1000 * len(spike_indices) / duration
 
@@ -952,7 +988,7 @@ def prepare_lif_plots():
             st.success(f"Added: {i_amp:.2f} $\\mu A/cm^{2}$ → {frequency:.1f} Hz")
             
     elif current_exists and current_changed:
-        st.info(f"Current {i_amp:.1f} $\\mu A/cm^2$ already tested")
+        st.info(f"Current {i_amp:.2f} $\\mu A/cm^2$ already tested")
     
     st.session_state.lif_last_current = i_amp
     
