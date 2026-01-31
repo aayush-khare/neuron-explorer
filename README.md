@@ -17,21 +17,25 @@ See requirements.txt
 
 ## Installing and Running the application
 
-- Clone the repository
+1. Clone the repository
+```bash
+   git clone https://github.com/aayush-khare/neuron-explorer
+```
 
-$ git clone https://github.com/aayush-khare/neuron-explorer
+2. Navigate into the directory
+```bash
+   cd neuron-explorer
+```
 
-- Navigate into the directory
+3. Install the dependencies
+```bash
+   pip install -r requirements.txt
+```
 
-$ cd neuron-explorer
-
-- Install the dependencies
-
-$ pip install -r requirements.txt
-
-- Run
-
-$ streamlit run main.py
+4. Run
+```bash
+   streamlit run main.py
+```
 
 ## License
 
