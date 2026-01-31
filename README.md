@@ -17,21 +17,21 @@ See requirements.txt
 
 ## Installing and Running the application
 
-1. Clone the repository
+- Clone the repository
 
-git clone https://github.com/aayush-khare/neuron-explorer
+$ git clone https://github.com/aayush-khare/neuron-explorer
 
-2. Navigate into the directory
+- Navigate into the directory
 
-cd neuron-explorer
+$ cd neuron-explorer
 
-3. Install the dependencies
+- Install the dependencies
 
-pip install -r requirements.txt
+$ pip install -r requirements.txt
 
-4. Run
+- Run
 
-streamlit run main.py
+$ streamlit run main.py
 
 ## License
 
@@ -44,9 +44,3 @@ Any feedback or issues can be communicated to aayushkhare@psu.edu or aayushkhare
 ## Acknowledgments
 
 This is an educational tool for learning purposes, inspired from classical research on neuroscience and neural dynamics, particularly the pioneering work of Hodgkin and Huxley on action potential modeling. This application also allows for exploration for more generalized models inspired from the Hodgkin-Huxley model, applicable to songbird research, carried out in the research group of Prof Dezhe Jin at the Pennsylvania State University.
-
--
--
--
--
----
