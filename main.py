@@ -40,8 +40,6 @@ st.markdown("""
             """, 
             unsafe_allow_html=True)
 
-
-
 select_page = st.sidebar.selectbox('Contents',
                              ['Introduction',
                               'Electrical Properties of a Neuron',
@@ -70,7 +68,13 @@ if select_page == 'Integrate and Fire model':
         display_lif_theory()
 
     else:
-        v, time, current_stimulus, current_list, frequency_list, last_current = prepare_lif_plots()
+        (v, 
+         time, 
+         current_stimulus, 
+         current_list, 
+         frequency_list, 
+         last_current
+          ) = prepare_lif_plots()
 
         fig_fi = plot_lif_membrane_potential(time,
                                             v,
@@ -92,7 +96,20 @@ if select_page == 'Hodgkin Huxley':
         display_hh_theory()
     
     else:
-        v_control, v_alt, time, current_stimulus, temperature, current_list, frequency_list_control, frequency_list_alt, spike_width_list_control, spike_width_list_alt, isi_list_control, isi_list_alt, last_current = prepare_hh_plots()
+        (v_control, 
+         v_alt, 
+         time, 
+         current_stimulus, 
+         temperature, 
+         current_list, 
+         frequency_list_control, 
+         frequency_list_alt, 
+         spike_width_list_control, 
+         spike_width_list_alt, 
+         isi_list_control, 
+         isi_list_alt, 
+         last_current 
+         ) = prepare_hh_plots()
 
         st.markdown("## Hodgkin Huxley model: Membrane potential and F-I relationship")
 
@@ -145,7 +162,26 @@ if select_page == 'HVC neurons':
                 display_hvcra_theory()
             
             else:
-                input_type, q_cond, fluctuations, vs_control, vs_alt, vd_control, vd_alt, time, input_array, input_array_alt, temperature, input_list, control_data_list, alt_data_list, control_spike_width, alt_spike_width, control_isi, alt_isi, last_input = prepare_hvcra_plots()
+                (input_type, 
+                 q_cond, 
+                 fluctuations, 
+                 vs_control, 
+                 vs_alt, 
+                 vd_control, 
+                 vd_alt, 
+                 time, 
+                 input_array, 
+                 input_array_alt, 
+                 temperature, 
+                 input_list, 
+                 control_data_list, 
+                 alt_data_list, 
+                 control_spike_width, 
+                 alt_spike_width, 
+                 control_isi, 
+                 alt_isi, 
+                 last_input
+                  ) = prepare_hvcra_plots()
 
                 if input_type == "Current input":
                     tab1, tab2, tab3 = st.tabs(['Soma membrane potential and spike counts', 'Somatic spike characteristics', 'Dendrite membrane potential'])
@@ -260,7 +296,23 @@ if select_page == 'HVC neurons':
                 display_hvci_theory()
 
             else:
-                input_type, q_cond, v_control, v_alt, time, input_profile_control, input_profile_alt, temperature, input_strength_list, frequency_list_control, frequency_list_alt, control_spike_width, alt_spike_width, control_isi, alt_isi, last_input_strength = prepare_hvci_plots()
+                (input_type, 
+                 q_cond, 
+                 v_control, 
+                 v_alt, 
+                 time, 
+                 input_profile_control, 
+                 input_profile_alt, 
+                 temperature, 
+                 input_strength_list, 
+                 frequency_list_control, 
+                 frequency_list_alt, 
+                 control_spike_width, 
+                 alt_spike_width, 
+                 control_isi, 
+                 alt_isi, 
+                 last_input_strength
+                  ) = prepare_hvci_plots()
                 
                 if input_type == 'Single current pulse':
                 

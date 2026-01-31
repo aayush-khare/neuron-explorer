@@ -631,6 +631,7 @@ def create_current_stimulus_array(time_array, i_amp, i_start, i_end):
 def create_synapse_stimulus_array(time_array, temp, q_gate, g_max, g_start, step_size):
     """                                            
     Function for creating a synapse stimulus array corresponding to a single synaptic input
+    that follows kick and decay dynamics (step increase followed by exponential decay)
     
     Parameters
     ----------
@@ -1172,7 +1173,14 @@ def prepare_hh_plots():
                                       st.session_state.hh_isi_list_control,
                                       st.session_state.hh_isi_list_alt))
             
-            st.session_state.hh_current_list, st.session_state.hh_frequency_list_control, st.session_state.hh_frequency_list_alt, st.session_state.hh_spike_width_list_control, st.session_state.hh_spike_width_list_alt, st.session_state.hh_isi_list_control, st.session_state.hh_isi_list_alt = zip(*sorted_pairs)
+            (st.session_state.hh_current_list, 
+             st.session_state.hh_frequency_list_control, 
+             st.session_state.hh_frequency_list_alt, 
+             st.session_state.hh_spike_width_list_control, 
+             st.session_state.hh_spike_width_list_alt, 
+             st.session_state.hh_isi_list_control, 
+             st.session_state.hh_isi_list_alt
+              ) = zip(*sorted_pairs) if sorted_pairs else ([], [])
 
             st.session_state.hh_current_list = list(st.session_state.hh_current_list)
             st.session_state.hh_frequency_list_control = list(st.session_state.hh_frequency_list_control)
@@ -1686,7 +1694,14 @@ def prepare_hvcra_plots():
                                           st.session_state.hvcra_isi_list_control,
                                           st.session_state.hvcra_isi_list_alt))
                 
-                st.session_state.hvcra_current_input_list, st.session_state.hvcra_frequency_control_list, st.session_state.hvcra_frequency_alt_list, st.session_state.hvcra_spike_width_list_control, st.session_state.hvcra_spike_width_list_alt, st.session_state.hvcra_isi_list_control, st.session_state.hvcra_isi_list_alt = zip(*sorted_pairs)
+                (st.session_state.hvcra_current_input_list, 
+                 st.session_state.hvcra_frequency_control_list, 
+                 st.session_state.hvcra_frequency_alt_list, 
+                 st.session_state.hvcra_spike_width_list_control, 
+                 st.session_state.hvcra_spike_width_list_alt, 
+                 st.session_state.hvcra_isi_list_control, 
+                 st.session_state.hvcra_isi_list_alt
+                  ) = zip(*sorted_pairs) if sorted_pairs else ([], [])
                 
                 st.session_state.hvcra_current_input_list = list(st.session_state.hvcra_current_input_list)
                 st.session_state.hvcra_frequency_control_list = list(st.session_state.hvcra_frequency_control_list)
@@ -1917,7 +1932,14 @@ def prepare_hvcra_plots():
                                           st.session_state.hvcra_isi_list_control,
                                           st.session_state.hvcra_isi_list_alt))
                 
-                st.session_state.hvcra_synaptic_input_list, st.session_state.response_time_control_list, st.session_state.response_time_alt_list, st.session_state.hvcra_spike_width_list_control, st.session_state.hvcra_spike_width_list_alt, st.session_state.hvcra_isi_list_control, st.session_state.hvcra_isi_list_alt = zip(*sorted_pairs)
+                (st.session_state.hvcra_synaptic_input_list, 
+                 st.session_state.response_time_control_list, 
+                 st.session_state.response_time_alt_list, 
+                 st.session_state.hvcra_spike_width_list_control, 
+                 st.session_state.hvcra_spike_width_list_alt, 
+                 st.session_state.hvcra_isi_list_control, 
+                 st.session_state.hvcra_isi_list_alt
+                  ) = zip(*sorted_pairs) if sorted_pairs else ([], [])
                 
                 st.session_state.hvcra_synaptic_input_list = list(st.session_state.hvcra_synaptic_input_list)
                 st.session_state.response_time_control_list = list(st.session_state.response_time_control_list)
@@ -2003,19 +2025,20 @@ def prepare_hvci_plots():
             with st.spinner(f"Running simulation for {i_amp:.2f} $\\mu A/cm^{2}$..."):
 
                 current_stimulus = create_current_stimulus_array(time,
-                                                                i_amp,
-                                                                i_start,
-                                                                i_end                                               
-                                                                )
+                                                                 i_amp,
+                                                                 i_start,
+                                                                 i_end
+                                                                 )
                 
                 solution_control = neuron_control.simulate(time,
-                                                        STEP_SIZE,
-                                                        current_stimulus_array=current_stimulus
-                                                        )
+                                                           STEP_SIZE,
+                                                           current_stimulus_array=current_stimulus
+                                                           )
                 
                 solution_alt = neuron_alt.simulate(time,
-                                                STEP_SIZE,
-                                                current_stimulus_array=current_stimulus)
+                                                   STEP_SIZE,
+                                                   current_stimulus_array=current_stimulus
+                                                   )
 
                 st.success(f"finished running for {i_amp:.2f} $\\mu A/cm^{2}$!")
 
@@ -2074,7 +2097,14 @@ def prepare_hvci_plots():
                                           st.session_state.hvci_isi_list_control,
                                           st.session_state.hvci_isi_list_alt))
                 
-                st.session_state.hvci_current_input_list, st.session_state.hvci_frequency_control_list, st.session_state.hvci_frequency_alt_list, st.session_state.hvci_spike_width_list_control, st.session_state.hvci_spike_width_list_alt, st.session_state.hvci_isi_list_control, st.session_state.hvci_isi_list_alt = zip(*sorted_pairs)
+                (st.session_state.hvci_current_input_list, 
+                 st.session_state.hvci_frequency_control_list, 
+                 st.session_state.hvci_frequency_alt_list, 
+                 st.session_state.hvci_spike_width_list_control, 
+                 st.session_state.hvci_spike_width_list_alt, 
+                 st.session_state.hvci_isi_list_control, 
+                 st.session_state.hvci_isi_list_alt
+                  ) = zip(*sorted_pairs) if sorted_pairs else ([], [])
                 
                 st.session_state.hvci_current_input_list = list(st.session_state.hvci_current_input_list)
                 st.session_state.hvci_frequency_control_list = list(st.session_state.hvci_frequency_control_list)
@@ -2223,7 +2253,6 @@ def prepare_hvci_plots():
                     if v_alt[i-1] < threshold and v_alt[i] >= threshold:
                         spike_count_alt += 1
                 
-                print(spike_count_control, spike_count_alt)
                 frequency_control = spike_count_control #* 1000 / simulation_time
                 frequency_alt = spike_count_alt #* 1000 / simulation_time
 
@@ -2232,8 +2261,15 @@ def prepare_hvci_plots():
                 st.session_state.hvci_frequency_alt_list.append(frequency_alt)
                 st.session_state.hvci_last_synaptic_input = input_strength
 
-                sorted_pairs = sorted(zip(st.session_state.hvci_synaptic_input_list, st.session_state.hvci_frequency_control_list, st.session_state.hvci_frequency_alt_list))
-                st.session_state.hvci_synaptic_input_list, st.session_state.hvci_frequency_control_list, st.session_state.hvci_frequency_alt_list = zip(*sorted_pairs)
+                sorted_pairs = sorted(zip(st.session_state.hvci_synaptic_input_list, 
+                                          st.session_state.hvci_frequency_control_list, 
+                                          st.session_state.hvci_frequency_alt_list))
+                
+                (st.session_state.hvci_synaptic_input_list, 
+                 st.session_state.hvci_frequency_control_list, 
+                 st.session_state.hvci_frequency_alt_list
+                  ) = zip(*sorted_pairs) if sorted_pairs else ([], [])
+                
                 st.session_state.hvci_synaptic_input_list = list(st.session_state.hvci_synaptic_input_list)
                 st.session_state.hvci_frequency_control_list = list(st.session_state.hvci_frequency_control_list)
                 st.session_state.hvci_frequency_alt_list = list(st.session_state.hvci_frequency_alt_list)
