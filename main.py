@@ -204,6 +204,7 @@ if select_page == 'HVC neurons':
 
                         fig_mp = plot_hvcra_somatic_spike_characteristics(temperature,
                                                                           input_list,
+                                                                          input_type,
                                                                           control_spike_width,
                                                                           alt_spike_width,
                                                                           control_isi,
@@ -247,6 +248,7 @@ if select_page == 'HVC neurons':
 
                             fig_mp = plot_hvcra_somatic_spike_characteristics(temperature,
                                                                             input_list,
+                                                                            input_type,
                                                                             control_spike_width,
                                                                             alt_spike_width,
                                                                             control_isi,

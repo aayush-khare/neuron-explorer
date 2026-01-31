@@ -517,7 +517,7 @@ def plot_hh_membrane_potential(time, v_control, v_alt, current, temperature, cur
     plt.tight_layout()
     return fig
 
-def plot_hvcra_somatic_spike_characteristics(temperature, input_list, spike_width_list_control, spike_width_list_alt, isi_list_control, isi_list_alt, last_input):
+def plot_hvcra_somatic_spike_characteristics(temperature, input_list, input_type, spike_width_list_control, spike_width_list_alt, isi_list_control, isi_list_alt, last_input):
     """
     Plot the mean spike width (ms) and Inter-Spike Intervals (ISI, ms) as input strength is varied
     at the control and alternative temperature conditions for the HVC(RA) neuron model.
@@ -528,6 +528,8 @@ def plot_hvcra_somatic_spike_characteristics(temperature, input_list, spike_widt
         Temperature (in °C) used for the alternative experimental condition.
     input_list : array_like
         List of input strength values applied during the experiment (either current pulse strength or the maximal synaptic kick strength).
+    input_type : str
+        Either 'Current input' or 'Synaptic input'.
     spike_width_list_control : array_like
         List of mean spike width values obtained as input strength is varied for the control condition.
     spike_width_list_alt : array_like
@@ -545,6 +547,14 @@ def plot_hvcra_somatic_spike_characteristics(temperature, input_list, spike_widt
         A matplotlib figure object containing plots for the mean spike width and ISI as
         input strength is varied at the two temperature conditions.
     """
+
+    if input_type == 'Current input':
+        input_units = '$\\mu A/cm^{2}$'
+        x_label = 'Injected Current ($\\mu A/cm^{2}$)'
+    elif input_type == 'Synaptic input':
+        input_units = '$mS/cm^{2}$'
+        x_label = 'Excitatory synaptic input, gE (mS/cm$^2$)'
+
 
     fig = plt.figure(figsize=(6,4))
     gs = gridspec.GridSpec(2, 1, height_ratios=[1, 1], figure=fig)
@@ -588,20 +598,20 @@ def plot_hvcra_somatic_spike_characteristics(temperature, input_list, spike_widt
 
             if current_spike_width_control != 0:
                 ax1.plot(last_input, current_spike_width_control, 'o', color='red', markersize=10,
-                        label=f'{last_input:.2f} $\\mu A/cm^{2}$, {current_spike_width_control:.2f} ms')
+                        label=f'{last_input:.2f} {input_units}, {current_spike_width_control:.2f} ms')
             if current_spike_width_alt != 0:
                 ax1.plot(last_input, current_spike_width_alt, 'o', color='blue', markersize=10,
-                        label=f'{last_input:.2f} $\\mu A/cm^{2}$, {current_spike_width_alt:.2f} ms')   
+                        label=f'{last_input:.2f} {input_units}, {current_spike_width_alt:.2f} ms')   
             if current_isi_control != 0:
                 ax2.plot(last_input, current_isi_control, 'o', color='red', markersize=10,
-                        label=f'{last_input:.2f} $\\mu A/cm^{2}$, {current_isi_control:.2f} ms')
+                        label=f'{last_input:.2f} {input_units}, {current_isi_control:.2f} ms')
             if current_isi_alt != 0:
                 ax2.plot(last_input, current_isi_alt, 'o', color='blue', markersize=10,
-                        label=f'{last_input:.2f} $\\mu A/cm^{2}$, {current_isi_alt:.2f} ms')   
+                        label=f'{last_input:.2f} {input_units}, {current_isi_alt:.2f} ms')   
         
         ax1.set_ylabel('Mean spike width (ms)', fontsize=6)
         ax2.set_ylabel('ISI (ms)', fontsize=6)
-        ax2.set_xlabel('Injected Current ($\\mu A/cm^{2}$)', fontsize=6)
+        ax2.set_xlabel(x_label, fontsize=6)
         ax1.set_title('Change in spike widths and Interspike intervals (ISIs) with temperature', fontsize=12)
         ax1.grid(True, alpha=0.3)
         ax1.legend(loc='center left', bbox_to_anchor=(1, 0.5))
@@ -613,16 +623,16 @@ def plot_hvcra_somatic_spike_characteristics(temperature, input_list, spike_widt
       
     else:
         ax1.set_ylabel('Mean spike width (ms)', fontsize=6)
-        ax2.set_xlabel('Injected Current ($\\mu A/cm^{2}$)', fontsize=6)
+        ax2.set_xlabel(x_label, fontsize=6)
         ax2.set_ylabel('Interspike interval (ms)', fontsize=6)
         ax1.set_title('Change in spike widths and Interspike intervals (ISIs) with temperature', fontsize=12)
         ax1.grid(True, alpha=0.3)
         ax2.grid(True, alpha=0.3)
         ax1.tick_params(axis='both', labelsize=8)
         ax2.tick_params(axis='both', labelsize=8)
-        ax1.text(0.5, 0.5, 'No data points yet\nAdjust current and observe', 
+        ax1.text(0.5, 0.5, 'No data points yet\nAdjust input strength and observe', 
                 transform=ax1.transAxes, ha='center', va='center', fontsize=12)
-        ax2.text(0.5, 0.5, 'No data points yet\nAdjust current and observe', 
+        ax2.text(0.5, 0.5, 'No data points yet\nAdjust input strength and observe', 
                 transform=ax2.transAxes, ha='center', va='center', fontsize=12)
     plt.tight_layout()
     return fig
