@@ -557,7 +557,7 @@ def display_hvcra_theory():
     as a function of input strength, as well as the temperature sensitivity of the response, given by the $Q_{10}$ for rise/response time. The model 
     behavior to an excitatory synaptic input and its temperature dependence has important implications towards emphasizing the role of a neural cicruit 
     localized within HVC towards governing the timing features of birdsong. For more details of the same, please refer to the research work done in the 
-    following computational [study](https://www.biorxiv.org/content/10.1101/2025.03.06.641874v1.full.pdf) """) 
+    following computational [study](https://link.springer.com/article/10.1007/s10827-026-00922-z) """) 
     
     st.markdown("""            
     To explore the model behavior, choose either the current input (for number of spikes) or synaptic input (for rise time $Q_{10}$), and then vary the 
@@ -593,7 +593,7 @@ def display_hvci_theory():
     as well as how a particular input profile that is consistent with experiments shapes the firing rate statistics and its temperature dependence.
     The model behavior explored here has important implications towards the role of HVC(I) neurons and their connectivity patterns with the HVC(RA)
     neurons in imparting temperature robustness to the HVC(RA) burst propagation time. For more details, please refer to the 
-    computational [study](https://www.biorxiv.org/content/10.1101/2025.03.06.641874v1.full.pdf)
+    computational [study](https://link.springer.com/article/10.1007/s10827-026-00922-z)
                 
     To explore the model behavior, choose either the current input or synaptic input, and then vary the respective input strength from the sidebar. 
     You can also change the $Q_{10}$ values or the temperature and repeat the analysis for model behavior and its temperature dependence as input 

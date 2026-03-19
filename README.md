@@ -47,4 +47,4 @@ Any feedback or issues can be communicated to aayushkhare@psu.edu or aayushkhare
 
 ## Acknowledgments
 
-This is an educational tool for learning purposes, inspired from classical research on neuroscience and neural dynamics, particularly the pioneering work of Hodgkin and Huxley on action potential modeling. This application also allows for exploration for more generalized models inspired from the Hodgkin-Huxley model, applicable to songbird research, carried out in the research group of Prof Dezhe Jin at the Pennsylvania State University.
+This is an educational tool for learning purposes, inspired from classical research on neuroscience and neural dynamics, particularly the pioneering work of Hodgkin and Huxley on action potential modeling. This application also allows for exploration for more generalized models inspired from the Hodgkin-Huxley model applicable to songbird research, carried out in the research group of Prof. Dezhe Jin at the Pennsylvania State University.
